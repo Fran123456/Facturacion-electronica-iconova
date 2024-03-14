@@ -6,7 +6,7 @@ use App\Models\APIEmpresa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
-class servicesController extends Controller
+class ServicesController extends Controller
 {
     private $urlFirmado;
 

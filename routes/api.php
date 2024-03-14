@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\ApiController;
-use App\Http\Controllers\servicesController;
+use App\Http\Controllers\ServicesController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -25,7 +25,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('services')->group(function () {
-        Route::post('/firmado', [servicesController::class, 'obtenerFirmaDTE']);
+        Route::post('/firmado', [ServicesController::class, 'obtenerFirmaDTE']);
     });
 });
 
