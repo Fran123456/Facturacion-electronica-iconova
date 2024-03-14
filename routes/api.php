@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ApiController;
+use App\Http\Controllers\servicesController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -22,5 +23,17 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::middleware('auth:sanctum')->group(function () {
+    Route::prefix('services')->group(function () {
+        Route::post('/firmado', [servicesController::class, 'obtenerFirmaDTE']);
+    });
+});
+
 Route::post('/login', [ApiController::class, 'login']);
+
+
+// ENDPOINTS DE PRUEBA
+Route::post('/signUp', [ApiController::class, 'signUp']);
 Route::get('/users', [ApiController::class, 'users']);
+Route::get('/token', [ApiController::class, 'pruebaToken']);
+

@@ -6,7 +6,9 @@ use App\Models\User;
 use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class ApiController extends Controller
 {
@@ -32,24 +34,36 @@ class ApiController extends Controller
     {
         $response = ["status" => 403, "msg" => ""];
 
-        $data = json_decode($request->getContent());
+        $data = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string',
+        ]);
 
         try {
-            // Validate required parameters
-            $this->validateLogin($request);
 
             // Find user and validate password
-            $user = User::where('email', $data->email)->first();
+            $user = User::where('email', $data['email'])->first();
 
-            if ( !$user || !Hash::check($data->password, $user->password) ) {
+            if (!$user || !Hash::check($data['password'], $user->password)) {
                 throw new AuthenticationException('Invalid login credentials');
             }
 
-            // Generate a secure random token
-            $token = $user->createToken('example');
+            // Generar el token sin la cadena de texto
+            $token = $user->createToken('access_token');
+
+            $additionalClaims = [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+            ];
+
+            $CredentialToken = Crypt::encryptString(json_encode($additionalClaims));
 
             $response["status"] = 200;
-            $response["msg"] = $token->plainTextToken;
+            $response["msg"] = "Login successful";
+            $response["access_token"] = $token->plainTextToken;
+            $response["token_type"] = 'Bearer';
+            $response["credentials_token"] = $CredentialToken;
 
         } catch (AuthenticationException $e) {
 
@@ -58,19 +72,63 @@ class ApiController extends Controller
 
         } catch (Exception $e) {
 
-            $response["msg"] = "An unexpected error occurred. Verified if the credencials are filled. Please try again later.";
+            $response["msg"] = "An unexpected error occurred. Please try again later.";
             report($e);
 
         }
 
-        return response()->json($response);
+        return response()->json($response, $response["status"]);
     }
 
-    private function validateLogin(Request $request)
+// ENDPOINTS DE PRUEBA
+    public function signUp(Request $request)
     {
-        $this->validate($request, [
-            'email' => 'required|email',
-            'password' => 'required|string',
+
+        $data = json_decode($request->getContent());
+
+        $encryptedPassword = Hash::make($data->password);
+
+        $user = User::create([
+            'name' => $data->name,
+            'email' => $data->email,
+            'password' => $encryptedPassword,
+            'created_at' => now(),
+            'create_at' => now(),
+
         ]);
+
+        $user->save();
+
+        return response()->json([
+            "status" => 200,
+            "msg" => "En teoria, correcto"
+        ]);
+    }
+
+    public function pruebaToken(Request $request)
+    {
+        // Obtener el token de la solicitud
+        $token = $request->bearerToken();
+
+        // Validar el contenido del token
+        if (
+            $token == null
+        ) {
+            $response = "El token no contiene la información deseada.";
+        } else {
+            $response = "El token contiene la información deseada.";
+        }
+
+
+        $tokenPayload = json_decode(Crypt::decryptString($token), true);
+
+        // Acceder a las reclamaciones personalizadas
+        if (!$tokenPayload['id'] || $tokenPayload['name'] || $tokenPayload['email']) {
+            $response = "El token de credenciales no contiene la información deseada.";
+            return response()->json($response, 200);
+        }
+
+
+        return response()->json($response, 200);
     }
 }
