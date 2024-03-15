@@ -26,6 +26,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('services')->group(function () {
         Route::post('/firmado', [ServicesController::class, 'obtenerFirmaDTE']);
+        Route::get('/encriptador', [ServicesController::class, 'encriptador']);
+        Route::get('/loginMH', [ServicesController::class, 'loginMH']);
+        Route::get('/desencriptador', [ServicesController::class, 'desencriptador']);
     });
 });
 

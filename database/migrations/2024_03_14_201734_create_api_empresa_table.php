@@ -16,7 +16,10 @@ return new class extends Migration
         Schema::create('empresa', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger("id_usuario");
-            $table->string("nombre");
+            $table->text("nombre");
+            $table->text("nit");
+            $table->text("credenciales_api");
+            $table->text("password_mh");
             $table->text("public_key");
             $table->text("private_key");
             $table->boolean("estado")->default(true);
