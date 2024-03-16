@@ -15,7 +15,7 @@ class Empresa extends Model
         'id_usuario',
         'nombre',
         'public_key',
-        'private_key',
+        'private_key','token_mh'
     ];
 
     public function empresa(){

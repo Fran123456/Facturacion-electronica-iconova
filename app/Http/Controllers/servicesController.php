@@ -66,7 +66,7 @@ class ServicesController extends Controller
 
     public function loginMH(Request $request)
     {
-        return 1;
+       
         $usuario = Auth::user();
         $empresa  =  Empresa::find($usuario->empresa_id);
         
@@ -92,10 +92,14 @@ class ServicesController extends Controller
         $requestResponse = Http::withHeaders([
             'Content-Type' => 'application/x-www-form-urlencoded',
             'User-Agent' => 'ApiLaravel/1.0',
+            "Accept"=>"application/json"
+
         ])->asForm()->post($url . "seguridad/auth", $jsonRequest);
 
         $responseData = $requestResponse->json();
         $statusCode = $requestResponse->status();
+        $empresa->token_mh=$responseData['body']['token'];
+         $empresa->save();
         return response()->json($responseData, $statusCode);
     }
 
