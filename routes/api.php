@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Hash;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+Route::post('/login', [ApiController::class, 'login']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
@@ -32,7 +33,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 });
 
-Route::post('/login', [ApiController::class, 'login']);
+
 
 
 // ENDPOINTS DE PRUEBA

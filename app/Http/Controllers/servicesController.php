@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use Illuminate\Support\Facades\Auth;
 
 use App\Models\APIEmpresa;
 use Illuminate\Http\Request;
@@ -18,7 +19,8 @@ class ServicesController extends Controller
 
     public function obtenerFirmaDTE(Request $request)
     {
-
+        $usuario = Auth::user();
+        return response()->json($usuario);
         $empresa = APIEmpresa::where("id_usuario", '1')->where("estado", true)->first();
 
 

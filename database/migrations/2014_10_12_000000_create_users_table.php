@@ -22,6 +22,9 @@ return new class extends Migration
             $table->boolean('active')->default(true);
             $table->rememberToken();
             $table->timestamps();
+
+            $table->unsignedBigInteger("empresa_id");
+            $table->foreign("empresa_id")->references("id")->on("empresa")->onUpdate("cascade")->onDelete("cascade");
         });
     }
 

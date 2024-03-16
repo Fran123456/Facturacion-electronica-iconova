@@ -15,7 +15,6 @@ return new class extends Migration
     {
         Schema::create('empresa', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger("id_usuario");
             $table->text("nombre");
             $table->text("nit");
             $table->text("credenciales_api");
@@ -23,7 +22,7 @@ return new class extends Migration
             $table->text("public_key");
             $table->text("private_key");
             $table->boolean("estado")->default(true);
-            $table->foreign("id_usuario")->references("id")->on("users")->onUpdate("cascade")->onDelete("cascade");
+           
             $table->timestamps();
         });
     }
