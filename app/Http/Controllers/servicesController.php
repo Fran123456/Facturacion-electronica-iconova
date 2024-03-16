@@ -2,37 +2,53 @@
 
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
-
-use App\Models\APIEmpresa;
+use Symfony\Component\HttpFoundation\Response;
+use App\Models\Empresa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
-
+use App\Models\Config;
+use App\Help\Help;
 class ServicesController extends Controller
 {
     private $urlFirmado;
 
     public function __construct()
     {
-        $this->urlFirmado = env("FIRMADOR_URL_BASE");
+        $this->urlFirmado = Help::urlFirmador();
+        
+            $this->middleware('auth:sanctum');
+        
+    }
+
+    public function fallback()
+    {
+        return response()->json([
+            'message' => 'No estás autenticado.'
+        ], 401);
     }
 
     public function obtenerFirmaDTE(Request $request)
     {
         $usuario = Auth::user();
-        return response()->json($usuario);
-        $empresa = APIEmpresa::where("id_usuario", '1')->where("estado", true)->first();
+        if ($usuario->empresa_id == null)
+            return response()->json(["error" => "El usuario no posee empresa"], Response::HTTP_NOT_FOUND);
 
-
-        if (!$empresa)
-            return response()->json([
-                "msg" => "Empresa no encontrada para el usuario logueado"
-            ], 400);
+        $empresa  =  Empresa::find($usuario->empresa_id);
+        if($empresa == null)
+             return response()->json(["error" => "La empresa no existe"], Response::HTTP_NOT_FOUND);
+        
+        if($empresa->estado == false)
+             return response()->json(["error" => "La empresa existe pero se encuentra desactivada"], Response::HTTP_NOT_FOUND);
 
         $nit = Crypt::decryptString($empresa->nit);
         $passwordPrivate = Crypt::decryptString($empresa->private_key);
         $jsonDTE = json_decode($request->getContent(), true);
 
+        if($jsonDTE ==null)
+             return response()->json(["error" => "Enviar un DTE valido por favor."], Response::HTTP_NOT_FOUND);
+
+     
         $jsonDocumento = [
             "nit" => $nit,
             "activo" => true,
@@ -41,34 +57,30 @@ class ServicesController extends Controller
         ];
 
         // $body = json_encode($jsonDocumento);
-
-        $url = $this->urlFirmado . "firmardocumento/";
-
+        $url =$this->urlFirmado . "firmardocumento/";
         $response = Http::post($url, $jsonDocumento);
-
-
         $responseData = $response->json(); // Obtener los datos de la respuesta en formato JSON
         $statusCode = $response->status(); // Obtener el código de estado de la respuesta
-
-
         return response()->json($responseData, $statusCode);
     }
 
     public function loginMH(Request $request)
     {
+        return 1;
+        $usuario = Auth::user();
+        $empresa  =  Empresa::find($usuario->empresa_id);
+        
+        if ($usuario->empresa_id == null)
+            return response()->json(["error" => "El usuario no posee empresa"], Response::HTTP_NOT_FOUND);
 
-        $empresa = APIEmpresa::where("id_usuario", '1')->where("estado", true)->first();
+        $empresa  =  Empresa::find($usuario->empresa_id);
+        if($empresa == null)
+             return response()->json(["error" => "La empresa no existe"], Response::HTTP_NOT_FOUND);
+        
+        if($empresa->estado == false)
+             return response()->json(["error" => "La empresa existe pero se encuentra desactivada"], Response::HTTP_NOT_FOUND);
 
-        if (!$empresa)
-            return response()->json([
-                "msg" => "Empresa no encontrada para el usuario logueado"
-            ], 400);
-
-        if (env("APP_DEBUG") == true)
-            $url = env("URL_MH_DTES_TEST");
-        else
-            $url = env("URL_MH_DTES");
-
+        $url = Help::mhUrl();
         $nit = Crypt::decryptString($empresa->nit);
         $pwd = Crypt::decryptString($empresa->credenciales_api);
 
@@ -84,8 +96,6 @@ class ServicesController extends Controller
 
         $responseData = $requestResponse->json();
         $statusCode = $requestResponse->status();
-
-
         return response()->json($responseData, $statusCode);
     }
 
