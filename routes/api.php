@@ -4,7 +4,7 @@ use App\Http\Controllers\ApiController;
 use App\Http\Controllers\ServicesController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\DteController;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
@@ -30,6 +30,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/firmado', [ServicesController::class, 'obtenerFirmaDTE']);
         Route::get('/encriptador', [ServicesController::class, 'encriptador']);
         Route::get('/desencriptador', [ServicesController::class, 'desencriptador']);
+
+        Route::post('/mh/enviar/dte/unitario', [DteController::class, 'enviarDteUnitario']);
     });
 });
 
