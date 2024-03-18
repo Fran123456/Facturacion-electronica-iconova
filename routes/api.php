@@ -31,7 +31,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/encriptador', [ServicesController::class, 'encriptador']);
         Route::get('/desencriptador', [ServicesController::class, 'desencriptador']);
 
-        Route::post('/mh/enviar/dte/unitario', [DteController::class, 'enviarDteUnitario']);
+        Route::post('/mh/enviar/dte/unitario/ccf', [DteController::class, 'enviarDteUnitarioCCF']);
     });
 });
 

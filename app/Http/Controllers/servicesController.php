@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\Empresa;
@@ -9,6 +10,7 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
 use App\Models\Config;
 use App\Help\Help;
+
 class ServicesController extends Controller
 {
     private $urlFirmado;
@@ -16,9 +18,8 @@ class ServicesController extends Controller
     public function __construct()
     {
         $this->urlFirmado = Help::urlFirmador();
-        
-            $this->middleware('auth:sanctum');
-        
+
+        $this->middleware('auth:sanctum');
     }
 
     public function fallback()
@@ -35,20 +36,20 @@ class ServicesController extends Controller
             return response()->json(["error" => "El usuario no posee empresa"], Response::HTTP_NOT_FOUND);
 
         $empresa  =  Empresa::find($usuario->empresa_id);
-        if($empresa == null)
-             return response()->json(["error" => "La empresa no existe"], Response::HTTP_NOT_FOUND);
-        
-        if($empresa->estado == false)
-             return response()->json(["error" => "La empresa existe pero se encuentra desactivada"], Response::HTTP_NOT_FOUND);
+        if ($empresa == null)
+            return response()->json(["error" => "La empresa no existe"], Response::HTTP_NOT_FOUND);
+
+        if ($empresa->estado == false)
+            return response()->json(["error" => "La empresa existe pero se encuentra desactivada"], Response::HTTP_NOT_FOUND);
 
         $nit = Crypt::decryptString($empresa->nit);
         $passwordPrivate = Crypt::decryptString($empresa->private_key);
         $jsonDTE = json_decode($request->getContent(), true);
 
-        if($jsonDTE ==null)
-             return response()->json(["error" => "Enviar un DTE valido por favor."], Response::HTTP_NOT_FOUND);
+        if ($jsonDTE == null)
+            return response()->json(["error" => "Enviar un DTE valido por favor."], Response::HTTP_NOT_FOUND);
 
-     
+
         $jsonDocumento = [
             "nit" => $nit,
             "activo" => true,
@@ -57,7 +58,7 @@ class ServicesController extends Controller
         ];
 
         // $body = json_encode($jsonDocumento);
-        $url =$this->urlFirmado . "firmardocumento/";
+        $url = $this->urlFirmado . "firmardocumento/";
         $response = Http::post($url, $jsonDocumento);
         $responseData = $response->json(); // Obtener los datos de la respuesta en formato JSON
         $statusCode = $response->status(); // Obtener el código de estado de la respuesta
@@ -66,19 +67,19 @@ class ServicesController extends Controller
 
     public function loginMH(Request $request)
     {
-       
+
         $usuario = Auth::user();
         $empresa  =  Empresa::find($usuario->empresa_id);
-        
+
         if ($usuario->empresa_id == null)
             return response()->json(["error" => "El usuario no posee empresa"], Response::HTTP_NOT_FOUND);
 
         $empresa  =  Empresa::find($usuario->empresa_id);
-        if($empresa == null)
-             return response()->json(["error" => "La empresa no existe"], Response::HTTP_NOT_FOUND);
-        
-        if($empresa->estado == false)
-             return response()->json(["error" => "La empresa existe pero se encuentra desactivada"], Response::HTTP_NOT_FOUND);
+        if ($empresa == null)
+            return response()->json(["error" => "La empresa no existe"], Response::HTTP_NOT_FOUND);
+
+        if ($empresa->estado == false)
+            return response()->json(["error" => "La empresa existe pero se encuentra desactivada"], Response::HTTP_NOT_FOUND);
 
         $url = Help::mhUrl();
         $nit = Crypt::decryptString($empresa->nit);
@@ -92,14 +93,14 @@ class ServicesController extends Controller
         $requestResponse = Http::withHeaders([
             'Content-Type' => 'application/x-www-form-urlencoded',
             'User-Agent' => 'ApiLaravel/1.0',
-            "Accept"=>"application/json"
+            "Accept" => "application/json"
 
         ])->asForm()->post($url . "seguridad/auth", $jsonRequest);
 
         $responseData = $requestResponse->json();
         $statusCode = $requestResponse->status();
-        $empresa->token_mh=$responseData['body']['token'];
-         $empresa->save();
+        $empresa->token_mh = $responseData['body']['token'];
+        $empresa->save();
         return response()->json($responseData, $statusCode);
     }
 
