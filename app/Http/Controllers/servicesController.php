@@ -62,6 +62,12 @@ class ServicesController extends Controller
         $response = Http::post($url, $jsonDocumento);
         $responseData = $response->json(); // Obtener los datos de la respuesta en formato JSON
         $statusCode = $response->status(); // Obtener el código de estado de la respuesta
+
+        $responseObject = json_decode($response);
+
+        // $statusCode = $responseObject->status;
+        $responseData = $responseObject->body;
+
         return response()->json($responseData, $statusCode);
     }
 
