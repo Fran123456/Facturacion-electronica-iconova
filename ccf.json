@@ -57,15 +57,15 @@
             "tipoItem": 4,
             "numeroDocumento": null,
             "codigo": null,
-            "codTributo": "A8",
+            "codTributo": "20",
             "descripcion": "descripcion",
             "cantidad": 1,
-            "uniMedida": 99,
-            "precioUni": 1,
+            "uniMedida": 1,
+            "precioUni": 1.00,
             "montoDescu": 0.0,
             "ventaNoSuj": 0.0,
             "ventaExenta": 0.0,
-            "ventaGravada": 0.0,
+            "ventaGravada": 1.00,
             "tributos": null,
             "psv": 0.0,
             "noGravado": 0.0
@@ -74,8 +74,8 @@
     "resumen": {
         "totalNoSuj": 0.0,
         "totalExenta": 0.0,
-        "totalGravada": 0.0,
-        "subTotalVentas": 0.0,
+        "totalGravada": 1.00,
+        "subTotalVentas": 1.00,
         "descuNoSuj": 0.0,
         "descuExenta": 0.0,
         "descuGravada": 0.0,
@@ -88,21 +88,21 @@
                 "valor": 1
             }
         ],
-        "subTotal": 0.0,
-        "ivaPerci1": 0.0,
+        "subTotal": 1.13,
+        "ivaPerci1": 0.13,
         "ivaRete1": 0.0,
         "reteRenta": 0.0,
         "montoTotalOperacion": 0.0,
         "totalNoGravado": 0.0,
-        "totalPagar": 0.0,
+        "totalPagar": 1.13,
         "totalLetras": "zero punto zero",
         "saldoFavor": 0.0,
         "condicionOperacion": 1,
         "pagos": [
             {
                 "codigo": "01",
-                "montoPago": 100.50,
-                "referencia": "Pago de factura",
+                "montoPago": 1.13,
+                "referencia": "1.13 pago ref",
                 "plazo": "01",
                 "periodo": 30
             }

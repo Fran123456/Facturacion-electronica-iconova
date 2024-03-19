@@ -2,6 +2,8 @@
 
 namespace App\help;
 use App\Models\Config;
+use App\Models\Empresa;
+use Illuminate\Support\Facades\Auth;
 class Help {
 
      public static function mhProduccion(){
@@ -25,6 +27,12 @@ class Help {
                 return self:: mhProd();
             }
             return self::mhDev();
+     }
+
+     public static function getEmpresa(){
+      $usuario = Auth::user();
+      $empresa  =  Empresa::find($usuario->empresa_id);
+      return $empresa;
      }
 }
 

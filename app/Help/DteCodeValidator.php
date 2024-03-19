@@ -14,7 +14,14 @@ class DteCodeValidator {
         return array("error"=> "No se ha podido loguear correctamente, validar token de ministerio de hacienda o credenciales");
      }
     
+     public static function code404($error =null){
+      if($error==null){
+         $error = "Error generico, comuniquese con el administrador";
+      }else{
 
+      }
+      return array("error"=> $error);
+   }
      
 }
 

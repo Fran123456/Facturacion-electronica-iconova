@@ -14,23 +14,26 @@ use Illuminate\Support\Facades\Http;
 use App\Models\Config;
 use App\Help\Help;
 use App\Help\DteCodeValidator;
-
+use App\Help\LoginMH;
 class DteController extends Controller
 {
 
 
     public function enviarDteUnitarioCCF(Request $request)
     {
+        //login para generar token de hacienda.
+        $responseLogin =LoginMH::login();
+        if($responseLogin['code']!=200)
+             return response()->json(DteCodeValidator::code404($responseLogin['error']), 404);
+
         $body = json_decode($request->getContent(), true);
-        $usuario = Auth::user();
-        $empresa  =  Empresa::find($usuario->empresa_id);
+        $empresa= Help::getEmpresa();
         $url = Help::mhUrl();
-        $nit = Crypt::decryptString($empresa->nit);
         $dte = $body['documento'];
 
         $jsonRequest = [
             'Content-Type' => 'application/JSON',
-            'ambiente' => env('APP_DEBUG') ? "00" : "01",
+            'ambiente' => 00,
             'idEnvio' => 1,
             'version' => 3,
             'tipoDte' => "03",
@@ -49,9 +52,9 @@ class DteController extends Controller
 
         //415 Unsupported Media Type
         if($statusCode==415) return response()->json(DteCodeValidator::code415($responseData), 415);
-        // 401 Unauthorized
-        if($statusCode==401)  return response()->json(DteCodeValidator::code401(), 401);
-
+        // 401 Unauthorized de parte de login hacienda.
+        if($statusCode==401) return response()->json(DteCodeValidator::code401(), 401);
+ 
         return response()->json($responseData, $statusCode);
 
     }
