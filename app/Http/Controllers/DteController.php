@@ -37,7 +37,7 @@ class DteController extends Controller
             return response()->json(["error" => "DTE no valido o nulo"], Response::HTTP_BAD_REQUEST);
 
         $dteFirmado =FirmadorElectronico::firmadorNew($request);
-        return $dteFirmado;
+        
         //$dteFirmado = FirmadorElectronico::firmador($dteJson);
 
         if ( $dteFirmado["status"] > 201 )
