@@ -8,6 +8,7 @@
         "php": "^8.0.2",
         "garygreen/pretty-routes": "^1.0",
         "guzzlehttp/guzzle": "^7.2",
+        "justinrainbow/json-schema": "^5.2",
         "laravel/framework": "^9.19",
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.7"

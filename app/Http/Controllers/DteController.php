@@ -17,11 +17,10 @@ use App\Help\DteCodeValidator;
 use App\help\FirmadorElectronico;
 use App\Help\LoginMH;
 use Monolog\Handler\FirePHPHandler;
+use JsonSchema\Validator;
 
 class DteController extends Controller
 {
-
-
     public function enviarDteUnitarioCCF(Request $request)
     {
         //login para generar token de hacienda.
@@ -30,36 +29,34 @@ class DteController extends Controller
         if ($responseLogin['code'] != 200)
             return response()->json(DteCodeValidator::code404($responseLogin['error']), 404);
 
-        // $body = json_decode($request->getContent(), true);
-        // $dteJson = $body['documento'];
         $empresa = Help::getEmpresa();
         $url = Help::mhUrl();
-        $dteJson = $request->documento;
-
+        $dteJson = $request;
 
         if ($dteJson == null)
             return response()->json(["error" => "DTE no valido o nulo"], Response::HTTP_BAD_REQUEST);
 
-        $dteFirmado = FirmadorElectronico::firmador($dteJson);
+        $dteFirmado =FirmadorElectronico::firmadorNew($request);
+        return $dteFirmado;
+        //$dteFirmado = FirmadorElectronico::firmador($dteJson);
 
         if ( $dteFirmado["status"] > 201 )
             return response()->json($dteFirmado, $dteFirmado["status"]);
 
-
         $jsonRequest = [
-            'Content-Type' => 'application/JSON',
-            'ambiente' => 00,
+            'ambiente' => "00",
             'idEnvio' => 1,
             'version' => 3,
             'tipoDte' => "03",
             "documento" => $dteFirmado["msg"],
-            "codigoGeneracion" => "2",
+            "codigoGeneracion" => "341CA743-70F1-4CFE-88BC7E4AE72E60CB",
+            "nitEmisor"=>"06141802161055"
         ];
 
         $requestResponse = Http::withHeaders([
             'Authorization' => $empresa->token_mh,
             'User-Agent' => 'ApiLaravel/1.0',
-            // 'Accept' => 'application/json',
+            'Content-Type' => 'application/JSON'
         ])->post($url . "fesv/recepciondte", $jsonRequest);
 
         $responseData = $requestResponse->json();

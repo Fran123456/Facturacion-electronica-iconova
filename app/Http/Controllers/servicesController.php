@@ -49,12 +49,12 @@ class ServicesController extends Controller
         if ($jsonDTE == null)
             return response()->json(["error" => "Enviar un DTE valido por favor."], Response::HTTP_NOT_FOUND);
 
-
+ 
         $jsonDocumento = [
             "nit" => $nit,
             "activo" => true,
             "passwordPri" => $passwordPrivate,
-            "dteJson" => $jsonDTE["dteJson"]
+            "dteJson" => $jsonDTE["dteJson"]??$jsonDTE
         ];
 
         // $body = json_encode($jsonDocumento);
@@ -63,10 +63,10 @@ class ServicesController extends Controller
         $responseData = $response->json(); // Obtener los datos de la respuesta en formato JSON
         $statusCode = $response->status(); // Obtener el código de estado de la respuesta
 
-        $responseObject = json_decode($response);
-
-        // $statusCode = $responseObject->status;
-        $responseData = $responseObject->body;
+        if(isset($request['firmanteAutomatico']))
+        {
+            return array("msg"=>$responseData['body'] , "status"=>$statusCode );
+        }
 
         return response()->json($responseData, $statusCode);
     }

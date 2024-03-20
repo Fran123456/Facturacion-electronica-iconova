@@ -8,49 +8,47 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
 use Symfony\Component\HttpFoundation\Response;
-
+use App\Http\Controllers\ServicesController;
 class FirmadorElectronico
 {
+
+
 
     public static function firmador($token)
     {
 
         $usuario = Auth::user();
         if ($usuario->empresa_id == null)
-            return ["error" => "El usuario no posee empresa", "status" => Response::HTTP_NOT_FOUND];
-
+            return response()->json(["error" => "El usuario no posee empresa"], Response::HTTP_NOT_FOUND);
 
         $empresa  =  Empresa::find($usuario->empresa_id);
         if ($empresa == null)
-            return ["error" => "La empresa no existe", "status" => Response::HTTP_NOT_FOUND];
+            return response()->json(["error" => "La empresa no existe"], Response::HTTP_NOT_FOUND);
 
         if ($empresa->estado == false)
-            return ["error" => "La empresa existe pero se encuentra en estado inactivo", "status" =>  Response::HTTP_NOT_FOUND];
-
+            return response()->json(["error" => "La empresa existe pero se encuentra desactivada"], Response::HTTP_NOT_FOUND);
 
         $nit = Crypt::decryptString($empresa->nit);
         $passwordPrivate = Crypt::decryptString($empresa->private_key);
+        $jsonDTE = $token;
 
-        if ($token == null)
-            return ["error" => "Enviar un DTE valido por favor.", "status" =>  Response::HTTP_NOT_FOUND];
+        if ($jsonDTE == null)
+            return response()->json(["error" => "Enviar un DTE valido por favor."], Response::HTTP_NOT_FOUND);
+
 
         $jsonDocumento = [
             "nit" => $nit,
             "activo" => true,
             "passwordPri" => $passwordPrivate,
-            "dteJson" => $token
+            "dteJson" => $jsonDTE
         ];
 
+        // $body = json_encode($jsonDocumento);
         $url = Help::urlFirmador() . "firmardocumento/";
-
         $response = Http::post($url, $jsonDocumento);
-
-
-        $response = Http::post($url, $jsonDocumento);
-
-        $statusCode = $response->status();
-        $responseData = $response->json(); // Accede al contenido JSON
-
+        $responseData = $response->json(); // Obtener los datos de la respuesta en formato JSON
+        $statusCode = $response->status(); // Obtener el código de estado de la respuesta
+        return $responseData;
         $value = $responseData['body'];
 
         if (isset($value['mensaje'])) {
@@ -59,5 +57,11 @@ class FirmadorElectronico
 
         return ["msg" => $value, "error" => "", "status" => $statusCode];
 
+    }
+
+    public static function firmadorNew($request){
+        $contro = new ServicesController();
+        $dteFirmado =$contro->obtenerFirmaDTE( $request);
+        return $dteFirmado;
     }
 }
