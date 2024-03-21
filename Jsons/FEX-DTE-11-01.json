@@ -1,0 +1,118 @@
+{
+    "identificacion": {
+        "version": 1,
+        "ambiente": "00",
+        "tipoDte": "11",
+        "numeroControl": "DTE-11-M001P001-100000000000019",
+        "codigoGeneracion": "1F908F3B-E7BE-11EE-B27B-6D39D78C3871",
+        "tipoOperacion": 1,
+        "tipoModelo": 1,
+        "tipoContingencia": null,
+        "motivoContigencia": null,
+        "fecEmi": "2024-03-21",
+        "horEmi": "14:02:15",
+        "tipoMoneda": "USD"
+    },
+    "emisor": {
+        "nit": "48212811110028",
+        "nrc": "1046446",
+        "nombre": "PEDRO PRIETO",
+        "codActividad": "69200",
+        "descActividad": "Actividades de contabilidad, teneduría de libros y auditoría; asesoramiento en materia de impuestos",
+        "nombreComercial": "OFICINA CONTABLE ",
+        "tipoEstablecimiento": "02",
+        "direccion": {
+            "departamento": "01",
+            "municipio": "08",
+            "complemento": "7 AV NORTE BO.  7"
+        },
+        "telefono": "00000000",
+        "correo": "PRIETO@HOTMAIL.COM",
+        "codEstableMH": "M001",
+        "codEstable": null,
+        "codPuntoVentaMH": "P001",
+        "codPuntoVenta": null,
+        "tipoItemExpor": 1,
+        "recintoFiscal": "01",
+        "regimen": "EX-1.1000.000"
+    },
+    "receptor": {
+        "nombre": "GUILLERMO ANTONIO DURAN MORALES",
+        "codPais": "9300",
+        "nombrePais": "EL SALVADOR",
+        "complemento": "CTON CARA SUCIA 34",
+        "tipoDocumento": "13",
+        "numDocumento": "33883797-8",
+        "tipoPersona": 1,
+        "descActividad": "Programación Informática",
+        "nombreComercial": "SYSMMOTECH",
+        "telefono": "24202677",
+        "correo": "SYSMMOTECH@GMAIL.COM"
+    },
+    "otrosDocumentos": null,
+    "ventaTercero": null,
+    "cuerpoDocumento": [
+        {
+            "numItem": 1,
+            "codigo": null,
+            "descripcion": "TELEFONO A54 5G",
+            "cantidad": 100.00000000,
+            "uniMedida": 59,
+            "precioUni": 444.0,
+            "montoDescu": 0,
+            "ventaGravada": 44400.0,
+            "tributos": null,
+            "noGravado": 0
+        },
+        {
+            "numItem": 2,
+            "codigo": null,
+            "descripcion": "SAMSUNG A55",
+            "cantidad": 10.00000000,
+            "uniMedida": 59,
+            "precioUni": 300.0,
+            "montoDescu": 0,
+            "ventaGravada": 3000.0,
+            "tributos": null,
+            "noGravado": 0
+        }
+    ],
+    "resumen": {
+        "totalGravada": 47400.0,
+        "descuento": 0,
+        "porcentajeDescuento": 0,
+        "totalDescu": 0,
+        "seguro": 0,
+        "flete": 0,
+        "montoTotalOperacion": 47400.0,
+        "totalNoGravado": 0,
+        "totalPagar": 47400.0,
+        "totalLetras": "USD CUARENTA Y SIETE MIL CUATROCIENTOS  CON 00/100 ",
+        "condicionOperacion": 1,
+        "pagos": [
+            {
+                "codigo": "01",
+                "montoPago": 47400.0,
+                "referencia": "PAGO EN EFECTIVO",
+                "periodo": null,
+                "plazo": null
+            }
+        ],
+        "numPagoElectronico": null,
+        "codIncoterms": "11",
+        "descIncoterms": "CIF- Costo seguro y flete",
+        "observaciones": null
+    },
+    "apendice": [
+        {
+            "campo": "Datos del Vendedor",
+            "etiqueta": "Nombre del Vendedor",
+            "valor": "000000000 - Administrador"
+        },
+        {
+            "campo": "placa_vehiculo",
+            "etiqueta": "PLACA VEHICULO",
+            "valor": "S/P"
+        }
+    ]
+}

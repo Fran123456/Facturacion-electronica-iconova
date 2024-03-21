@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
 use Symfony\Component\HttpFoundation\Response;
 use App\Http\Controllers\ServicesController;
+
 class FirmadorElectronico
 {
 
@@ -43,12 +44,12 @@ class FirmadorElectronico
             "dteJson" => $jsonDTE
         ];
 
-        // $body = json_encode($jsonDocumento);
+
         $url = Help::urlFirmador() . "firmardocumento/";
         $response = Http::post($url, $jsonDocumento);
-        $responseData = $response->json(); // Obtener los datos de la respuesta en formato JSON
-        $statusCode = $response->status(); // Obtener el código de estado de la respuesta
-        return $responseData;
+
+        $responseData = $response->json();
+        $statusCode = $response->status();
         $value = $responseData['body'];
 
         if (isset($value['mensaje'])) {
@@ -56,12 +57,12 @@ class FirmadorElectronico
         }
 
         return ["msg" => $value, "error" => "", "status" => $statusCode];
-
     }
 
-    public static function firmadorNew($request){
+    public static function firmadorNew($request)
+    {
         $contro = new ServicesController();
-        $dteFirmado =$contro->obtenerFirmaDTE( $request);
+        $dteFirmado = $contro->obtenerFirmaDTE($request);
         return $dteFirmado;
     }
 }

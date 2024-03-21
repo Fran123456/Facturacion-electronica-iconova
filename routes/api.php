@@ -6,6 +6,7 @@ use App\Http\Controllers\DteSeparadoController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DteController;
+use App\Http\Controllers\TestController;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
@@ -43,4 +44,6 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::post('/signUp', [ApiController::class, 'signUp']);
 Route::get('/users', [ApiController::class, 'users']);
 Route::get('/token', [ApiController::class, 'pruebaToken']);
+Route::get('/generator', [TestController::class, 'numControl']);
+Route::get('/generatorCode', [TestController::class, 'codeGeneration']);
 

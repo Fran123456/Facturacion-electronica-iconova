@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
 
+        $this->call(Config::class);
         $this->call(MHCatalogoGeneral::class);
         $this->call(MHAmbienteDestino::class);
         $this->call(MHTipoDocumento::class);

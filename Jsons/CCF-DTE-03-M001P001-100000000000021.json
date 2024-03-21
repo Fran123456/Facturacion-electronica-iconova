@@ -1,0 +1,127 @@
+{
+    "identificacion": {
+        "version": 3,
+        "ambiente": "00",
+        "tipoDte": "03",
+        "numeroControl": "DTE-03-M001P001-100000000000021",
+        "codigoGeneracion": "8C657516-E637-11EE-B27B-6D39D78C3871",
+        "tipoOperacion": 2,
+        "tipoModelo": 2,
+        "tipoContingencia": 2,
+        "motivoContin": "No disponibilidad de sistema del emisor",
+        "fecEmi": "2024-03-19",
+        "horEmi": "15:25:30",
+        "tipoMoneda": "USD"
+    },
+    "documentoRelacionado": null,
+    "emisor": {
+        "nit": "06141802161055",
+        "nrc": "2496424",
+        "nombre": "XPERTIS, S.A de C.V.",
+        "codActividad": "70200",
+        "descActividad": "Cultivo de cereales excepto arroz y para forrajes",
+        "nombreComercial": "Iconova Consulting Group",
+        "tipoEstablecimiento": "20",
+        "direccion": {
+            "departamento": "06",
+            "municipio": "14",
+            "complemento": "Calle Los Abetos y Calle Los Bambúes #37, Col. San Francisco"
+        },
+        "telefono": "617542485",
+        "correo": "contacto@iconovasv.com",
+        "codEstableMH": "0012",
+        "codEstable": "0123",
+        "codPuntoVentaMH": "0123",
+        "codPuntoVenta": null
+    },
+    "receptor": {
+        "nit": "036937976",
+        "nrc": "2970895",
+        "nombre": "GUILLERMO ANTONIO DURAN MORALES",
+        "codActividad": "62010",
+        "descActividad": "Programaci�n Inform�tica",
+        "nombreComercial": "SYSMMOTECH",
+        "direccion": {
+            "departamento": "01",
+            "municipio": "08",
+            "complemento": "6 AV SUR BO EL PROGRESO CTON CARA SUCIA 34"
+        },
+        "telefono": "24202677",
+        "correo": "SYSMMOTECH@GMAIL.COM"
+    },
+    "otrosDocumentos": null,
+    "ventaTercero": null,
+    "cuerpoDocumento": [
+        {
+            "numItem": 1,
+            "tipoItem": 1,
+            "numeroDocumento": null,
+            "codigo": null,
+            "codTributo": null,
+            "descripcion": "SAMSUNG A55",
+            "cantidad": 100.00000000,
+            "uniMedida": 59,
+            "precioUni": 265.48672566,
+            "montoDescu": 0,
+            "ventaNoSuj": 0.0,
+            "ventaExenta": 0.0,
+            "ventaGravada": 26548.67,
+            "tributos": [
+                "20"
+            ],
+            "psv": 0,
+            "noGravado": 0
+        }
+    ],
+    "resumen": {
+        "totalNoSuj": 0.0,
+        "totalExenta": 0.0,
+        "totalGravada": 26548.67,
+        "subTotalVentas": 26548.67,
+        "descuNoSuj": 0,
+        "descuExenta": 0,
+        "descuGravada": 0,
+        "porcentajeDescuento": 0,
+        "totalDescu": 0,
+        "tributos": [
+            {
+                "codigo": "20",
+                "descripcion": "IVA",
+                "valor": 3451.33
+            }
+        ],
+        "subTotal": 26548.67,
+        "ivaPerci1": 0,
+        "ivaRete1": 0.0,
+        "reteRenta": 0.0,
+        "montoTotalOperacion": 30000.0,
+        "totalNoGravado": 0,
+        "totalPagar": 30000.0,
+        "totalLetras": "USD TREINTA MIL  CON 00/100 ",
+        "saldoFavor": 0,
+        "condicionOperacion": 1,
+        "pagos": [
+            {
+                "codigo": "01",
+                "montoPago": 30000.0,
+                "referencia": "PAGO EN EFECTIVO",
+                "periodo": null,
+                "plazo": null
+            }
+        ],
+        "numPagoElectronico": null
+    },
+    "extension": null,
+    "apendice": [
+        {
+            "campo": "Datos del Vendedor",
+            "etiqueta": "Nombre del Vendedor",
+            "valor": "000000000 - Administrador"
+        },
+        {
+            "campo": "placa_vehiculo",
+            "etiqueta": "PLACA VEHICULO",
+            "valor": "S/P"
+        }
+    ]
+}
