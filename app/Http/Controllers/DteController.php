@@ -18,6 +18,8 @@ use App\help\FirmadorElectronico;
 use App\Help\LoginMH;
 use Monolog\Handler\FirePHPHandler;
 use JsonSchema\Validator;
+use App\Mail\DteMail;
+use Illuminate\Support\Facades\Mail;
 
 class DteController extends Controller
 {
@@ -42,7 +44,7 @@ class DteController extends Controller
 
         if ( $dteFirmado["status"] > 201 )
             return response()->json($dteFirmado, $dteFirmado["status"]);
-
+        
         $jsonRequest = [
             'ambiente' => "00",
             'idEnvio' => 1,
@@ -70,4 +72,13 @@ class DteController extends Controller
         return response()->json($responseData, $statusCode);
 
     }
+
+
+
+    public function enviarDteUnitarioFacturaExterior(Request $request){
+        $correo = new DteMail();
+        Mail::to('francisco.navas@datasys.la')->send($correo);
+    }
+
+
 }

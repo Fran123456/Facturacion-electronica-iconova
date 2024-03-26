@@ -34,6 +34,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/desencriptador', [ServicesController::class, 'desencriptador']);
         Route::post('/mh/enviar/dte/unitario/ccf/individual', [DteSeparadoController::class, 'enviarDteUnitarioCCF']);
         Route::post('/mh/enviar/dte/unitario/ccf', [DteController::class, 'enviarDteUnitarioCCF']);
+
+        Route::post('/mh/enviar/dte/unitario/factura-exterior', [DteController::class, 'enviarDteUnitarioFacturaExterior']);
+
     });
 });
 
