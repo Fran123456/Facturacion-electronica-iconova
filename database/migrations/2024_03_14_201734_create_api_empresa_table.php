@@ -21,6 +21,9 @@ return new class extends Migration
             $table->text("password_mh");
             $table->text("public_key");
             $table->text("private_key");
+            $table->text("correo_electronico");
+            $table->text("telefono");
+            $table->text("celular");
             $table->boolean("estado")->default(true);
            
             $table->timestamps();

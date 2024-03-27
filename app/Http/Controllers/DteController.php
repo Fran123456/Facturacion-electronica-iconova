@@ -76,8 +76,15 @@ class DteController extends Controller
 
 
     public function enviarDteUnitarioFacturaExterior(Request $request){
-        $correo = new DteMail();
-        Mail::to('francisco.navas@datasys.la')->send($correo);
+        $empresa = Help::getEmpresa();
+        $correoEmpresa = Crypt::decryptString($empresa->correo_electronico);
+        $telefono = Crypt::decryptString($empresa->telefono);
+        $nombreEmpresa = Crypt::decryptString($empresa->nombre);
+        $nombreCliente = 'Francisco Navas';
+
+        Mail::to('francisco.navas@datasys.la')
+        ->from($correoEmpresa, $nombreEmpresa)
+        ->send(new DteMail($nombreCliente ,  $correoEmpresa,  $telefono, "9D50E003-621E-1AB5-B828-0004AC1EA976"));
     }
 
 

@@ -12,15 +12,21 @@ use Illuminate\Queue\SerializesModels;
 class DteMail extends Mailable
 {
     use Queueable, SerializesModels;
-
+    public $nombreCliente;
+    public $correoEmpresa;
+    public $telefonoEmpresa;
+    public $dte;
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($nombreCliente, $correoEmpresa, $telefonoEmpresa, $dte)
     {
-        //
+        $this->nombreCliente = $nombreCliente;
+        $this->correoEmpresa = $correoEmpresa;
+        $this->telefonoEmpresa = $telefonoEmpresa;
+        $this->dte = $dte;
     }
 
     /**
@@ -31,7 +37,7 @@ class DteMail extends Mailable
     public function envelope()
     {
         return new Envelope(
-            subject: 'Dte Mail',
+            subject: 'Facturación Electrónica',
         );
     }
 
@@ -43,16 +49,19 @@ class DteMail extends Mailable
     public function content()
     {
         return new Content(
-            view: 'mail.mai',
+            view: 'mail.mail',
         );
     }
 
 
     public function build()
     {
-        return $this->view('mail.mai')
+        return $this->view('mail.mail')
                     ->with([
-                        'nombre' => 'Francisco'
+                        'nombreliente' =>  $this->nombreCliente,
+                        'correoEmpresa' =>  $this->correoEmpresa,
+                        'telefonoEmpresa' =>  $this->telefonoEmpresa,
+                        'dte'=> $this->dte
                     ]);
     }
 
