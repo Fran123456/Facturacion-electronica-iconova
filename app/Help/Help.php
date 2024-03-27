@@ -4,7 +4,7 @@ namespace App\help;
 
 use App\Models\Config;
 use App\Models\Empresa;
-use App\Models\MHTributo;
+use App\Models\MH\MHTributo;
 use Illuminate\Support\Facades\Auth;
 
 class Help
