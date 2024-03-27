@@ -232,7 +232,8 @@ class DteController extends Controller
        
         //GENERAR JSON VALIDO PARA  HACIENDA
         $identificacion = Identificacion::identidad('11');
-        $emisor = Identificacion::emisor('20');
+        $emisor = Identificacion::emisor('20', null, null);
+        return $emisor;
 
         $empresa = Help::getEmpresa();
         $correoEmpresa = Crypt::decryptString($empresa->correo_electronico);
