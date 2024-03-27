@@ -16,7 +16,7 @@ class Identificacion
         $identificacion =  [
             "version" => 1,
             "ambiente" => "00",
-            "tipoDte" => "11",
+            "tipoDte" => $tipoDoc,
             "numeroControl" =>  Generator::generateNumControl($tipoDoc),
             "codigoGeneracion" => Generator::generateCodeGeneration(),
             "tipoOperacion" => 1,

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('codigo');
             $table->string('valor');
+            $table->double('porcentaje', 10, 2)->nullable()->default(0);
             $table->string('tipo');
             $table->timestamps();
         });
