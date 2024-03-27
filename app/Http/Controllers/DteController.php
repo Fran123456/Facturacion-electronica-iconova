@@ -20,6 +20,8 @@ use Monolog\Handler\FirePHPHandler;
 use JsonSchema\Validator;
 use App\Mail\DteMail;
 use Illuminate\Support\Facades\Mail;
+use App\Help\WhatsappSender;
+use App\Help\DTEIdentificacion\Identificacion;
 
 class DteController extends Controller
 {
@@ -76,15 +78,40 @@ class DteController extends Controller
 
 
     public function enviarDteUnitarioFacturaExterior(Request $request){
+       
+        
+
+        //login para generar token de hacienda.
+        $responseLogin = LoginMH::login();
+
+        if ($responseLogin['code'] != 200)
+            return response()->json(DteCodeValidator::code404($responseLogin['error']), 404);
+
+        $empresa = Help::getEmpresa();
+        $url = Help::mhUrl();
+        $dteJson = $request;
+
+        if ($dteJson == null)
+            return response()->json(["error" => "DTE no valido o nulo"], Response::HTTP_BAD_REQUEST);
+       
+        //GENERAR JSON VALIDO PARA  HACIENDA
+        $identificacion = Identificacion::identidad('11');
+        $emisor = Identificacion::emisor('20');
+
         $empresa = Help::getEmpresa();
         $correoEmpresa = Crypt::decryptString($empresa->correo_electronico);
         $telefono = Crypt::decryptString($empresa->telefono);
         $nombreEmpresa = Crypt::decryptString($empresa->nombre);
-        $nombreCliente = 'Francisco Navas';
+        
+        
+        //$nombreCliente = 'Francisco Navas';
+        //return WhatsappSender::send();
 
-        Mail::to('francisco.navas@datasys.la')
+      /*  Mail::to('francisco.navas@datasys.la')
         ->from($correoEmpresa, $nombreEmpresa)
         ->send(new DteMail($nombreCliente ,  $correoEmpresa,  $telefono, "9D50E003-621E-1AB5-B828-0004AC1EA976"));
+    
+        */
     }
 
 

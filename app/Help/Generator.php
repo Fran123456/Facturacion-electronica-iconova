@@ -1,19 +1,27 @@
 <?php
 
-namespace App\help;
+namespace App\Help;
 
 use App\Models\Config;
-
+use App\Help\Help;
 class Generator
 {
 
     public static function generateNumControl($tipoDoc, $codigoEmpresa = "EIV6XMQ0")
     {
-        $registroContadorDTE = Config::where('key_conf', $tipoDoc)->first();
+        
+        $registroContadorDTE=null;
+        $empresa = Help::getEmpresa();
+        if($tipoDoc=='11'){
+            $registroContadorDTE= $empresa->correlativo_fex;
+        }
+        if($tipoDoc=='03'){
+            $registroContadorDTE=  $empresa->correlativo_ccf;
+        }
 
-        if ($registroContadorDTE) {
+        if ($registroContadorDTE!=null) {
 
-            $contadorDTEs = $registroContadorDTE->valor;
+            $contadorDTEs = $registroContadorDTE;
 
             $contadorDTEs += 1;
 
@@ -21,9 +29,15 @@ class Generator
             $digitos = str_pad($contadorDTEs, 15, "0", STR_PAD_LEFT);
             $generated .= '-' . $digitos;
 
-            $registroContadorDTE->valor = $contadorDTEs;
-            $registroContadorDTE->save();
+            $registroContadorDTE = $contadorDTEs;
 
+            if($tipoDoc=='11'){
+                $empresa->correlativo_fex= $registroContadorDTE;
+            }
+            if($tipoDoc=='03'){
+                $empresa->correlativo_ccf=$registroContadorDTE;
+            }
+            $empresa->save();
             return $generated;
         }
 

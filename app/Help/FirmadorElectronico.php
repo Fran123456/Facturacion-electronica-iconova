@@ -1,6 +1,6 @@
 <?php
 
-namespace App\help;
+namespace App\Help;
 
 use App\help\Help;
 use App\Models\Empresa;
