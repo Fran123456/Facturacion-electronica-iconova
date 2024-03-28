@@ -23,6 +23,7 @@ use App\Mail\DteMail;
 use Illuminate\Support\Facades\Mail;
 use App\Help\WhatsappSender;
 use App\Help\DTEIdentificacion\Identificacion;
+use DateTime;
 
 class DteController extends Controller
 {
@@ -54,6 +55,7 @@ class DteController extends Controller
 
         $newDTE = [];
 
+        $fecha_actual = new DateTime();
         // IDENTICACION
         $identificacion = [];
         $identificacion['version'] = 3;
@@ -65,7 +67,8 @@ class DteController extends Controller
         $identificacion['tipoModelo'] = 1;
         $identificacion['tipoContingencia'] = null;
         $identificacion['motivoContin'] = null;
-        $identificacion['fecEmi'] = date('Y-m-d');
+        $identificacion['fecEmi'] = $fecha_actual->format('Y-m-d');
+        // $identificacion['fecEmi'] = date('Y-m-d');
         $identificacion['horEmi'] = date('h:i:s');
         $identificacion['tipoMoneda'] = "USD";
 
@@ -94,6 +97,11 @@ class DteController extends Controller
 
 
         // RESUMEN DEL CUERPO
+        $codigoPago = $body['codigo_pago'];
+        $periodoPago = $body['periodo_pago'];
+        $plazoPago = $body['plazo_pago'];
+        $descripcionPago = Help::getPayWay($codigoPago);
+
         $totalNoSuj = 0.0;
         $totalExenta = 0.0;
         $subTotal = 0.0;
@@ -107,7 +115,8 @@ class DteController extends Controller
 
         foreach ($dte['cuerpoDocumento'] as $key => $value) {
 
-            $ventaGravada = $value['cantidad'] * $value['precioUni'];
+            $ventaGravada = round($value['cantidad'] * $value['precioUni'], 2);
+            $impuestoTotalItem = 0.0;
 
             // return response()->json([
             //         'value' => $ventaGravada
@@ -123,7 +132,7 @@ class DteController extends Controller
                 $encontrado = false;
                 $impuesto = 0.0;
 
-                $impuesto = Help::getTax($tributo, $ventaGravada);
+                $impuesto = round(Help::getTax($tributo, $ventaGravada), 2);
 
                 foreach ($tributos as $clave => $valor) {
 
@@ -131,7 +140,7 @@ class DteController extends Controller
 
                     if ($codigo == $tributo) {
                         $encontrado = true;
-                        $tributos[$clave]['valor'] += round($impuesto, 2);
+                        $tributos[$clave]['valor'] += $impuesto;
                         break;
                     }
                 }
@@ -140,7 +149,7 @@ class DteController extends Controller
                     $tributos[] = [
                         'codigo' => $tributo,
                         'descripcion' => Help::getTributo($tributo),
-                        'valor' => round($impuesto, 2)
+                        'valor' => $impuesto
                     ];
                 }
 
@@ -148,7 +157,16 @@ class DteController extends Controller
                 //     'value' => $impuesto
                 // ]);
                 $totalImpuestos += $impuesto;
+                $impuestoTotalItem += $impuesto;
             }
+
+            $pagos[] = [
+                "codigo" => $codigoPago,
+                "montoPago" => $impuestoTotalItem + $ventaGravada,
+                "referencia" => $descripcionPago,
+                "periodo" => $periodoPago,
+                "plazo" => $plazoPago
+            ];
 
         }
 
@@ -186,7 +204,7 @@ class DteController extends Controller
 
         $newDTE['resumen']['saldoFavor'] = 0;
         $newDTE['resumen']['condicionOperacion'] = 1;
-        $newDTE['resumen']['pagos'] = $dte['resumen']['pagos'];
+        $newDTE['resumen']['pagos'] = $pagos;
         $newDTE['resumen']['numPagoElectronico'] = null;
 
 

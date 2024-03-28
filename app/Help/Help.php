@@ -4,6 +4,7 @@ namespace App\help;
 
 use App\Models\Config;
 use App\Models\Empresa;
+use App\Models\MH\MHFormaPago;
 use App\Models\MH\MHTributo;
 use Illuminate\Support\Facades\Auth;
 
@@ -185,5 +186,15 @@ class Help
                 return Help::numberToString($millar) . ' mil ' . Help::numberToString($resto);
             }
         }
+    }
+
+    public static function getPayWay($way){
+        $forma = MHFormaPago::where('codigo', $way)->first();
+
+        if ( !$forma->id ){
+            return $forma->valor;
+        }
+
+        return null;
     }
 }
