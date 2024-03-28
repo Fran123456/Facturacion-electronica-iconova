@@ -34,7 +34,6 @@ class Identificacion
     {
 
         $empresa = Help::getEmpresa();
-        
         $nit = Crypt::decryptString($empresa->nit);
         $nrc = Crypt::decryptString($empresa->nrc);
         $nombreEmpresa = Crypt::decryptString($empresa->nombre);
