@@ -45,7 +45,8 @@ class Help
         return $empresa;
     }
 
-    public static function getEmisorDefault() {
+    public static function getEmisorDefault()
+    {
         $emisor = [];
 
         $emisor['nit'] = '06141802161055';
@@ -68,36 +69,121 @@ class Help
         return $emisor;
     }
 
-    public static function getTributo($codigo) {
+    public static function getTributo($codigo)
+    {
         $tributo = MHTributo::where('codigo', $codigo)->first();
 
-        if ( $tributo->id )
+        if ($tributo->id)
             return $tributo->valor;
 
         return 'Sin descripcion';
     }
 
-    public static function getTax($codigo, $subtotal, $totalGalones = 0){
+    public static function getTax($codigo, $subtotal, $totalGalones = 0)
+    {
 
         $tributo = MHTributo::where('codigo', $codigo)->first();
 
-        if ( !$tributo->id )
+        if (!$tributo->id)
             return 0;
 
         $retorno = 0;
 
         $porcentaje = $tributo->porcentaje;
 
-        switch( $tributo->codigo ){
+        switch ($tributo->codigo) {
             case '20':
             case 'C3':
             case '59':
                 $retorno = $subtotal * $porcentaje;
-            break;
+                break;
         }
 
         return $retorno;
-
     }
 
+    public static function numberToString($numero){
+        $conversion = array(
+            0 => 'cero',
+            1 => 'uno',
+            2 => 'dos',
+            3 => 'tres',
+            4 => 'cuatro',
+            5 => 'cinco',
+            6 => 'seis',
+            7 => 'siete',
+            8 => 'ocho',
+            9 => 'nueve'
+        );
+
+        $decenas = array(
+            2 => 'veinte',
+            3 => 'treinta',
+            4 => 'cuarenta',
+            5 => 'cincuenta',
+            6 => 'sesenta',
+            7 => 'setenta',
+            8 => 'ochenta',
+            9 => 'noventa'
+        );
+
+        $centenas = array(
+            1 => 'ciento',
+            2 => 'doscientos',
+            3 => 'trescientos',
+            4 => 'cuatrocientos',
+            5 => 'quinientos',
+            6 => 'seiscientos',
+            7 => 'setecientos',
+            8 => 'ochocientos',
+            9 => 'novecientos'
+        );
+
+        if($numero < 10){
+            return $conversion[$numero];
+        } elseif($numero < 20){
+            $conversion_especial = array(
+                10 => 'diez',
+                11 => 'once',
+                12 => 'doce',
+                13 => 'trece',
+                14 => 'catorce',
+                15 => 'quince',
+                16 => 'dieciséis',
+                17 => 'diecisiete',
+                18 => 'dieciocho',
+                19 => 'diecinueve'
+            );
+            return $conversion_especial[$numero];
+        } elseif($numero < 100){
+            $decena = floor($numero / 10);
+            $unidad = $numero % 10;
+
+            $texto = $decenas[$decena];
+
+            if($unidad == 0){
+                return $texto;
+            } else {
+                return $texto . ' y ' . $conversion[$unidad];
+            }
+        } elseif($numero < 1000){
+            $centena = floor($numero / 100);
+            $resto = $numero % 100;
+
+            if($resto == 0){
+                return $centenas[$centena];
+            } else {
+                return $centenas[$centena] . ' ' . Help::numberToString($resto);
+            }
+        } elseif($numero < 1000000){
+            $millar = floor($numero / 1000);
+            $resto = $numero % 1000;
+
+            if($resto == 0){
+                return Help::numberToString($millar) . ' mil';
+            } else {
+                return Help::numberToString($millar) . ' mil ' . Help::numberToString($resto);
+            }
+        }
+    }
 }
