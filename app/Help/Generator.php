@@ -9,7 +9,7 @@ class Generator
 
     public static function generateNumControl($tipoDoc, $codigoEmpresa = "EIV6XMQ0")
     {
-        
+
         $registroContadorDTE=null;
         $empresa = Help::getEmpresa();
         if($tipoDoc=='11'){
@@ -45,7 +45,7 @@ class Generator
     }
 
     public static function generateCodeGeneration(){
-        $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $characters = '0123456789ABCDEF';
         $generatedCode = '';
 
         $lengthSections = [8,4,4,4,12];

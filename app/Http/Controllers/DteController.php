@@ -90,90 +90,104 @@ class DteController extends Controller
         $newDTE['ventaTercero'] = $dte['ventaTercero'];
 
         // Cuerpo Documento
-        $totalNoSuj = 0;
-        $totalExenta = 0;
-        $subTotal = 0;
-        $totalDescu = 0;
-        $totalPagar = 0;
+        $newDTE['cuerpoDocumento'] = $dte['cuerpoDocumento'];
 
-        $totalImpuestos = 0;
+
+        // RESUMEN DEL CUERPO
+        $totalNoSuj = 0.0;
+        $totalExenta = 0.0;
+        $subTotal = 0.0;
+        $totalDescu = 0.0;
+        $totalPagar = 0.0;
+
+        $totalImpuestos = 0.0;
         $tributos = [];
         $pagos = [];
 
-        $newDTE['cuerpoDocumento'] = $dte['cuerpoDocumento'];
 
         foreach ($dte['cuerpoDocumento'] as $key => $value) {
 
             $ventaGravada = $value['cantidad'] * $value['precioUni'];
+
+            // return response()->json([
+            //         'value' => $ventaGravada
+            //     ]);
             $totalNoSuj += $value['ventaNoSuj'];
             $totalExenta += $value['ventaExenta'];
             $subTotal += $ventaGravada;
             $totalDescu += $value['montoDescu'];
-            $dte['cuerpoDocumento'][$key]['ventaGravada'] = $ventaGravada;
+            // $dte['cuerpoDocumento'][$key]['ventaGravada'] = $ventaGravada;
 
-            foreach($value['tributos'] as $tributo){
+            foreach ($value['tributos'] as $tributo) {
 
                 $encontrado = false;
+                $impuesto = 0.0;
 
-                $impuesto = Help::getTax($tributo, $subTotal);
+                $impuesto = Help::getTax($tributo, $ventaGravada);
 
-                foreach($tributos as $clave => $valor){
+                foreach ($tributos as $clave => $valor) {
 
                     $codigo = $valor['codigo'];
 
-                    if( $codigo == $tributo ){
+                    if ($codigo == $tributo) {
                         $encontrado = true;
-                        $tributos[$clave]['valor'] += $impuesto ;
+                        $tributos[$clave]['valor'] += round($impuesto, 2);
                         break;
                     }
-
                 }
 
-                if( !$encontrado ){
+                if (!$encontrado) {
                     $tributos[] = [
                         'codigo' => $tributo,
-                        'descripcion' => Help::getTributo($value),
-                        'valor' => $impuesto
+                        'descripcion' => Help::getTributo($tributo),
+                        'valor' => round($impuesto, 2)
                     ];
                 }
 
-                $$totalImpuestos += $impuesto;
-
+                // return response()->json([
+                //     'value' => $impuesto
+                // ]);
+                $totalImpuestos += $impuesto;
             }
-
-            $totalNoSuj += $value['ventaNoSuj'];
-            $totalNoSuj += $value['ventaNoSuj'];
-            $totalNoSuj += $value['ventaNoSuj'];
-
 
         }
 
-        $totalPagar = $subTotal += $totalImpuestos;
+        $subTotal = round($subTotal, 2);
+        $totalPagar = round($subTotal + $totalImpuestos, 2);
 
         // RESUMEN CUERPO
         $newDTE['resumen']['totalNoSuj'] = $totalNoSuj;
         $newDTE['resumen']['totalExenta'] = $totalExenta;
         $newDTE['resumen']['totalGravada'] = $subTotal;
         $newDTE['resumen']['subTotalVentas'] = $subTotal;
-        $newDTE['resumen']['descuNoSuj'] = 0;
-        $newDTE['resumen']['descuExenta'] = 0;
-        $newDTE['resumen']['descuGravada'] = 0;
-        $newDTE['resumen']['porcentajeDescuento'] = 0;
+        $newDTE['resumen']['descuNoSuj'] = 0.0;
+        $newDTE['resumen']['descuExenta'] = 0.0;
+        $newDTE['resumen']['descuGravada'] = 0.0;
+        $newDTE['resumen']['porcentajeDescuento'] = 0.0;
 
         $newDTE['resumen']['totalDescu'] = $totalDescu;
+        $newDTE['resumen']['tributos'] = $tributos;
         $newDTE['resumen']['subTotal'] = $subTotal;
-        $newDTE['resumen']['ivaPerci1'] = 0;
-        $newDTE['resumen']['ivaRete1'] = 0;
-        $newDTE['resumen']['reteRenta'] = 0;
+        $newDTE['resumen']['ivaPerci1'] = 0.0;
+        $newDTE['resumen']['ivaRete1'] = 0.0;
+        $newDTE['resumen']['reteRenta'] = 0.0;
         $newDTE['resumen']['montoTotalOperacion'] = $totalPagar;
         $newDTE['resumen']['totalNoGravado'] = 0;
 
         $newDTE['resumen']['totalPagar'] = $totalPagar;
-        $newDTE['resumen']['totalLetras'] = 'zero zero';
+
+        $numero_str = strval($totalPagar);
+        $partes = explode('.', $numero_str);
+        $entero = isset($partes[0]) ? intval($partes[0]) : 0;
+        $decimal = isset($partes[1]) ? intval($partes[1]) : 0;
+        $numero_en_letras = Help::numberToString($entero) . " con " . Help::numberToString($decimal);
+
+        $newDTE['resumen']['totalLetras'] = 'USD ' . $numero_en_letras;
+
         $newDTE['resumen']['saldoFavor'] = 0;
         $newDTE['resumen']['condicionOperacion'] = 1;
-        $newDTE['resumen']['pagos'] = $pagos;
-        $newDTE['resumen']['numPagoElectronico'] = $null;
+        $newDTE['resumen']['pagos'] = $dte['resumen']['pagos'];
+        $newDTE['resumen']['numPagoElectronico'] = null;
 
 
 
@@ -183,14 +197,16 @@ class DteController extends Controller
         // $dte['identificacion'] = $identificacion;
 
 
-        return response()->json($newDTE);
+        // return response()->json($newDTE);
+        $newDTE = FirmadorElectronico::firmador($newDTE);
+
 
         $jsonRequest = [
             'ambiente' => "00",
             'idEnvio' => 1,
             'version' => 3,
             'tipoDte' => "03",
-            "documento" => $newDTE,
+            "documento" => $newDTE['msg'],
             "codigoGeneracion" => "341CA743-70F1-4CFE-88BC7E4AE72E60CB",
             "nitEmisor" => "06141802161055"
         ];
@@ -215,7 +231,8 @@ class DteController extends Controller
 
 
 
-    public function enviarDteUnitarioFacturaExterior(Request $request){
+    public function enviarDteUnitarioFacturaExterior(Request $request)
+    {
 
         //login para generar token de hacienda.
         $responseLogin = LoginMH::login();
@@ -229,7 +246,7 @@ class DteController extends Controller
 
         if ($dteJson == null)
             return response()->json(["error" => "DTE no valido o nulo"], Response::HTTP_BAD_REQUEST);
-       
+
         //GENERAR JSON VALIDO PARA  HACIENDA
         $identificacion = Identificacion::identidad('11');
         $emisor = Identificacion::emisor('20', null, null);
@@ -239,16 +256,15 @@ class DteController extends Controller
         $correoEmpresa = Crypt::decryptString($empresa->correo_electronico);
         $telefono = Crypt::decryptString($empresa->telefono);
         $nombreEmpresa = Crypt::decryptString($empresa->nombre);
-        
-        
+
+
         //$nombreCliente = 'Francisco Navas';
         //return WhatsappSender::send();
 
-      /*  Mail::to('francisco.navas@datasys.la')
+        /*  Mail::to('francisco.navas@datasys.la')
         ->from($correoEmpresa, $nombreEmpresa)
         ->send(new DteMail($nombreCliente ,  $correoEmpresa,  $telefono, "9D50E003-621E-1AB5-B828-0004AC1EA976"));
-    
-        */
 
+        */
     }
 }

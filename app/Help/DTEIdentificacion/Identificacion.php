@@ -30,7 +30,7 @@ class Identificacion
         return $identificacion;
     }
 
-    public static function emisor($tipoDoc,$tipoEstablecimiento, $puntoDeVentaCodigo, $recintoFiscal)
+    public static function emisor($tipoDoc,$tipoEstablecimiento, $puntoDeVentaCodigo, $recintoFiscal = null)
     {
 
         $empresa = Help::getEmpresa();
@@ -39,10 +39,10 @@ class Identificacion
         $nombreEmpresa = Crypt::decryptString($empresa->nombre);
         $telefono = Crypt::decryptString($empresa->telefono);
         $correo = Crypt::decryptString($empresa->correo_electronico);
-        
+
         $actividad =MHActividadEconomica::where('codigo',$empresa->codigo_actividad)->first();
 
-       
+
         $emisor = [
             "nit" => $nit,
             "nrc" =>  $nrc,
@@ -65,7 +65,7 @@ class Identificacion
             "regimen" => "EX-1.1000.000"
         ];
 
-      
+
         if ($tipoDoc == '11') { //PARA FACTURA  DE EXPORTACION
             $emisor["tipoItemExpor"] = 1;
             $emisor["recintoFiscal"] = $recintoFiscal;
@@ -74,5 +74,5 @@ class Identificacion
         return $emisor;
     }
 
-   
+
 }
