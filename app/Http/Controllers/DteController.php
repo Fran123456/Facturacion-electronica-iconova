@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Http;
 use App\Models\Config;
 use App\Help\Help;
 use App\Help\DteCodeValidator;
+use App\Help\DTEHelper\CCFDTE;
 use App\help\FirmadorElectronico;
 use App\help\Generator;
 use App\Help\LoginMH;
@@ -23,6 +24,7 @@ use App\Mail\DteMail;
 use Illuminate\Support\Facades\Mail;
 use App\Help\WhatsappSender;
 use App\Help\DTEIdentificacion\Identificacion;
+use DateTime;
 
 class DteController extends Controller
 {
@@ -40,13 +42,6 @@ class DteController extends Controller
 
         if ($dteJson == null)
             return response()->json(["error" => "DTE no valido o nulo"], Response::HTTP_BAD_REQUEST);
-
-        $dteFirmado = FirmadorElectronico::firmadorNew($request);
-
-        //$dteFirmado = FirmadorElectronico::firmador($dteJson);
-
-        if ($dteFirmado["status"] > 201)
-            return response()->json($dteFirmado, $dteFirmado["status"]);
 
 
         $body = json_decode($request->getContent(), true);
@@ -66,6 +61,7 @@ class DteController extends Controller
         $identificacion['tipoContingencia'] = null;
         $identificacion['motivoContin'] = null;
         $identificacion['fecEmi'] = date('Y-m-d');
+        // $identificacion['fecEmi'] = date('Y-m-d');
         $identificacion['horEmi'] = date('h:i:s');
         $identificacion['tipoMoneda'] = "USD";
 
@@ -78,7 +74,7 @@ class DteController extends Controller
             $newDTE['emisor'] = Help::getEmisorDefault();
 
         // DOCUMENTO RELACIONADO
-        if (array_key_exists('emisor', $dte))
+        if (array_key_exists('documentoRelacionado', $dte))
             $newDTE['documentoRelacionado'] = $dte['documentoRelacionado'];
         else
             $newDTE['documentoRelacionado'] = null;
@@ -92,121 +88,33 @@ class DteController extends Controller
         // Cuerpo Documento
         $newDTE['cuerpoDocumento'] = $dte['cuerpoDocumento'];
 
-
         // RESUMEN DEL CUERPO
-        $totalNoSuj = 0.0;
-        $totalExenta = 0.0;
-        $subTotal = 0.0;
-        $totalDescu = 0.0;
-        $totalPagar = 0.0;
-
-        $totalImpuestos = 0.0;
-        $tributos = [];
-        $pagos = [];
-
-
-        foreach ($dte['cuerpoDocumento'] as $key => $value) {
-
-            $ventaGravada = $value['cantidad'] * $value['precioUni'];
-
-            // return response()->json([
-            //         'value' => $ventaGravada
-            //     ]);
-            $totalNoSuj += $value['ventaNoSuj'];
-            $totalExenta += $value['ventaExenta'];
-            $subTotal += $ventaGravada;
-            $totalDescu += $value['montoDescu'];
-            // $dte['cuerpoDocumento'][$key]['ventaGravada'] = $ventaGravada;
-
-            foreach ($value['tributos'] as $tributo) {
-
-                $encontrado = false;
-                $impuesto = 0.0;
-
-                $impuesto = Help::getTax($tributo, $ventaGravada);
-
-                foreach ($tributos as $clave => $valor) {
-
-                    $codigo = $valor['codigo'];
-
-                    if ($codigo == $tributo) {
-                        $encontrado = true;
-                        $tributos[$clave]['valor'] += round($impuesto, 2);
-                        break;
-                    }
-                }
-
-                if (!$encontrado) {
-                    $tributos[] = [
-                        'codigo' => $tributo,
-                        'descripcion' => Help::getTributo($tributo),
-                        'valor' => round($impuesto, 2)
-                    ];
-                }
-
-                // return response()->json([
-                //     'value' => $impuesto
-                // ]);
-                $totalImpuestos += $impuesto;
-            }
-
-        }
-
-        $subTotal = round($subTotal, 2);
-        $totalPagar = round($subTotal + $totalImpuestos, 2);
-
-        // RESUMEN CUERPO
-        $newDTE['resumen']['totalNoSuj'] = $totalNoSuj;
-        $newDTE['resumen']['totalExenta'] = $totalExenta;
-        $newDTE['resumen']['totalGravada'] = $subTotal;
-        $newDTE['resumen']['subTotalVentas'] = $subTotal;
-        $newDTE['resumen']['descuNoSuj'] = 0.0;
-        $newDTE['resumen']['descuExenta'] = 0.0;
-        $newDTE['resumen']['descuGravada'] = 0.0;
-        $newDTE['resumen']['porcentajeDescuento'] = 0.0;
-
-        $newDTE['resumen']['totalDescu'] = $totalDescu;
-        $newDTE['resumen']['tributos'] = $tributos;
-        $newDTE['resumen']['subTotal'] = $subTotal;
-        $newDTE['resumen']['ivaPerci1'] = 0.0;
-        $newDTE['resumen']['ivaRete1'] = 0.0;
-        $newDTE['resumen']['reteRenta'] = 0.0;
-        $newDTE['resumen']['montoTotalOperacion'] = $totalPagar;
-        $newDTE['resumen']['totalNoGravado'] = 0;
-
-        $newDTE['resumen']['totalPagar'] = $totalPagar;
-
-        $numero_str = strval($totalPagar);
-        $partes = explode('.', $numero_str);
-        $entero = isset($partes[0]) ? intval($partes[0]) : 0;
-        $decimal = isset($partes[1]) ? intval($partes[1]) : 0;
-        $numero_en_letras = Help::numberToString($entero) . " con " . Help::numberToString($decimal);
-
-        $newDTE['resumen']['totalLetras'] = 'USD ' . $numero_en_letras;
-
-        $newDTE['resumen']['saldoFavor'] = 0;
-        $newDTE['resumen']['condicionOperacion'] = 1;
-        $newDTE['resumen']['pagos'] = $dte['resumen']['pagos'];
-        $newDTE['resumen']['numPagoElectronico'] = null;
-
-
+        $codigoPago = $body['codigo_pago'];
+        $periodoPago = isset($body['periodo_pago']) ? $body['periodo_pago'] : null;
+        $plazoPago = isset($body['plazo_pago']) ? $body['plazo_pago'] : null;
+        $newDTE['resumen'] = CCFDTE::Resumen($dte['cuerpoDocumento'], $codigoPago, $periodoPago, $plazoPago);
 
         $newDTE['extension'] = $dte['extension'];
         $newDTE['apendice'] = $dte['apendice'];
 
-        // $dte['identificacion'] = $identificacion;
-
-
-        // return response()->json($newDTE);
         $newDTE = FirmadorElectronico::firmador($newDTE);
+        // return response()->json($newDTE);
 
+        $statusSigner =  $newDTE['status'];
+
+        if ( $statusSigner > 201 )
+            return response()->json([
+                "error" => $newDTE['error']
+            ], $statusSigner);
+
+        $tokenDTE = $newDTE['msg'];
 
         $jsonRequest = [
             'ambiente' => "00",
             'idEnvio' => 1,
             'version' => 3,
             'tipoDte' => "03",
-            "documento" => $newDTE['msg'],
+            "documento" => $tokenDTE,
             "codigoGeneracion" => "341CA743-70F1-4CFE-88BC7E4AE72E60CB",
             "nitEmisor" => "06141802161055"
         ];
@@ -227,9 +135,6 @@ class DteController extends Controller
 
         return response()->json($responseData, $statusCode);
     }
-
-
-
 
     public function enviarDteUnitarioFacturaExterior(Request $request)
     {
