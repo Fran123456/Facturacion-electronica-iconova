@@ -25,7 +25,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Help\WhatsappSender;
 use App\Help\DTEIdentificacion\Identificacion;
 use DateTime;
-
+use App\Help\DTEHelper\FEXDTE;
 class DteController extends Controller
 {
     public function enviarDteUnitarioCCF(Request $request)
@@ -147,17 +147,56 @@ class DteController extends Controller
 
         $empresa = Help::getEmpresa();
         $url = Help::mhUrl();
-        $dteJson = $request;
+        /*
+         $dteJson = $request;
 
         if ($dteJson == null)
             return response()->json(["error" => "DTE no valido o nulo"], Response::HTTP_BAD_REQUEST);
+        if ($dteJson['cliente'] == null)
+            return response()->json(["error" => "El cliente es requerido"], Response::HTTP_BAD_REQUEST);
 
         //GENERAR JSON VALIDO PARA  HACIENDA
         $identificacion = Identificacion::identidad('11');
-        $emisor = Identificacion::emisor('20', null, null);
-        return $emisor;
+        $emisor = Identificacion::emisor('20', null, null, null);
+        $receptor = Identificacion::receptor($dteJson['cliente']);
+        if(isset($receptor['error']))
+            return response()->json(["error" => $receptor['comentario']], Response::HTTP_BAD_REQUEST);
+        $detalle = FEXDTE::BuildDetalle($dteJson['cuerpoDocumento']);
+        $resumen = FEXDTE::Resumen($detalle, $dteJson['condicionPago']??'1',  $dteJson['pago']??null);
+   
+        $dte = [
+            "identificacion"=>$identificacion,
+            'emisor'=>$emisor,
+            'receptor'=>$receptor,
+            'otrosDocumentos'=>null,
+            'ventaTercero'=>null,
+            'cuerpoDocumento'=>$detalle,
+            'resumen'=>$resumen ,
+            'apendice'=>[FEXDTE::Apendice(),FEXDTE::Apendice()]
+        ];
+      // return $dte;
+        */ 
+       
+      $dte = $request;
+        $dte = FirmadorElectronico::firmador($dte);
+        
+        $requestResponse = Http::withHeaders([
+            'Authorization' => $empresa->token_mh,
+            'User-Agent' => 'ApiLaravel/1.0',
+            'Content-Type' => 'application/JSON'
+        ])->post($url . "fesv/recepciondte", $dte);
 
-        $empresa = Help::getEmpresa();
+        $responseData = $requestResponse->json();
+        $statusCode = $requestResponse->status();
+
+        //415 Unsupported Media Type
+        if ($statusCode == 415) return response()->json(DteCodeValidator::code415($responseData), 415);
+        // 401 Unauthorized de parte de login hacienda.
+        if ($statusCode == 401) return response()->json(DteCodeValidator::code401(), 401);
+
+        return response()->json($responseData, $statusCode);
+
+
         $correoEmpresa = Crypt::decryptString($empresa->correo_electronico);
         $telefono = Crypt::decryptString($empresa->telefono);
         $nombreEmpresa = Crypt::decryptString($empresa->nombre);

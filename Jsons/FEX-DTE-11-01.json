@@ -29,9 +29,9 @@
         "telefono": "00000000",
         "correo": "PRIETO@HOTMAIL.COM",
         "codEstableMH": "M001",
-        "codEstable": null,
+        "codEstable": "P001",
         "codPuntoVentaMH": "P001",
-        "codPuntoVenta": null,
+        "codPuntoVenta": "P001",
         "tipoItemExpor": 1,
         "recintoFiscal": "01",
         "regimen": "EX-1.1000.000"
@@ -61,7 +61,9 @@
             "precioUni": 444.0,
             "montoDescu": 0,
             "ventaGravada": 44400.0,
-            "tributos": null,
+            "tributos": [
+                "C3"
+            ],
             "noGravado": 0
         },
         {
@@ -73,7 +75,9 @@
             "precioUni": 300.0,
             "montoDescu": 0,
             "ventaGravada": 3000.0,
-            "tributos": null,
+            "tributos": [
+                "C3"
+            ],
             "noGravado": 0
         }
     ],
@@ -103,16 +107,5 @@
         "descIncoterms": "CIF- Costo seguro y flete",
         "observaciones": null
     },
-    "apendice": [
-        {
-            "campo": "Datos del Vendedor",
-            "etiqueta": "Nombre del Vendedor",
-            "valor": "000000000 - Administrador"
-        },
-        {
-            "campo": "placa_vehiculo",
-            "etiqueta": "PLACA VEHICULO",
-            "valor": "S/P"
-        }
-    ]
+    "apendice": null
 }
