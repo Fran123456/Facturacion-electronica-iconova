@@ -26,6 +26,9 @@ use App\Help\WhatsappSender;
 use App\Help\DTEIdentificacion\Identificacion;
 use DateTime;
 use App\Help\DTEHelper\FEXDTE;
+use App\Models\LogDTE;
+use App\Models\RegistroDTE;
+
 class DteController extends Controller
 {
     public function enviarDteUnitarioCCF(Request $request)
@@ -49,12 +52,17 @@ class DteController extends Controller
 
         $newDTE = [];
 
+        $tipoDTE = '03';
+        $numeroDTE = Generator::generateNumControl($tipoDTE);
+        $fechaEmision = date('Y-m-d');
+        $horaEmision =  date('h:i:s');
+
         // IDENTICACION
         $identificacion = [];
         $identificacion['version'] = 3;
         $identificacion['ambiente'] = "00";
-        $identificacion['tipoDte'] = "03";
-        $identificacion['numeroControl'] =  Generator::generateNumControl('03');
+        $identificacion['tipoDte'] = $tipoDTE;
+        $identificacion['numeroControl'] =  $numeroDTE;
         $identificacion['codigoGeneracion'] = Generator::generateCodeGeneration();
         $identificacion['tipoOperacion'] = 1;
         $identificacion['tipoModelo'] = 1;
@@ -97,43 +105,84 @@ class DteController extends Controller
         $newDTE['extension'] = $dte['extension'];
         $newDTE['apendice'] = $dte['apendice'];
 
-        $newDTE = FirmadorElectronico::firmador($newDTE);
-        // return response()->json($newDTE);
+        $registoDTE = RegistroDTE::create([
+            'id_cliente' => 1,
+            'numero_dte' => $numeroDTE,
+            'tipo_documento' => $tipoDTE,
+            'dte' => json_encode($newDTE),
+            'estado' => true,
+        ]);
 
-        $statusSigner =  $newDTE['status'];
+        $responseData = '';
+        $statusCode = '';
 
-        if ( $statusSigner > 201 )
-            return response()->json([
-                "error" => $newDTE['error']
-            ], $statusSigner);
+        try {
 
-        $tokenDTE = $newDTE['msg'];
+            $DTESigned = FirmadorElectronico::firmador($newDTE);
+            // return response()->json($newDTE);
 
-        $jsonRequest = [
-            'ambiente' => "00",
-            'idEnvio' => 1,
-            'version' => 3,
-            'tipoDte' => "03",
-            "documento" => $tokenDTE,
-            "codigoGeneracion" => "341CA743-70F1-4CFE-88BC7E4AE72E60CB",
-            "nitEmisor" => "06141802161055"
-        ];
+            $statusSigner =  $newDTE['status'];
 
-        $requestResponse = Http::withHeaders([
-            'Authorization' => $empresa->token_mh,
-            'User-Agent' => 'ApiLaravel/1.0',
-            'Content-Type' => 'application/JSON'
-        ])->post($url . "fesv/recepciondte", $jsonRequest);
+            if ($statusSigner > 201)
+                return response()->json([
+                    "error" => $DTESigned['error']
+                ], $statusSigner);
 
-        $responseData = $requestResponse->json();
-        $statusCode = $requestResponse->status();
+            $tokenDTE = $DTESigned['msg'];
 
-        //415 Unsupported Media Type
-        if ($statusCode == 415) return response()->json(DteCodeValidator::code415($responseData), 415);
-        // 401 Unauthorized de parte de login hacienda.
-        if ($statusCode == 401) return response()->json(DteCodeValidator::code401(), 401);
+            $jsonRequest = [
+                'ambiente' => "00",
+                'idEnvio' => 1,
+                'version' => 3,
+                'tipoDte' => $tipoDTE,
+                "documento" => $tokenDTE,
+                "codigoGeneracion" => "341CA743-70F1-4CFE-88BC7E4AE72E60CB",
+                "nitEmisor" => "06141802161055"
+            ];
 
-        return response()->json($responseData, $statusCode);
+            $requestResponse = Http::withHeaders([
+                'Authorization' => $empresa->token_mh,
+                'User-Agent' => 'ApiLaravel/1.0',
+                'Content-Type' => 'application/JSON'
+            ])->post($url . "fesv/recepciondte", $jsonRequest);
+
+            $responseData = $requestResponse->json();
+            $statusCode = $requestResponse->status();
+
+            //415 Unsupported Media Type
+            if ($statusCode == 415)
+                $responseData = DteCodeValidator::code415($responseData);
+            // 401 Unauthorized de parte de login hacienda.
+            if ($statusCode == 401)
+                $responseData = DteCodeValidator::code401();
+
+            if ($statusCode == 404)
+                $responseData = DteCodeValidator::code404();
+
+            if ($statusCode >= 400) {
+                $errorMessage = "Error $statusCode: " . json_encode($responseData);
+
+                throw new Exception($errorMessage);
+            }
+
+        } catch (Exception $e) {
+
+            $logDTE = LogDTE::create([
+                'id_cliente' => '',
+                'numero_dte' => $numeroDTE,
+                'tipo_documento' => $tipoDTE,
+                'fecha' => $horaEmision,
+                'hora' => $fechaEmision,
+                'error' => $e->getMessage(),
+                'estado' => false,
+            ]);
+
+            $logDTE->save();
+            $registoDTE->estado = false;
+        } finally {
+            $registoDTE->save();
+            return response()->json($responseData, $statusCode);
+        }
     }
 
     public function enviarDteUnitarioFacturaExterior(Request $request)
@@ -163,7 +212,7 @@ class DteController extends Controller
             return response()->json(["error" => $receptor['comentario']], Response::HTTP_BAD_REQUEST);
         $detalle = FEXDTE::BuildDetalle($dteJson['cuerpoDocumento']);
         $resumen = FEXDTE::Resumen($detalle, $dteJson['condicionPago']??'1',  $dteJson['pago']??null);
-   
+
         $dte = [
             "identificacion"=>$identificacion,
             'emisor'=>$emisor,
@@ -175,11 +224,11 @@ class DteController extends Controller
             'apendice'=>[FEXDTE::Apendice(),FEXDTE::Apendice()]
         ];
       // return $dte;
-        */ 
-       
-      $dte = $request;
+        */
+
+        $dte = $request;
         $dte = FirmadorElectronico::firmador($dte);
-        
+
         $requestResponse = Http::withHeaders([
             'Authorization' => $empresa->token_mh,
             'User-Agent' => 'ApiLaravel/1.0',

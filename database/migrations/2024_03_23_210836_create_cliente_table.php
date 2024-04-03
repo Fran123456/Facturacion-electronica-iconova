@@ -15,20 +15,23 @@ return new class extends Migration
     {
         Schema::create('cliente', function (Blueprint $table) {
             $table->id();
-            $table->text('nit');
-            $table->text('nrc');
-            $table->text('nombre');
-            $table->text('codigo_activad');
+            $table->string('tipo_documento', 10);
+            $table->string('nit', 50)->unique();
+            $table->string('nrc', 50)->unique();
+            $table->string('dui', 50)->unique();
+            $table->string('nombre', 255);
+            $table->string('codigo_activad', 50);
             $table->text('descripcion_activad');
-            $table->text('nombre_comercial');
-            $table->text('departamento');
-            $table->text('municipio');
-            $table->text('complemento');
-            $table->text('telefono');
-            $table->text('correo')->nullable();
+            $table->string('nombre_comercial', 255);
+            $table->string('departamento', 255);
+            $table->string('municipio', 255);
+            $table->string('complemento', 255)->nullable();
+            $table->string('telefono', 50);
+            $table->string('correo', 255)->nullable();
             $table->boolean('estado')->default(true);
             $table->timestamps();
         });
+
     }
 
     /**
