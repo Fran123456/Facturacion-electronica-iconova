@@ -54,7 +54,7 @@ class Identificacion
         },
         */
 
-        $cliente = Cliente::where('nit',$clienteR['numDocumento'])->first();
+        $cliente = Cliente::where('nit', $clienteR['numDocumento'])->first();
 
         $actividadCliente = MHActividadEconomica::where('codigo',$clienteR['descActividad'])->first();
         if($actividadCliente==null){
@@ -79,7 +79,7 @@ class Identificacion
             $paisCliente = MHPais::where('codigo','9999')->first();
         }
 
-    
+
 
         if($cliente==null){
 
@@ -170,7 +170,7 @@ class Identificacion
             "recintoFiscal" => $recintoFiscal??'01',
             "regimen" => $regimen??'EX-1.1000.000'
 
-          
+
         ];
 
 

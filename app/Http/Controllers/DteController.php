@@ -87,8 +87,8 @@ class DteController extends Controller
         else
             $newDTE['documentoRelacionado'] = null;
 
-        //  RECEPTOR
-        $newDTE['receptor'] = $dte['receptor'];
+        // //  RECEPTOR
+        // $newDTE['receptor'] = $dte['receptor'];
 
         $newDTE['otrosDocumentos'] = $dte['otrosDocumentos'];
         $newDTE['ventaTercero'] = $dte['ventaTercero'];
@@ -105,23 +105,28 @@ class DteController extends Controller
         $newDTE['extension'] = $dte['extension'];
         $newDTE['apendice'] = $dte['apendice'];
 
-        $registoDTE = RegistroDTE::create([
-            'id_cliente' => 1,
-            'numero_dte' => $numeroDTE,
-            'tipo_documento' => $tipoDTE,
-            'dte' => json_encode($newDTE),
-            'estado' => true,
-        ]);
-
+        $registoDTE = null;
+        $idCliente = 0;
         $responseData = '';
         $statusCode = '';
 
+
+        // return response()->json($newDTE['receptor']);
         try {
 
-            $DTESigned = FirmadorElectronico::firmador($newDTE);
-            // return response()->json($newDTE);
+            $newDTE['receptor'] = Help::setCliente($dte['receptor']);
+            $idCliente = Help::getClienteId($dte['receptor']['nit']);
+            $registoDTE = RegistroDTE::create([
+                'id_cliente' => $idCliente,
+                'numero_dte' => $numeroDTE,
+                'tipo_documento' => $tipoDTE,
+                'dte' => json_encode($newDTE),
+                'estado' => true,
+            ]);
 
-            $statusSigner =  $newDTE['status'];
+            $DTESigned = FirmadorElectronico::firmador($newDTE);
+
+            $statusSigner =  $DTESigned['status'];
 
             if ($statusSigner > 201)
                 return response()->json([
@@ -168,11 +173,11 @@ class DteController extends Controller
         } catch (Exception $e) {
 
             $logDTE = LogDTE::create([
-                'id_cliente' => '',
+                'id_cliente' => $idCliente,
                 'numero_dte' => $numeroDTE,
                 'tipo_documento' => $tipoDTE,
-                'fecha' => $horaEmision,
-                'hora' => $fechaEmision,
+                'fecha' => $fechaEmision,
+                'hora' => $horaEmision,
                 'error' => $e->getMessage(),
                 'estado' => false,
             ]);
@@ -181,8 +186,8 @@ class DteController extends Controller
             $registoDTE->estado = false;
         } finally {
             $registoDTE->save();
-            return response()->json($responseData, $statusCode);
         }
+        return response()->json($responseData, $statusCode);
     }
 
     public function enviarDteUnitarioFacturaExterior(Request $request)

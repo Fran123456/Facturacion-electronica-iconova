@@ -7,6 +7,7 @@ use App\Models\Config;
 use App\Models\Empresa;
 use App\Models\MH\MHFormaPago;
 use App\Models\MH\MHTributo;
+use Exception;
 use Illuminate\Support\Facades\Auth;
 
 class Help
@@ -201,7 +202,7 @@ class Help
         return null;
     }
 
-    public static function getCliente($receptor)
+    public static function setCliente($receptor)
     {
 
         $nit = $receptor['nit'];
@@ -242,16 +243,29 @@ class Help
 
         $newReceptor = [];
 
-        $receptor['nit'] = $cliente->nit;
-        $receptor['nrc'] = $cliente->nrc;
-        $receptor['nombre'] = $cliente->nrc;
-        $receptor['codActividad'] = $cliente->nrc;
-        $receptor['descActividad'] = $cliente->nrc;
-        $receptor['nombreComercial'] = $cliente->nrc;
-        $receptor['direccion']['departamento'] = $cliente->nrc;
-        $receptor['direccion']['municipio'] = $cliente->nrc;
-        $receptor['direccion']['complemento'] = $cliente->nrc;
-        $receptor['telefono'] = $cliente->nrc;
-        $receptor['correo'] = $cliente->nrc;
+        $newReceptor['nit'] = $cliente->nit;
+        $newReceptor['nrc'] = $cliente->nrc;
+        $newReceptor['nombre'] = $cliente->nombre;
+        $newReceptor['codActividad'] = $cliente->codigo_activad;
+        $newReceptor['descActividad'] = $cliente->descripcion_activad;
+        $newReceptor['nombreComercial'] = $cliente->nombre_comercial;
+        $newReceptor['direccion']['departamento'] = $cliente->departamento;
+        $newReceptor['direccion']['municipio'] = $cliente->municipio;
+        $newReceptor['direccion']['complemento'] = $cliente->complemento;
+        $newReceptor['telefono'] = $cliente->telefono;
+        $newReceptor['correo'] = $cliente->correo;
+
+        return $newReceptor;
+    }
+
+    public static function getClienteId($nit)
+    {
+
+        $cliente = Cliente::where('nit', $nit)->first();
+
+        if ( $cliente == null )
+            throw new Exception("No existe ningun registro para cliente con nit $nit");
+
+        return $cliente->id;
     }
 }
