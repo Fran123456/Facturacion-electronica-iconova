@@ -61,6 +61,7 @@ class FirmadorElectronico
 
     public static function firmadorNew($request)
     {
+        $request['firmanteAutomatico']=true;
         $contro = new ServicesController();
         $dteFirmado = $contro->obtenerFirmaDTE($request);
         return $dteFirmado;
