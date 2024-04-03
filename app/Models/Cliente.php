@@ -13,8 +13,10 @@ class Cliente extends Model
 
     protected $fillable = [
         'id',
+        'tipo_documento',
         'nit',
-        'nrc','dui','tipo_documento',
+        'nrc',
+        'dui',
         'nombre',
         'codigo_activad',
         'descripcion_activad',
@@ -25,7 +27,6 @@ class Cliente extends Model
         'telefono',
         'correo',
         'estado',
-
     ];
 
     public function logDTE(){

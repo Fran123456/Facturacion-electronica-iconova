@@ -22,8 +22,8 @@ return new class extends Migration
             $table->timestamp('hora');
             $table->text('error');
             $table->boolean('estado');
-            $table->foreign('id_cliente')->references('cliente')->on('id')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
+            $table->foreign('id_cliente')->references('id')->on('cliente')->onUpdate('cascade');
         });
     }
 

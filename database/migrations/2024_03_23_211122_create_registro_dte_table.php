@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('tipo_documento');
             $table->json('dte');
             $table->boolean('estado');
-            $table->foreign('id_cliente')->references('cliente')->on('id')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('id_cliente')->references('id')->on('cliente')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });
     }

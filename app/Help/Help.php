@@ -2,10 +2,12 @@
 
 namespace App\help;
 
+use App\Models\Cliente;
 use App\Models\Config;
 use App\Models\Empresa;
 use App\Models\MH\MHFormaPago;
 use App\Models\MH\MHTributo;
+use Exception;
 use Illuminate\Support\Facades\Auth;
 
 class Help
@@ -103,7 +105,8 @@ class Help
         return $retorno;
     }
 
-    public static function numberToString($numero){
+    public static function numberToString($numero)
+    {
         $conversion = array(
             0 => 'cero',
             1 => 'uno',
@@ -140,9 +143,9 @@ class Help
             9 => 'novecientos'
         );
 
-        if($numero < 10){
+        if ($numero < 10) {
             return $conversion[$numero];
-        } elseif($numero < 20){
+        } elseif ($numero < 20) {
             $conversion_especial = array(
                 10 => 'diez',
                 11 => 'once',
@@ -156,31 +159,31 @@ class Help
                 19 => 'diecinueve'
             );
             return $conversion_especial[$numero];
-        } elseif($numero < 100){
+        } elseif ($numero < 100) {
             $decena = floor($numero / 10);
             $unidad = $numero % 10;
 
             $texto = $decenas[$decena];
 
-            if($unidad == 0){
+            if ($unidad == 0) {
                 return $texto;
             } else {
                 return $texto . ' y ' . $conversion[$unidad];
             }
-        } elseif($numero < 1000){
+        } elseif ($numero < 1000) {
             $centena = floor($numero / 100);
             $resto = $numero % 100;
 
-            if($resto == 0){
+            if ($resto == 0) {
                 return $centenas[$centena];
             } else {
                 return $centenas[$centena] . ' ' . Help::numberToString($resto);
             }
-        } elseif($numero < 1000000){
+        } elseif ($numero < 1000000) {
             $millar = floor($numero / 1000);
             $resto = $numero % 1000;
 
-            if($resto == 0){
+            if ($resto == 0) {
                 return Help::numberToString($millar) . ' mil';
             } else {
                 return Help::numberToString($millar) . ' mil ' . Help::numberToString($resto);
@@ -188,13 +191,81 @@ class Help
         }
     }
 
-    public static function getPayWay($way){
+    public static function getPayWay($way)
+    {
         $forma = MHFormaPago::where('codigo', $way)->first();
 
-        if ( !$forma->id ){
+        if (!$forma->id) {
             return $forma->valor;
         }
 
         return null;
+    }
+
+    public static function setCliente($receptor)
+    {
+
+        $nit = $receptor['nit'];
+        $cliente = Cliente::where('nit', $nit)->first();
+
+        if ($cliente == null) {
+            $nrc = $receptor['nrc'];
+            $nombre = $receptor['nombre'];
+            $codigoActividad = $receptor['codActividad'];
+            $descripcionActividad = $receptor['descActividad'];
+            $nombreComercial = $receptor['nombreComercial'];
+            $departamento = $receptor['direccion']['departamento'];
+            $municipio = $receptor['direccion']['municipio'];
+            $complemento = isset($receptor['direccion']['complemento']) ? $receptor['direccion']['complemento'] : ' ';
+            $telefono = $receptor['telefono'];
+            $correo = $receptor['correo'];
+
+            $cliente = Cliente::create([
+                'tipo_documento' => '03',
+                'nit' => $nit,
+                'nrc' => $nrc,
+                'dui' => Generator::generateCodeGeneration(),
+                'nombre' => $nombre,
+                'codigo_activad' => $codigoActividad,
+                'descripcion_activad' => $descripcionActividad,
+                'nombre_comercial' => $nombreComercial,
+                'departamento' => $departamento,
+                'municipio' => $municipio,
+                'complemento' => $complemento,
+                'telefono' => $telefono,
+                'correo' => $correo,
+            ]);
+
+            $cliente->save();
+
+            return $receptor;
+        }
+
+        $newReceptor = [];
+
+        $newReceptor['nit'] = $cliente->nit;
+        $newReceptor['nrc'] = $cliente->nrc;
+        $newReceptor['nombre'] = $cliente->nombre;
+        $newReceptor['codActividad'] = $cliente->codigo_activad;
+        $newReceptor['descActividad'] = $cliente->descripcion_activad;
+        $newReceptor['nombreComercial'] = $cliente->nombre_comercial;
+        $newReceptor['direccion']['departamento'] = $cliente->departamento;
+        $newReceptor['direccion']['municipio'] = $cliente->municipio;
+        $newReceptor['direccion']['complemento'] = $cliente->complemento;
+        $newReceptor['telefono'] = $cliente->telefono;
+        $newReceptor['correo'] = $cliente->correo;
+
+        return $newReceptor;
+    }
+
+    public static function getClienteId($nit)
+    {
+
+        $cliente = Cliente::where('nit', $nit)->first();
+
+        if ( $cliente == null )
+            throw new Exception("No existe ningun registro para cliente con nit $nit");
+
+        return $cliente->id;
     }
 }
