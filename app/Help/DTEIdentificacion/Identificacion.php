@@ -95,6 +95,9 @@ class Identificacion
                 'departamento'=> $clienteR['departamento']??null,
                 'municipio'=> $clienteR['municipio']??null,
                 'complemento'=> $clienteR['direccion']??null,
+                'telefono'=> $clienteR['telefono']??null,
+                'correo'=> $clienteR['correo']??null,
+                'estado'=>1
             ]);
         }else{
             $cliente= Cliente::where('nit',$clienteR['numDocumento'])->update([
