@@ -226,14 +226,27 @@ class DteController extends Controller
       // return $dte;
         */
 
-        $dte = $request;
-        $dte = FirmadorElectronico::firmador($dte);
+      $dte = $request;
+        $dte = FirmadorElectronico::firmadorNew($dte);
+
+
+
+        $jsonRequest = [
+            'ambiente' => "00",
+            'idEnvio' => 1,
+            'version' =>1,
+            'tipoDte' => "11",
+            "documento" => $dte['msg'],
+            "codigoGeneracion" => "341CA743-70F1-4CFE-88B57E4AE72E60CB",
+            "nitEmisor" => "06141802161055"
+        ];
+
 
         $requestResponse = Http::withHeaders([
             'Authorization' => $empresa->token_mh,
             'User-Agent' => 'ApiLaravel/1.0',
             'Content-Type' => 'application/JSON'
-        ])->post($url . "fesv/recepciondte", $dte);
+        ])->post($url . "fesv/recepciondte", $jsonRequest);
 
         $responseData = $requestResponse->json();
         $statusCode = $requestResponse->status();
