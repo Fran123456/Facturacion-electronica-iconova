@@ -86,18 +86,21 @@ class Identificacion
 
         if ($cliente == null) {
 
-            $cliente = Cliente::create([
-                'nit' =>  $clienteR['numDocumento'],
-                'tipo_documento' =>  $clienteR['tipoDocumento'],
-                'nrc' =>  $clienteR['nrc'] ?? null,
-                'dui' =>  $dui,
-                'nombre' => $clienteR['nombre'],
-                'codigo_actividad' => $actividadCliente->codigo,
-                'descripcion_actividad' => $actividadCliente->valor,
-                'nombre_comercial' => $clienteR['nombreComercial'] ?? $clienteR['nombre'],
-                'departamento' => $clienteR['departamento'] ?? null,
-                'municipio' => $clienteR['municipio'] ?? null,
-                'complemento' => $clienteR['direccion'] ?? null,
+            $cliente= Cliente::create([
+                'nit'=>  $clienteR['numDocumento'],
+                'tipo_documento'=>  $clienteR['tipoDocumento'],
+                'nrc'=>  $clienteR['nrc']??null,
+                'dui'=>  $dui,
+                'nombre'=> $clienteR['nombre'],
+                'codigo_actividad'=> $actividadCliente->codigo,
+                'descripcion_actividad'=> $actividadCliente->valor,
+                'nombre_comercial'=> $clienteR['nombreComercial']??$clienteR['nombre'],
+                'departamento'=> $clienteR['departamento']??null,
+                'municipio'=> $clienteR['municipio']??null,
+                'complemento'=> $clienteR['direccion']??null,
+                'telefono'=> $clienteR['telefono']??null,
+                'correo'=> $clienteR['correo']??null,
+                'estado'=>1
             ]);
         } else {
             $cliente = Cliente::where('nit', $clienteR['numDocumento'])->update([
