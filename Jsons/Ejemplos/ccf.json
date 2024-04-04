@@ -1,0 +1,79 @@
+{
+    "firmanteAutomatico": 1,
+    "codigo_pago": "01",
+    "dteJson": {
+        "receptor": {
+            "nit": "04132112711013",
+            "nrc": "2092593",
+            "nombre": "Solórzano Villegas, María de los Ángeles",
+            "codActividad": "62010",
+            "descActividad": "Cultivo de cereales excepto arroz y para forrajes",
+            "nombreComercial": "REGIT",
+            "direccion": {
+                "departamento": "06",
+                "municipio": "14",
+                "complemento": "2 Av. Norte Psj.Viuad, Bo. San Miguelito, # 128"
+            },
+            "telefono": "54545545",
+            "correo": "example@gmail.com"
+        },
+        "documentoRelacionado": null,
+        "otrosDocumentos": null,
+        "ventaTercero": null,
+        "cuerpoDocumento": [
+            {
+                "numItem": 1,
+                "tipoItem": 1,
+                "numeroDocumento": null,
+                "codigo": null,
+                "codTributo": null,
+                "descripcion": "SAMSUNG A55",
+                "cantidad": 100.00000000,
+                "uniMedida": 59,
+                "precioUni": 265.48672566,
+                "montoDescu": 0,
+                "ventaNoSuj": 0.0,
+                "ventaExenta": 0.0,
+                "ventaGravada": 26548.67,
+                "tributos": [
+                    "20"
+                ],
+                "psv": 0,
+                "noGravado": 0
+            },
+            {
+                "numItem": 2,
+                "tipoItem": 1,
+                "numeroDocumento": null,
+                "codigo": null,
+                "codTributo": null,
+                "descripcion": "SAMSUNG A55",
+                "cantidad": 100.00000000,
+                "uniMedida": 59,
+                "precioUni": 265.48672566,
+                "montoDescu": 0,
+                "ventaNoSuj": 0.0,
+                "ventaExenta": 0.0,
+                "ventaGravada": 26548.67,
+                "tributos": [
+                    "20", "59"
+                ],
+                "psv": 0,
+                "noGravado": 0
+            }
+        ],
+        "extension": null,
+        "apendice": [
+            {
+                "campo": "Datos del Vendedor",
+                "etiqueta": "Nombre del Vendedor",
+                "valor": "000000000 - Administrador"
+            },
+            {
+                "campo": "placa_vehiculo",
+                "etiqueta": "PLACA VEHICULO",
+                "valor": "S/P"
+            }
+        ]
+    }
+}

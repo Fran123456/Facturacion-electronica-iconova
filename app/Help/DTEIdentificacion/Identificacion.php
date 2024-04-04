@@ -11,11 +11,13 @@ use App\Models\MH\MHPais;
 
 use App\Help\Help;
 use App\Models\Cliente;
+
 class Identificacion
 {
 
     public static function identidad($tipoDoc)
-    {   $empresa = Help::getEmpresa();
+    {
+        $empresa = Help::getEmpresa();
         $fecha_actual = new \DateTime();
         $identificacion =  [
             "version" => 1,
@@ -30,15 +32,16 @@ class Identificacion
             "fecEmi" => $fecha_actual->format('Y-m-d'),
             "horEmi" => $fecha_actual->format('H:i:s'),
             "tipoMoneda" => "USD"
-         ] ;
+        ];
         return $identificacion;
     }
 
 
 
-    public static function receptor($clienteR){
+    public static function receptor($clienteR)
+    {
 
-       /*RECEPTOR A CONSTRUIR
+        /*RECEPTOR A CONSTRUIR
         "receptor": {
         "nombre": "GUILLERMO ANTONIO DURAN MORALES",
         "codPais": "9300",
@@ -56,64 +59,64 @@ class Identificacion
 
         $cliente = Cliente::where('nit', $clienteR['numDocumento'])->first();
 
-        $actividadCliente = MHActividadEconomica::where('codigo',$clienteR['descActividad'])->first();
-        if($actividadCliente==null){
-            $actividadCliente = MHActividadEconomica::where('codigo','10005')->first();
+        $actividadCliente = MHActividadEconomica::where('codigo', $clienteR['descActividad'])->first();
+        if ($actividadCliente == null) {
+            $actividadCliente = MHActividadEconomica::where('codigo', '10005')->first();
         }
 
-        $dui =null;
-        $tipoDocumentoCliente = MHTipoDocumento::where('codigo',$clienteR['tipoDocumento'])->first();
-        if($tipoDocumentoCliente==null){
-           return array("error"=> true, "comentario"=> "El tipo de documento no coinciden en la base de datos");
-        }else{
-            if($tipoDocumentoCliente->valor =='DUI'){
-                $dui=$clienteR['dui']??null;
-                if(!isset($clienteR['dui'])){
-                    return array("error"=> true, "comentario"=> "El campo dui es requerido ya que el tipo de documento seleccionado para el cliente ha sido DUI");
+        $dui = null;
+        $tipoDocumentoCliente = MHTipoDocumento::where('codigo', $clienteR['tipoDocumento'])->first();
+        if ($tipoDocumentoCliente == null) {
+            return array("error" => true, "comentario" => "El tipo de documento no coinciden en la base de datos");
+        } else {
+            if ($tipoDocumentoCliente->valor == 'DUI') {
+                $dui = $clienteR['dui'] ?? null;
+                if (!isset($clienteR['dui'])) {
+                    return array("error" => true, "comentario" => "El campo dui es requerido ya que el tipo de documento seleccionado para el cliente ha sido DUI");
                 }
             }
         }
 
-        $paisCliente = MHPais::where('codigo',$clienteR['pais'])->first();
-        if($paisCliente==null){
-            $paisCliente = MHPais::where('codigo','9999')->first();
+        $paisCliente = MHPais::where('codigo', $clienteR['pais'])->first();
+        if ($paisCliente == null) {
+            $paisCliente = MHPais::where('codigo', '9999')->first();
         }
 
 
 
-        if($cliente==null){
+        if ($cliente == null) {
 
-            $cliente= Cliente::create([
-                'nit'=>  $clienteR['numDocumento'],
-                'tipo_documento'=>  $clienteR['tipoDocumento'],
-                'nrc'=>  $clienteR['nrc']??null,
-                'dui'=>  $dui,
-                'nombre'=> $clienteR['nombre'],
-                'codigo_actividad'=> $actividadCliente->codigo,
-                'descripcion_actividad'=> $actividadCliente->valor,
-                'nombre_comercial'=> $clienteR['nombreComercial']??$clienteR['nombre'],
-                'departamento'=> $clienteR['departamento']??null,
-                'municipio'=> $clienteR['municipio']??null,
-                'complemento'=> $clienteR['direccion']??null,
+            $cliente = Cliente::create([
+                'nit' =>  $clienteR['numDocumento'],
+                'tipo_documento' =>  $clienteR['tipoDocumento'],
+                'nrc' =>  $clienteR['nrc'] ?? null,
+                'dui' =>  $dui,
+                'nombre' => $clienteR['nombre'],
+                'codigo_actividad' => $actividadCliente->codigo,
+                'descripcion_actividad' => $actividadCliente->valor,
+                'nombre_comercial' => $clienteR['nombreComercial'] ?? $clienteR['nombre'],
+                'departamento' => $clienteR['departamento'] ?? null,
+                'municipio' => $clienteR['municipio'] ?? null,
+                'complemento' => $clienteR['direccion'] ?? null,
             ]);
-        }else{
-            $cliente= Cliente::where('nit',$clienteR['numDocumento'])->update([
-                'nit'=>  $clienteR['numDocumento'],
-                'tipo_documento'=>  $clienteR['tipoDocumento'],
-                'nrc'=>  $clienteR['nrc']??null,
-                'dui'=> $dui,
-                'nombre'=> $clienteR['nombre'],
-                'codigo_actividad'=> $actividadCliente->codigo,
-                'descripcion_actividad'=> $actividadCliente->valor,
-                'nombre_comercial'=> $clienteR['nombreComercial']??$clienteR['nombre'],
-                'departamento'=> $clienteR['departamento']??null,
-                'municipio'=> $clienteR['municipio']??null,
-                'complemento'=> $clienteR['direccion']??null,
-                'telefono'=> $clienteR['telefono']??null,
-                'correo'=> $clienteR['correo']??null,
-                'estado'=>1
+        } else {
+            $cliente = Cliente::where('nit', $clienteR['numDocumento'])->update([
+                'nit' =>  $clienteR['numDocumento'],
+                'tipo_documento' =>  $clienteR['tipoDocumento'],
+                'nrc' =>  $clienteR['nrc'] ?? null,
+                'dui' => $dui,
+                'nombre' => $clienteR['nombre'],
+                'codigo_actividad' => $actividadCliente->codigo,
+                'descripcion_actividad' => $actividadCliente->valor,
+                'nombre_comercial' => $clienteR['nombreComercial'] ?? $clienteR['nombre'],
+                'departamento' => $clienteR['departamento'] ?? null,
+                'municipio' => $clienteR['municipio'] ?? null,
+                'complemento' => $clienteR['direccion'] ?? null,
+                'telefono' => $clienteR['telefono'] ?? null,
+                'correo' => $clienteR['correo'] ?? null,
+                'estado' => 1
             ]);
-            $cliente = Cliente::where('nit',$clienteR['numDocumento'])->first();
+            $cliente = Cliente::where('nit', $clienteR['numDocumento'])->first();
         }
 
 
@@ -121,20 +124,96 @@ class Identificacion
             "nombre" => $cliente['nombre'],
             "tipoDocumento" =>  $tipoDocumentoCliente->codigo,
             "numDocumento" => $clienteR['numDocumento'],
-            "codPais" => $cliente['pais']??'9999',
+            "codPais" => $cliente['pais'] ?? '9999',
             "nombrePais" => $paisCliente->valor,
             "complemento" => $clienteR['direccion'],
-            "tipoPersona"=> $clienteR['tipoPersona'],
-            "descActividad"=> $actividadCliente->valor,
-            "nombreComercial"=>$cliente['nombreComercial']??$cliente['nombre'],
-            "telefono"=> $cliente['telefono'],
-            "correo"=> $cliente['correo'],
-         ] ;
+            "tipoPersona" => $clienteR['tipoPersona'],
+            "descActividad" => $actividadCliente->valor,
+            "nombreComercial" => $cliente['nombreComercial'] ?? $cliente['nombre'],
+            "telefono" => $cliente['telefono'],
+            "correo" => $cliente['correo'],
+        ];
         return $clienteF;
     }
 
+    public static function receptorCCF($receptor)
+    {
 
-    public static function emisor($tipoDoc,$tipoEstablecimiento, $puntoDeVentaCodigo, $recintoFiscal = null, $regimen=null)
+        $nit = $receptor['nit'];
+        $cliente = Cliente::where('nit', $nit)->first();
+
+        $nrc = $receptor['nrc'];
+        $nombre = $receptor['nombre'];
+        $codigoActividad = $receptor['codActividad'];
+        $descripcionActividad = $receptor['descActividad'];
+        $nombreComercial = $receptor['nombreComercial'];
+        $departamento = $receptor['direccion']['departamento'];
+        $municipio = $receptor['direccion']['municipio'];
+        $complemento = isset($receptor['direccion']['complemento']) ? $receptor['direccion']['complemento'] : 'Sin complemento';
+        $telefono = $receptor['telefono'];
+        $correo = $receptor['correo'];
+
+        if ( $cliente == null ) {
+
+            $cliente = Cliente::create([
+                'tipo_documento' => '03',
+                'nit' => $nit,
+                'nrc' => $nrc,
+                'dui' => Generator::generateCodeGeneration(),
+                'nombre' => $nombre,
+                'codigo_activad' => $codigoActividad,
+                'descripcion_activad' => $descripcionActividad,
+                'nombre_comercial' => $nombreComercial,
+                'departamento' => $departamento,
+                'municipio' => $municipio,
+                'complemento' => $complemento,
+                'telefono' => $telefono,
+                'correo' => $correo,
+            ]);
+
+            $cliente->save();
+
+            return $receptor;
+
+        } else {
+
+            Cliente::where('id', $cliente->id)->update([
+                'tipo_documento' => '03',
+                'nit' => $nit,
+                'nrc' => $nrc,
+                'dui' => Generator::generateCodeGeneration(),
+                'nombre' => $nombre,
+                'codigo_activad' => $codigoActividad,
+                'descripcion_activad' => $descripcionActividad,
+                'nombre_comercial' => $nombreComercial,
+                'departamento' => $departamento,
+                'municipio' => $municipio,
+                'complemento' => $complemento,
+                'telefono' => $telefono,
+                'correo' => $correo,
+            ]);
+
+        }
+
+        $newReceptor = [];
+
+        $newReceptor['nit'] = $cliente->nit;
+        $newReceptor['nrc'] = $cliente->nrc;
+        $newReceptor['nombre'] = $cliente->nombre;
+        $newReceptor['codActividad'] = $cliente->codigo_activad;
+        $newReceptor['descActividad'] = $cliente->descripcion_activad;
+        $newReceptor['nombreComercial'] = $cliente->nombre_comercial;
+        $newReceptor['direccion']['departamento'] = $cliente->departamento;
+        $newReceptor['direccion']['municipio'] = $cliente->municipio;
+        $newReceptor['direccion']['complemento'] = $cliente->complemento;
+        $newReceptor['telefono'] = $cliente->telefono;
+        $newReceptor['correo'] = $cliente->correo;
+
+        return $newReceptor;
+    }
+
+
+    public static function emisor($tipoDoc, $tipoEstablecimiento, $puntoDeVentaCodigo, $recintoFiscal = null, $regimen = null)
     {
 
         $empresa = Help::getEmpresa();
@@ -144,7 +223,7 @@ class Identificacion
         $telefono = Crypt::decryptString($empresa->telefono);
         $correo = Crypt::decryptString($empresa->correo_electronico);
 
-        $actividad =MHActividadEconomica::where('codigo',$empresa->codigo_actividad)->first();
+        $actividad = MHActividadEconomica::where('codigo', $empresa->codigo_actividad)->first();
 
 
         $emisor = [
@@ -154,7 +233,7 @@ class Identificacion
             "codActividad" => $empresa->codigo_actividad,
             "descActividad" => $actividad->valor,
             "nombreComercial" => $empresa->nombre_comercial,
-            "tipoEstablecimiento" => $tipoEstablecimiento??'02',
+            "tipoEstablecimiento" => $tipoEstablecimiento ?? '02',
             "direccion" => [
                 "departamento" => $empresa->departamento,
                 "municipio" => $empresa->municipio,
@@ -163,24 +242,17 @@ class Identificacion
             "telefono" => $telefono,
             "correo" => $correo,
             "codEstableMH" => $empresa->codigo_establecimiento,
-            "codEstable"=> null,
-            "codPuntoVenta"=>null,
-            "codPuntoVentaMH" => $puntoDeVentaCodigo??$empresa->codigo_establecimiento,
-            "tipoItemExpor" => 1,
-            "recintoFiscal" => $recintoFiscal??'01',
-            "regimen" => $regimen??'EX-1.1000.000'
-
-
+            "codEstable" => null,
+            "codPuntoVenta" => null,
+            "codPuntoVentaMH" => $puntoDeVentaCodigo ?? $empresa->codigo_establecimiento,
         ];
 
 
         if ($tipoDoc == '11') { //PARA FACTURA  DE EXPORTACION
             $emisor["tipoItemExpor"] = 1;
-            $emisor["recintoFiscal"] = $recintoFiscal;
-            $emisor["regimen"] = "EX-1.1000.000";
+            $emisor["recintoFiscal"] =  $recintoFiscal ?? $recintoFiscal;
+            $emisor["regimen"] =  $regimen ?? "EX-1.1000.000";
         }
         return $emisor;
     }
-
-
 }

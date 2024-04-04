@@ -68,9 +68,8 @@ class DteController extends Controller
         $identificacion['tipoModelo'] = 1;
         $identificacion['tipoContingencia'] = null;
         $identificacion['motivoContin'] = null;
-        $identificacion['fecEmi'] = date('Y-m-d');
-        // $identificacion['fecEmi'] = date('Y-m-d');
-        $identificacion['horEmi'] = date('h:i:s');
+        $identificacion['fecEmi'] = $fechaEmision;
+        $identificacion['horEmi'] = $horaEmision;
         $identificacion['tipoMoneda'] = "USD";
 
         $newDTE['identificacion'] = $identificacion;
@@ -79,7 +78,10 @@ class DteController extends Controller
         if (array_key_exists('emisor', $dte))
             $newDTE['emisor'] = $dte['emisor'];
         else
-            $newDTE['emisor'] = Help::getEmisorDefault();
+        $newDTE['emisor'] = Identificacion::emisor('03', '20', null);
+            // $newDTE['emisor'] = Help::getEmisorDefault();
+
+        $newDTE['receptor'] = Identificacion::receptorCCF($dte['receptor']);
 
         // DOCUMENTO RELACIONADO
         if (array_key_exists('documentoRelacionado', $dte))
@@ -87,19 +89,22 @@ class DteController extends Controller
         else
             $newDTE['documentoRelacionado'] = null;
 
-        // //  RECEPTOR
-        // $newDTE['receptor'] = $dte['receptor'];
-
+        //  RECEPTOR
         $newDTE['otrosDocumentos'] = $dte['otrosDocumentos'];
         $newDTE['ventaTercero'] = $dte['ventaTercero'];
 
         // Cuerpo Documento
         $newDTE['cuerpoDocumento'] = $dte['cuerpoDocumento'];
 
+        // En el json, periodo pago y plazo pago son opcionales a colocar, pero codigo pago es obligatorio
+        // El valor de codigo pago, debe ser alguno de los codigo de la tabla mh_forma_pago
+        // El valor de plazo debe de venir de alguno de los codigos de la tabla mh plazo
+        // El valor de periodo debe de se tipo numerico
         // RESUMEN DEL CUERPO
         $codigoPago = $body['codigo_pago'];
         $periodoPago = isset($body['periodo_pago']) ? $body['periodo_pago'] : null;
         $plazoPago = isset($body['plazo_pago']) ? $body['plazo_pago'] : null;
+
         $newDTE['resumen'] = CCFDTE::Resumen($dte['cuerpoDocumento'], $codigoPago, $periodoPago, $plazoPago);
 
         $newDTE['extension'] = $dte['extension'];
@@ -111,10 +116,8 @@ class DteController extends Controller
         $statusCode = '';
 
 
-        // return response()->json($newDTE['receptor']);
         try {
 
-            $newDTE['receptor'] = Help::setCliente($dte['receptor']);
             $idCliente = Help::getClienteId($dte['receptor']['nit']);
             $registoDTE = RegistroDTE::create([
                 'id_cliente' => $idCliente,
@@ -136,7 +139,7 @@ class DteController extends Controller
             $tokenDTE = $DTESigned['msg'];
 
             $jsonRequest = [
-                'ambiente' => "00",
+                'ambiente' => $empresa->ambiente,
                 'idEnvio' => 1,
                 'version' => 3,
                 'tipoDte' => $tipoDTE,
@@ -169,7 +172,6 @@ class DteController extends Controller
 
                 throw new Exception($errorMessage);
             }
-
         } catch (Exception $e) {
 
             $logDTE = LogDTE::create([
@@ -187,6 +189,7 @@ class DteController extends Controller
         } finally {
             $registoDTE->save();
         }
+
         return response()->json($responseData, $statusCode);
     }
 
@@ -231,7 +234,7 @@ class DteController extends Controller
       // return $dte;
         */
 
-      $dte = $request;
+        $dte = $request;
         $dte = FirmadorElectronico::firmadorNew($dte);
 
 
@@ -239,7 +242,7 @@ class DteController extends Controller
         $jsonRequest = [
             'ambiente' => "00",
             'idEnvio' => 1,
-            'version' =>1,
+            'version' => 1,
             'tipoDte' => "11",
             "documento" => $dte['msg'],
             "codigoGeneracion" => "341CA743-70F1-4CFE-88B57E4AE72E60CB",

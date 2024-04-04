@@ -202,69 +202,13 @@ class Help
         return null;
     }
 
-    public static function setCliente($receptor)
+    public static function getClienteId($numDocumento)
     {
 
-        $nit = $receptor['nit'];
-        $cliente = Cliente::where('nit', $nit)->first();
+        $cliente = Cliente::where('nit', $numDocumento)->orWhere('dui', $numDocumento)->first();
 
-        if ($cliente == null) {
-            $nrc = $receptor['nrc'];
-            $nombre = $receptor['nombre'];
-            $codigoActividad = $receptor['codActividad'];
-            $descripcionActividad = $receptor['descActividad'];
-            $nombreComercial = $receptor['nombreComercial'];
-            $departamento = $receptor['direccion']['departamento'];
-            $municipio = $receptor['direccion']['municipio'];
-            $complemento = isset($receptor['direccion']['complemento']) ? $receptor['direccion']['complemento'] : ' ';
-            $telefono = $receptor['telefono'];
-            $correo = $receptor['correo'];
-
-            $cliente = Cliente::create([
-                'tipo_documento' => '03',
-                'nit' => $nit,
-                'nrc' => $nrc,
-                'dui' => Generator::generateCodeGeneration(),
-                'nombre' => $nombre,
-                'codigo_activad' => $codigoActividad,
-                'descripcion_activad' => $descripcionActividad,
-                'nombre_comercial' => $nombreComercial,
-                'departamento' => $departamento,
-                'municipio' => $municipio,
-                'complemento' => $complemento,
-                'telefono' => $telefono,
-                'correo' => $correo,
-            ]);
-
-            $cliente->save();
-
-            return $receptor;
-        }
-
-        $newReceptor = [];
-
-        $newReceptor['nit'] = $cliente->nit;
-        $newReceptor['nrc'] = $cliente->nrc;
-        $newReceptor['nombre'] = $cliente->nombre;
-        $newReceptor['codActividad'] = $cliente->codigo_activad;
-        $newReceptor['descActividad'] = $cliente->descripcion_activad;
-        $newReceptor['nombreComercial'] = $cliente->nombre_comercial;
-        $newReceptor['direccion']['departamento'] = $cliente->departamento;
-        $newReceptor['direccion']['municipio'] = $cliente->municipio;
-        $newReceptor['direccion']['complemento'] = $cliente->complemento;
-        $newReceptor['telefono'] = $cliente->telefono;
-        $newReceptor['correo'] = $cliente->correo;
-
-        return $newReceptor;
-    }
-
-    public static function getClienteId($nit)
-    {
-
-        $cliente = Cliente::where('nit', $nit)->first();
-
-        if ( $cliente == null )
-            throw new Exception("No existe ningun registro para cliente con nit $nit");
+        if ($cliente == null)
+            throw new Exception("No existe ningun registro para cliente con nit/dui $numDocumento");
 
         return $cliente->id;
     }
