@@ -86,21 +86,21 @@ class Identificacion
 
         if ($cliente == null) {
 
-            $cliente= Cliente::create([
-                'nit'=>  $clienteR['numDocumento'],
-                'tipo_documento'=>  $clienteR['tipoDocumento'],
-                'nrc'=>  $clienteR['nrc']??null,
-                'dui'=>  $dui,
-                'nombre'=> $clienteR['nombre'],
-                'codigo_actividad'=> $actividadCliente->codigo,
-                'descripcion_actividad'=> $actividadCliente->valor,
-                'nombre_comercial'=> $clienteR['nombreComercial']??$clienteR['nombre'],
-                'departamento'=> $clienteR['departamento']??null,
-                'municipio'=> $clienteR['municipio']??null,
-                'complemento'=> $clienteR['direccion']??null,
-                'telefono'=> $clienteR['telefono']??null,
-                'correo'=> $clienteR['correo']??null,
-                'estado'=>1
+            $cliente = Cliente::create([
+                'nit' =>  $clienteR['numDocumento'],
+                'tipo_documento' =>  $clienteR['tipoDocumento'],
+                'nrc' =>  $clienteR['nrc'] ?? null,
+                'dui' =>  $dui,
+                'nombre' => $clienteR['nombre'],
+                'codigo_actividad' => $actividadCliente->codigo,
+                'descripcion_actividad' => $actividadCliente->valor,
+                'nombre_comercial' => $clienteR['nombreComercial'] ?? $clienteR['nombre'],
+                'departamento' => $clienteR['departamento'] ?? null,
+                'municipio' => $clienteR['municipio'] ?? null,
+                'complemento' => $clienteR['direccion'] ?? null,
+                'telefono' => $clienteR['telefono'] ?? null,
+                'correo' => $clienteR['correo'] ?? null,
+                'estado' => 1
             ]);
         } else {
             $cliente = Cliente::where('nit', $clienteR['numDocumento'])->update([
@@ -156,7 +156,7 @@ class Identificacion
         $telefono = $receptor['telefono'];
         $correo = $receptor['correo'];
 
-        if ( $cliente == null ) {
+        if ($cliente == null) {
 
             $cliente = Cliente::create([
                 'tipo_documento' => '03',
@@ -164,8 +164,8 @@ class Identificacion
                 'nrc' => $nrc,
                 'dui' => Generator::generateCodeGeneration(),
                 'nombre' => $nombre,
-                'codigo_activad' => $codigoActividad,
-                'descripcion_activad' => $descripcionActividad,
+                'codigo_actividad' => $codigoActividad,
+                'descripcion_actividad' => $descripcionActividad,
                 'nombre_comercial' => $nombreComercial,
                 'departamento' => $departamento,
                 'municipio' => $municipio,
@@ -177,7 +177,6 @@ class Identificacion
             $cliente->save();
 
             return $receptor;
-
         } else {
 
             Cliente::where('id', $cliente->id)->update([
@@ -186,8 +185,8 @@ class Identificacion
                 'nrc' => $nrc,
                 'dui' => Generator::generateCodeGeneration(),
                 'nombre' => $nombre,
-                'codigo_activad' => $codigoActividad,
-                'descripcion_activad' => $descripcionActividad,
+                'codigo_actividad' => $codigoActividad,
+                'descripcion_actividad' => $descripcionActividad,
                 'nombre_comercial' => $nombreComercial,
                 'departamento' => $departamento,
                 'municipio' => $municipio,
@@ -195,7 +194,6 @@ class Identificacion
                 'telefono' => $telefono,
                 'correo' => $correo,
             ]);
-
         }
 
         $newReceptor = [];
@@ -203,14 +201,86 @@ class Identificacion
         $newReceptor['nit'] = $cliente->nit;
         $newReceptor['nrc'] = $cliente->nrc;
         $newReceptor['nombre'] = $cliente->nombre;
-        $newReceptor['codActividad'] = $cliente->codigo_activad;
-        $newReceptor['descActividad'] = $cliente->descripcion_activad;
+        $newReceptor['codActividad'] = $cliente->codigo_actividad;
+        $newReceptor['descActividad'] = $cliente->descripcion_actividad;
         $newReceptor['nombreComercial'] = $cliente->nombre_comercial;
         $newReceptor['direccion']['departamento'] = $cliente->departamento;
         $newReceptor['direccion']['municipio'] = $cliente->municipio;
         $newReceptor['direccion']['complemento'] = $cliente->complemento;
         $newReceptor['telefono'] = $cliente->telefono;
         $newReceptor['correo'] = $cliente->correo;
+
+        return $newReceptor;
+    }
+
+    public static function receptorFactura($receptor)
+    {
+        $cliente = Cliente::where('nit', $receptor['numDocumento'])->first();
+
+        $descripcionActividad = $receptor['descActividad'];
+        $numDocumento = $receptor['numDocumento'];
+        $codigoActividad = $receptor['codActividad'];
+        $correo = $receptor['correo'];
+        $departamento = $receptor['direccion']['departamento'];
+        $municipio = $receptor['direccion']['municipio'];
+        $complemento = isset($receptor['direccion']['complemento']) ? $receptor['direccion']['complemento'] : 'Sin complemento';
+        $telefono = $receptor['telefono'];
+        $nombre = $receptor['nombre'];
+        $nrc = $receptor['nrc'];
+
+        if ($cliente == null) {
+
+            $cliente = Cliente::create([
+                'tipo_documento' => '13',
+                'nit' => (string)$numDocumento,
+                'nrc' => (string)$nrc ?? null,
+                'dui' => (string)$numDocumento,
+                'nombre' => (string)$nombre,
+                'codigo_actividad' => (string)$codigoActividad,
+                'descripcion_actividad' => (string)$descripcionActividad,
+                'nombre_comercial' => (string)$receptor['nombreComercial'] ?? (string)$receptor['nombre'],
+                'departamento' => (string)$departamento,
+                'municipio' => (string)$municipio,
+                'complemento' => (string)$complemento,
+                'telefono' => (string)$telefono,
+                'correo' => (string)$correo,
+            ]);
+
+            $cliente->save();
+
+            return $receptor;
+        } else {
+
+            Cliente::where('id', $cliente->id)->update([
+                'tipo_documento' => '13',
+                'nit' => (string)$numDocumento,
+                'nrc' => (string)$nrc ?? null,
+                'dui' => (string)$numDocumento,
+                'nombre' => (string)$nombre,
+                'codigo_actividad' => (string)$codigoActividad,
+                'descripcion_actividad' => (string)$descripcionActividad,
+                'nombre_comercial' => (string)$receptor['nombreComercial'] ?? $receptor['nombre'],
+                'departamento' => (string)$departamento,
+                'municipio' => (string)$municipio,
+                'complemento' => (string)$complemento,
+                'telefono' => (string)$telefono,
+                'correo' => (string)$correo,
+            ]);
+        }
+
+        $newReceptor = [];
+
+        $newReceptor['descActividad'] = $cliente->descripcion_actividad;
+        $newReceptor['tipoDocumento'] = $cliente->tipo_documento;
+        $newReceptor['numDocumento'] = $cliente->dui;
+        $newReceptor['codActividad'] = $cliente->codigo_actividad;
+        $newReceptor['correo'] = $cliente->correo;
+        $newReceptor['direccion']['departamento'] = $cliente->departamento;
+        $newReceptor['direccion']['municipio'] = $cliente->municipio;
+        $newReceptor['direccion']['complemento'] = $cliente->complemento;
+        $newReceptor['telefono'] = $cliente->telefono;
+        $newReceptor['nombre'] = $cliente->nombre;
+        $newReceptor['nrc'] = $cliente->nrc;
 
         return $newReceptor;
     }
