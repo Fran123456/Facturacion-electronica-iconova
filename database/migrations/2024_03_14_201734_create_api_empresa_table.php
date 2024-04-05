@@ -16,7 +16,9 @@ return new class extends Migration
         Schema::create('empresa', function (Blueprint $table) {
             $table->id();
             $table->text("nombre");
+            $table->string("nombre_comercial", 300)->nullable();
             $table->text("nit");
+            $table->string("nit", 200)->nullable();
             $table->text("credenciales_api");
             $table->text("password_mh");
             $table->text("public_key");
@@ -24,8 +26,19 @@ return new class extends Migration
             $table->text("correo_electronico");
             $table->text("telefono");
             $table->text("celular");
+
+            // Campos agregados
+            $table->string('departamento', 200)->nullable();
+            $table->string('municipio', 100)->nullable();
+            $table->text('direccion')->nullable();
+            $table->string('codigo_establecimiento', 20)->nullable();
+            $table->text('token_mh')->nullable();
+            $table->string('codigo_actividad', 200)->nullable();
+            $table->string('ambiente', 10)->nullable();
+            $table->string('correlativo_fex', 200)->nullable();
+            $table->string('correlativo_ccf', 200)->nullable();
+
             $table->boolean("estado")->default(true);
-           
             $table->timestamps();
         });
     }
