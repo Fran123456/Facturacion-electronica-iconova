@@ -36,7 +36,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/mh/enviar/dte/unitario/ccf', [DteController::class, 'enviarDteUnitarioCCF']);
 
         Route::post('/mh/enviar/dte/unitario/factura-exterior', [DteController::class, 'enviarDteUnitarioFacturaExterior']);
-
+        Route::post('/mh/enviar/dte/unitario/factura', [DteController::class, 'enviarDteUnitarioFactura']);
     });
 });
 

@@ -78,8 +78,8 @@ class DteController extends Controller
         if (array_key_exists('emisor', $dte))
             $newDTE['emisor'] = $dte['emisor'];
         else
-        $newDTE['emisor'] = Identificacion::emisor('03', '20', null);
-            // $newDTE['emisor'] = Help::getEmisorDefault();
+            $newDTE['emisor'] = Identificacion::emisor('03', '20', null);
+        // $newDTE['emisor'] = Help::getEmisorDefault();
 
         $newDTE['receptor'] = Identificacion::receptorCCF($dte['receptor']);
 
@@ -280,5 +280,42 @@ class DteController extends Controller
         ->send(new DteMail($nombreCliente ,  $correoEmpresa,  $telefono, "9D50E003-621E-1AB5-B828-0004AC1EA976"));
 
         */
+    }
+
+    public function enviarDteUnitarioFactura(Request $request)
+    {
+        $body = json_decode($request->getContent(), true);
+        $dte = $body['dteJson'];
+        $codigoPago = $body['codigo_pago'];
+        $periodoPago = isset($body['periodo_pago']) ? $body['periodo_pago'] : null;
+        $plazoPago = isset($body['plazo_pago']) ? $body['plazo_pago'] : null;
+        $newDTE = [];
+        //login para generar token de hacienda.
+        $responseLogin = LoginMH::login();
+
+        if ($responseLogin['code'] != 200)
+            return response()->json(DteCodeValidator::code404($responseLogin['error']), 404);
+
+        $empresa = Help::getEmpresa();
+        $url = Help::mhUrl();
+
+        //GENERAR JSON VALIDO PARA  HACIENDA
+        $identificacion = Identificacion::identidad('01');
+        $emisor = Identificacion::emisor('01', null, null, null);
+
+        $newDTE['extension'] = null;
+        $newDTE['identificacion'] = $identificacion;
+        $newDTE['resumen'] = CCFDTE::Resumen($dte['cuerpoDocumento'], $codigoPago, $periodoPago, $plazoPago);
+        $newDTE['cuerpoDocumento'] = $dte['cuerpoDocumento'];
+        $newDTE['otrosDocumentos'] = $dte['otrosDocumentos'];
+        $newDTE['ventaTercero'] = $dte['ventaTercero'];
+        $newDTE['apendice'] = $dte['apendice'];
+        if (array_key_exists('documentoRelacionado', $dte))
+            $newDTE['documentoRelacionado'] = $dte['documentoRelacionado'];
+        else
+            $newDTE['documentoRelacionado'] = null;
+        $newDTE['emisor'] = $emisor;
+
+        return response()->json($newDTE, 200);
     }
 }
