@@ -336,8 +336,6 @@ class DteController extends Controller
                 'estado' => true,
             ]);
 
-            return response()->json($registroDTE, 200);
-
             $DTESigned = FirmadorElectronico::firmador($newDTE);
             $statusSigner =  $DTESigned['status'];
 
@@ -395,7 +393,7 @@ class DteController extends Controller
             $logDTE->save();
             $registroDTE->estado = false;
         } finally {
-            // $registroDTE->save();
+            $registroDTE->save();
         }
 
         return response()->json($responseData, $statusCode);
