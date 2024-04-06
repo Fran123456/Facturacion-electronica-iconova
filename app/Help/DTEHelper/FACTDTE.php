@@ -6,8 +6,12 @@ use App\help\Help;
 
 class FACTDTE
 {
-
-    public static function Resumen($cuerpo, $codigoPago, $plazoPago, $periodoPago)
+    //$condicionPago =  mh_condicion_operacion
+    //codigoPago = mh_forma_pago
+    //$plazoPago = mh_plazo
+    //$periodoPago  = 
+    //$formaPago = mh_condicion_operacion
+    public static function Resumen($cuerpo, $codigoPago, $plazoPago, $periodoPago, $formaPago, $numPagoElectronico)
     {
         $resumen = [];
         $descripcionPago = Help::getPayWay($codigoPago);
@@ -34,33 +38,35 @@ class FACTDTE
             $subTotal += $ventaGravada;
             $totalDescu += $value['montoDescu'];
 
-            foreach ($value['tributos'] as $tributo) {
-                $encontrado = false;
-                $impuesto = 0.0;
-
-                $impuesto = round(Help::getTax($tributo, $ventaGravada), 2);
-
-                foreach ($tributos as $clave => $valor) {
-
-                    $codigo = $valor['codigo'];
-
-                    if ($codigo == $tributo) {
-                        $encontrado = true;
-                        $tributos[$clave]['valor'] += $impuesto;
-                        break;
+            if($value['tributos'] != null){
+                foreach ($value['tributos'] as $tributo) {
+                    $encontrado = false;
+                    $impuesto = 0.0;
+    
+                    $impuesto = round(Help::getTax($tributo, $ventaGravada), 2);
+    
+                    foreach ($tributos as $clave => $valor) {
+    
+                        $codigo = $valor['codigo'];
+    
+                        if ($codigo == $tributo) {
+                            $encontrado = true;
+                            $tributos[$clave]['valor'] += $impuesto;
+                            break;
+                        }
                     }
+    
+                    if (!$encontrado) {
+                        $tributos[] = [
+                            'codigo' => $tributo,
+                            'descripcion' => Help::getTributo($tributo),
+                            'valor' => $impuesto
+                        ];
+                    }
+    
+                    $totalImpuestos += $impuesto;
+                    $impuestoTotalItem += $impuesto;
                 }
-
-                if (!$encontrado) {
-                    $tributos[] = [
-                        'codigo' => $tributo,
-                        'descripcion' => Help::getTributo($tributo),
-                        'valor' => $impuesto
-                    ];
-                }
-
-                $totalImpuestos += $impuesto;
-                $impuestoTotalItem += $impuesto;
             }
 
             $pagos[] = [
@@ -87,12 +93,12 @@ class FACTDTE
             'totalLetras' => $numero_en_letras,
             'ivaRete1' => 0.0,
             'subTotalVentas' => $subTotal,
+            'subTotal' => $subTotal,
             'reteRenta' => 0.0,
             'tributos' => $tributos,
             'pagos' => $pagos,
             'descuExenta' => 0.0,
             'totalDescu' => $totalDescu,
-            'numeroPagoElectronico' => null,
             'descuGravada' => 0.0,
             'porcentajeDescuento' => 0.0,
             'totalGravada' => $subTotal,
@@ -101,7 +107,8 @@ class FACTDTE
             'saldoFavor' => 0,
             'totalExenta' => $totalExenta,
             'totalPagar' => $totalPagar,
-            'codicionOperacion' => 1,
+            'condicionOperacion'=>$formaPago,
+            'numPagoElectronico'=>$numPagoElectronico
         ];
 
         return $resumen;

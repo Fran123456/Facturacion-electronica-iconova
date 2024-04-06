@@ -288,6 +288,7 @@ class DteController extends Controller
     {
         $body = json_decode($request->getContent(), true);
         // return response()->json($body, 200);
+        
         $dte = $body['dteJson'];
         $codigoPago = $body['codigo_pago'];
         $periodoPago = isset($body['periodo_pago']) ? $body['periodo_pago'] : null;
@@ -311,11 +312,12 @@ class DteController extends Controller
         $identificacion = Identificacion::identidad('01');
         $emisor = Identificacion::emisor('01', null, null, null);
         $receptor = Identificacion::receptorFactura($dte['receptor']);
-
+ 
         $newDTE['extension'] = null;
         $newDTE['receptor'] = $receptor;
         $newDTE['identificacion'] = $identificacion;
-        $newDTE['resumen'] = FACTDTE::Resumen($dte['cuerpoDocumento'], $codigoPago, $periodoPago, $plazoPago);
+        $newDTE['resumen'] = FACTDTE::Resumen($dte['cuerpoDocumento'], $codigoPago, $periodoPago, $plazoPago, $body['forma_pago'], $body['numPagoElectronico']);
+        
         $newDTE['cuerpoDocumento'] = $dte['cuerpoDocumento'];
         $newDTE['otrosDocumentos'] = $dte['otrosDocumentos'] ?? null;
         $newDTE['ventaTercero'] = $dte['ventaTercero'] ?? null;
@@ -335,8 +337,9 @@ class DteController extends Controller
                 'dte' => json_encode($newDTE),
                 'estado' => true,
             ]);
-
+          
             $DTESigned = FirmadorElectronico::firmador($newDTE);
+            
             $statusSigner =  $DTESigned['status'];
 
             if ($statusSigner > 201)
@@ -345,11 +348,12 @@ class DteController extends Controller
                 ], $statusSigner);
 
             $documento = $DTESigned['msg'];
+            
 
             $jsonRequest = [
                 'ambiente' => $empresa->ambiente,
                 'idEnvio' => 1,
-                'version' => 3,
+                'version' => 1,
                 'tipoDte' => $tipoDTE,
                 "documento" => $documento,
                 "codigoGeneracion" => Generator::generateCodeGeneration(),

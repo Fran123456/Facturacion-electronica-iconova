@@ -28,11 +28,18 @@ class Identificacion
             "tipoOperacion" => 1,
             "tipoModelo" => 1,
             "tipoContingencia" => null,
-            "motivoContigencia" => null,
+           
             "fecEmi" => $fecha_actual->format('Y-m-d'),
             "horEmi" => $fecha_actual->format('H:i:s'),
             "tipoMoneda" => "USD"
         ];
+
+        if($tipoDoc=="01") //factura
+        {
+            $identificacion['motivoContin']=null;
+        }else{
+            $identificacion['motivoContigencia']=  null;
+        }
         return $identificacion;
     }
 
@@ -226,7 +233,7 @@ class Identificacion
         $complemento = isset($receptor['direccion']['complemento']) ? $receptor['direccion']['complemento'] : 'Sin complemento';
         $telefono = $receptor['telefono'];
         $nombre = $receptor['nombre'];
-        $nrc = $receptor['nrc'];
+        $nrc = $receptor['nrc']??null;
 
         if ($cliente == null) {
 
@@ -280,7 +287,7 @@ class Identificacion
         $newReceptor['direccion']['complemento'] = $cliente->complemento;
         $newReceptor['telefono'] = $cliente->telefono;
         $newReceptor['nombre'] = $cliente->nombre;
-        $newReceptor['nrc'] = $cliente->nrc;
+        $newReceptor['nrc'] = $cliente->nrc==""?null:$cliente->nrc;
 
         return $newReceptor;
     }

@@ -1,0 +1,43 @@
+{
+    "firmanteAutomatico": 1,
+    "codigo_pago": "01",
+    "dteJson": {
+        "receptor": {
+            "tipoDocumento": "13",
+            "numDocumento": "20699277-7",
+            "codActividad": "62010",
+            "descActividad": "Cultivo de cereales excepto arroz y para forrajes",
+            "nombre": "Solórzano Villegas, María de los Ángeles",
+            "nombreComercial": "Test",
+            "direccion": {
+                "departamento": "06",
+                "municipio": "14",
+                "complemento": "2 Av. Norte Psj.Viuad, Bo. San Miguelito, # 128"
+            },
+            "telefono": "54545545",
+            "correo": "example@gmail.com",
+            "nrc": null
+        },
+        "cuerpoDocumento": [
+            {
+                "descripcion": "Mantenimiento de servidor",
+                "montoDescu": 0,
+                "codigo": null,
+                "ventaGravada": 35,
+                "ivaItem": 4.03,
+                "ventaNoSuj": 0,
+                "ventaExenta": 0,
+                "tributos": [],
+                "numItem": 1,
+                "noGravado": 0,
+                "psv": 0,
+                "tipoItem": 2,
+                "codTributo": null,
+                "uniMedida": 59,
+                "numeroDocumento": null,
+                "cantidad": 1,
+                "precioUni": 35
+            }
+        ]
+    }
+}
