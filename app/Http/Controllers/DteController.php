@@ -30,6 +30,7 @@ use App\Help\DTEHelper\FEXDTE;
 use App\Models\LogDTE;
 use App\Models\RegistroDTE;
 use Carbon\Carbon;
+use Illuminate\Http\Client\ConnectionException;
 
 class DteController extends Controller
 {
@@ -269,12 +270,13 @@ class DteController extends Controller
         return response()->json($responseData, $statusCode);
 
 
-        $correoEmpresa = Crypt::decryptString($empresa->correo_electronico);
-        $telefono = Crypt::decryptString($empresa->telefono);
-        $nombreEmpresa = Crypt::decryptString($empresa->nombre);
+      
 
 
         //$nombreCliente = 'Francisco Navas';
+      //  $correoEmpresa = Crypt::decryptString($empresa->correo_electronico);
+       // $telefono = Crypt::decryptString($empresa->telefono);
+       // $nombreEmpresa = Crypt::decryptString($empresa->nombre);
         //return WhatsappSender::send();
 
         /*  Mail::to('francisco.navas@datasys.la')
@@ -286,10 +288,17 @@ class DteController extends Controller
 
     public function enviarDteUnitarioFactura(Request $request)
     {
+
+        //PASO 1 , HACER LOGIN EN HACIENDA
+      
+        $responseLogin = LoginMH::login();
+        if ($responseLogin['code'] != 200)
+        return response()->json(DteCodeValidator::code404($responseLogin['error']), 404);
+
+
+        //PASO 2 OBTENER INFORMACION Y DESFRAGMENTARLA
         $body = json_decode($request->getContent(), true);
-        // return response()->json($body, 200);
-        
-        $dte = $body['dteJson'];
+        $dte = $body['dteJson']; //OBTENER EL DTE
         $codigoPago = $body['codigo_pago'];
         $periodoPago = isset($body['periodo_pago']) ? $body['periodo_pago'] : null;
         $plazoPago = isset($body['plazo_pago']) ? $body['plazo_pago'] : null;
@@ -297,18 +306,12 @@ class DteController extends Controller
         $tipoDTE = '01';
         $numeroDTE = Generator::generateNumControl($tipoDTE);
         $fechaEmision = Carbon::now()->format('Y-m-d');
-        $horaEmision = Carbon::now()->format('h:i:s');
-
-        //login para generar token de hacienda.
-        $responseLogin = LoginMH::login();
-
-        if ($responseLogin['code'] != 200)
-            return response()->json(DteCodeValidator::code404($responseLogin['error']), 404);
+        $horaEmision = Carbon::now()->format('H:i:s'); //24 horas
 
         $empresa = Help::getEmpresa();
         $url = Help::mhUrl();
 
-        //GENERAR JSON VALIDO PARA  HACIENDA
+        //PASO 3 GENERAR JSON VALIDO PARA  HACIENDA
         $identificacion = Identificacion::identidad('01');
         $emisor = Identificacion::emisor('01', null, null, null);
         $receptor = Identificacion::receptorFactura($dte['receptor']);
@@ -326,18 +329,12 @@ class DteController extends Controller
             $newDTE['documentoRelacionado'] = $dte['documentoRelacionado'];
         else
             $newDTE['documentoRelacionado'] = null;
+        
         $newDTE['emisor'] = $emisor;
 
         try {
             $idCliente = Help::getClienteId($dte['receptor']['numDocumento']);
-            $registroDTE = RegistroDTE::create([
-                'id_cliente' => $idCliente,
-                'numero_dte' => $numeroDTE,
-                'tipo_documento' => $tipoDTE,
-                'dte' => json_encode($newDTE),
-                'estado' => true,
-            ]);
-          
+           
             $DTESigned = FirmadorElectronico::firmador($newDTE);
             
             $statusSigner =  $DTESigned['status'];
@@ -383,6 +380,17 @@ class DteController extends Controller
                 $errorMessage = "Error $statusCode: " . json_encode($responseData);
                 throw new Exception($errorMessage);
             }
+            $registroDTE = RegistroDTE::create([
+                'id_cliente' => $idCliente,
+                'numero_dte' => $numeroDTE,
+                'tipo_documento' => $tipoDTE,
+                'dte' => json_encode($newDTE),
+                'estado' => true,
+                'empresa_id'=> $empresa->id
+            ]);
+            Generator::saveNumeroControl($tipoDTE);
+           
+            return response()->json($responseData, $statusCode);
         } catch (Exception $e) {
             $logDTE = LogDTE::create([
                 'id_cliente' => $idCliente,
@@ -392,14 +400,13 @@ class DteController extends Controller
                 'hora' => $horaEmision,
                 'error' => $e->getMessage(),
                 'estado' => false,
+                'empresa_id'=> $empresa->id
             ]);
 
             $logDTE->save();
-            $registroDTE->estado = false;
-        } finally {
-            $registroDTE->save();
+            return response()->json($responseData, $statusCode);
         }
 
-        return response()->json($responseData, $statusCode);
+        
     }
 }

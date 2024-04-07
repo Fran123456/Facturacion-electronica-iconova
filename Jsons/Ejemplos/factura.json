@@ -1,6 +1,7 @@
 {
-    "firmanteAutomatico": 1,
     "codigo_pago": "01",
+    "forma_pago": 1,
+    "numPagoElectronico": null,
     "dteJson": {
         "receptor": {
             "tipoDocumento": "13",
@@ -27,7 +28,7 @@
                 "ivaItem": 4.03,
                 "ventaNoSuj": 0,
                 "ventaExenta": 0,
-                "tributos": [],
+                "tributos": null,
                 "numItem": 1,
                 "noGravado": 0,
                 "psv": 0,

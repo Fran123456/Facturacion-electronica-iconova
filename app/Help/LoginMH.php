@@ -39,12 +39,18 @@ class LoginMH {
             "pwd" => $pwd,
         ];
 
-        $requestResponse = Http::withHeaders([
-            'Content-Type' => 'application/x-www-form-urlencoded',
-            'User-Agent' => 'ApiLaravel/1.0',
-            "Accept" => "application/json"
+        try {
+            $requestResponse = Http::withHeaders([
+                'Content-Type' => 'application/x-www-form-urlencoded',
+                'User-Agent' => 'ApiLaravel/1.0',
+                "Accept" => "application/json"
+    
+            ])->asForm()->post($url . "seguridad/auth", $jsonRequest);
+        } catch (ConnectionException $e) {
+            return array(["error" => "No se pudo conectar con la  API de Ministerio hacienda",'code'=>500])[0];
+        }
 
-        ])->asForm()->post($url . "seguridad/auth", $jsonRequest);
+      
 
         $responseData = $requestResponse->json();
         $statusCode = $requestResponse->status();

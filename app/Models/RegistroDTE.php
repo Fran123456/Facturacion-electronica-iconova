@@ -17,7 +17,7 @@ class RegistroDTE extends Model
         'numero_dte',
         'tipo_documento',
         'dte',
-        'estado',
+        'estado','empresa_id'
     ];
 
     public function cliente(){

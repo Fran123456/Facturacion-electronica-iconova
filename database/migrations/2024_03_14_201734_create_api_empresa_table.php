@@ -37,8 +37,8 @@ return new class extends Migration
             $table->string('ambiente', 10)->nullable();
             $table->string('correlativo_fex', 200)->nullable();
             $table->string('correlativo_ccf', 200)->nullable();
-
-            $table->boolean("estado")->default(true);
+            $table->string('correlativo_ccf', 200)->nullable();
+            $table->string("correlativo_fact",200)->nullable();
             $table->timestamps();
         });
     }

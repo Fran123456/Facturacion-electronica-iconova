@@ -8,6 +8,20 @@ use App\Help\Help;
 class Generator
 {
 
+    public static function saveNumeroControl($tipoDoc){
+        $empresa = Help::getEmpresa();
+        if ($tipoDoc == '11') {
+            $empresa->correlativo_fex = (int)$empresa->correlativo_fex+1;
+        }
+        if ($tipoDoc == '03') {
+            $empresa->correlativo_ccf =  (int) $empresa->correlativo_ccf+1;
+        }
+        if ($tipoDoc == '01') {
+            $empresa->correlativo_fact = (int) $empresa->correlativo_fact+1;
+        }
+        $empresa->save();
+    }
+
     public static function generateNumControl($tipoDoc, $codigoEmpresa = "EIV6XMQ0")
     {
 
@@ -34,13 +48,7 @@ class Generator
 
             $registroContadorDTE = $contadorDTEs;
 
-            if ($tipoDoc == '11') {
-                $empresa->correlativo_fex = $registroContadorDTE;
-            }
-            if ($tipoDoc == '03') {
-                $empresa->correlativo_ccf = $registroContadorDTE;
-            }
-            $empresa->save();
+            
             return $generated;
         }
 
