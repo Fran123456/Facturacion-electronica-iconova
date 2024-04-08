@@ -270,13 +270,13 @@ class DteController extends Controller
         return response()->json($responseData, $statusCode);
 
 
-      
+
 
 
         //$nombreCliente = 'Francisco Navas';
-      //  $correoEmpresa = Crypt::decryptString($empresa->correo_electronico);
-       // $telefono = Crypt::decryptString($empresa->telefono);
-       // $nombreEmpresa = Crypt::decryptString($empresa->nombre);
+        //  $correoEmpresa = Crypt::decryptString($empresa->correo_electronico);
+        // $telefono = Crypt::decryptString($empresa->telefono);
+        // $nombreEmpresa = Crypt::decryptString($empresa->nombre);
         //return WhatsappSender::send();
 
         /*  Mail::to('francisco.navas@datasys.la')
@@ -290,10 +290,9 @@ class DteController extends Controller
     {
 
         //PASO 1 , HACER LOGIN EN HACIENDA
-      
         $responseLogin = LoginMH::login();
         if ($responseLogin['code'] != 200)
-        return response()->json(DteCodeValidator::code404($responseLogin['error']), 404);
+            return response()->json(DteCodeValidator::code404($responseLogin['error']), 404);
 
 
         //PASO 2 OBTENER INFORMACION Y DESFRAGMENTARLA
@@ -311,17 +310,20 @@ class DteController extends Controller
         $empresa = Help::getEmpresa();
         $url = Help::mhUrl();
 
+        $detalle = FACTDTE::BuildDetalle($dte['cuerpoDocumento']);
+        $resumen = FACTDTE::Resumen($detalle, $codigoPago, $periodoPago, $plazoPago, $body['forma_pago'], $body['numPagoElectronico']);
+
         //PASO 3 GENERAR JSON VALIDO PARA  HACIENDA
         $identificacion = Identificacion::identidad('01');
         $emisor = Identificacion::emisor('01', null, null, null);
         $receptor = Identificacion::receptorFactura($dte['receptor']);
- 
+
         $newDTE['extension'] = null;
         $newDTE['receptor'] = $receptor;
         $newDTE['identificacion'] = $identificacion;
-        $newDTE['resumen'] = FACTDTE::Resumen($dte['cuerpoDocumento'], $codigoPago, $periodoPago, $plazoPago, $body['forma_pago'], $body['numPagoElectronico']);
-        
-        $newDTE['cuerpoDocumento'] = $dte['cuerpoDocumento'];
+        $newDTE['resumen'] = $resumen;
+
+        $newDTE['cuerpoDocumento'] = $detalle;
         $newDTE['otrosDocumentos'] = $dte['otrosDocumentos'] ?? null;
         $newDTE['ventaTercero'] = $dte['ventaTercero'] ?? null;
         $newDTE['apendice'] = $dte['apendice'] ?? null;
@@ -329,14 +331,14 @@ class DteController extends Controller
             $newDTE['documentoRelacionado'] = $dte['documentoRelacionado'];
         else
             $newDTE['documentoRelacionado'] = null;
-        
+
         $newDTE['emisor'] = $emisor;
 
         try {
             $idCliente = Help::getClienteId($dte['receptor']['numDocumento']);
-           
+
             $DTESigned = FirmadorElectronico::firmador($newDTE);
-            
+
             $statusSigner =  $DTESigned['status'];
 
             if ($statusSigner > 201)
@@ -345,7 +347,7 @@ class DteController extends Controller
                 ], $statusSigner);
 
             $documento = $DTESigned['msg'];
-            
+
 
             $jsonRequest = [
                 'ambiente' => $empresa->ambiente,
@@ -386,10 +388,10 @@ class DteController extends Controller
                 'tipo_documento' => $tipoDTE,
                 'dte' => json_encode($newDTE),
                 'estado' => true,
-                'empresa_id'=> $empresa->id
+                'empresa_id' => $empresa->id
             ]);
             Generator::saveNumeroControl($tipoDTE);
-           
+
             return response()->json($responseData, $statusCode);
         } catch (Exception $e) {
             $logDTE = LogDTE::create([
@@ -400,13 +402,13 @@ class DteController extends Controller
                 'hora' => $horaEmision,
                 'error' => $e->getMessage(),
                 'estado' => false,
-                'empresa_id'=> $empresa->id
+                'empresa_id' => $empresa->id
             ]);
 
             $logDTE->save();
             return response()->json($responseData, $statusCode);
+        } finally {
+            $registroDTE->save();
         }
-
-        
     }
 }
