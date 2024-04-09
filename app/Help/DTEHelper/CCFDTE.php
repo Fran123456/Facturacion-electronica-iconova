@@ -6,9 +6,11 @@ use App\help\Help;
 
 class CCFDTE
 {
+    // public static function
 
-    public static function Resumen($cuerpo, $codigoPago, $plazoPago, $periodoPago)
+    public static function Resumen($cuerpo, $codigoPago, $idTipoCliente, $plazoPago = null, $periodoPago = null)
     {
+
         $resumen = [];
         $descripcionPago = Help::getPayWay($codigoPago);
 
@@ -17,6 +19,7 @@ class CCFDTE
         $subTotal = 0.0;
         $totalDescu = 0.0;
         $totalPagar = 0.0;
+        $ivaRetenida = 0.0;
 
         $totalImpuestos = 0.0;
         $tributos = [];
@@ -95,7 +98,7 @@ class CCFDTE
         $resumen['tributos'] = $tributos;
         $resumen['subTotal'] = $subTotal;
         $resumen['ivaPerci1'] = 0.0;
-        $resumen['ivaRete1'] = 0.0;
+        $resumen['ivaRete1'] = $ivaRetenida;
         $resumen['reteRenta'] = 0.0;
         $resumen['montoTotalOperacion'] = $totalPagar;
         $resumen['totalNoGravado'] = 0;

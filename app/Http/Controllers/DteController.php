@@ -59,69 +59,68 @@ class DteController extends Controller
         $numeroDTE = Generator::generateNumControl($tipoDTE);
         $fechaEmision = date('Y-m-d');
         $horaEmision =  date('h:i:s');
-
-        // IDENTICACION
-        $identificacion = [];
-        $identificacion['version'] = 3;
-        $identificacion['ambiente'] = "00";
-        $identificacion['tipoDte'] = $tipoDTE;
-        $identificacion['numeroControl'] =  $numeroDTE;
-        $identificacion['codigoGeneracion'] = Generator::generateCodeGeneration();
-        $identificacion['tipoOperacion'] = 1;
-        $identificacion['tipoModelo'] = 1;
-        $identificacion['tipoContingencia'] = null;
-        $identificacion['motivoContin'] = null;
-        $identificacion['fecEmi'] = $fechaEmision;
-        $identificacion['horEmi'] = $horaEmision;
-        $identificacion['tipoMoneda'] = "USD";
-
-        $newDTE['identificacion'] = $identificacion;
-
-        // EMISOR
-        if (array_key_exists('emisor', $dte))
-            $newDTE['emisor'] = $dte['emisor'];
-        else
-            $newDTE['emisor'] = Identificacion::emisor('03', '20', null);
-        // $newDTE['emisor'] = Help::getEmisorDefault();
-
-        $newDTE['receptor'] = Identificacion::receptorCCF($dte['receptor']);
-
-        // DOCUMENTO RELACIONADO
-        if (array_key_exists('documentoRelacionado', $dte))
-            $newDTE['documentoRelacionado'] = $dte['documentoRelacionado'];
-        else
-            $newDTE['documentoRelacionado'] = null;
-
-        //  RECEPTOR
-        $newDTE['otrosDocumentos'] = $dte['otrosDocumentos'];
-        $newDTE['ventaTercero'] = $dte['ventaTercero'];
-
-        // Cuerpo Documento
-        $newDTE['cuerpoDocumento'] = $dte['cuerpoDocumento'];
-
-        // En el json, periodo pago y plazo pago son opcionales a colocar, pero codigo pago es obligatorio
-        // El valor de codigo pago, debe ser alguno de los codigo de la tabla mh_forma_pago
-        // El valor de plazo debe de venir de alguno de los codigos de la tabla mh plazo
-        // El valor de periodo debe de se tipo numerico
-        // RESUMEN DEL CUERPO
-        $codigoPago = $body['codigo_pago'];
-        $periodoPago = isset($body['periodo_pago']) ? $body['periodo_pago'] : null;
-        $plazoPago = isset($body['plazo_pago']) ? $body['plazo_pago'] : null;
-
-        $newDTE['resumen'] = CCFDTE::Resumen($dte['cuerpoDocumento'], $codigoPago, $periodoPago, $plazoPago);
-
-        $newDTE['extension'] = $dte['extension'];
-        $newDTE['apendice'] = $dte['apendice'];
-
+        $idCliente = Help::getClienteId($dte['receptor']['nit']);
         $registoDTE = null;
         $idCliente = 0;
         $responseData = '';
         $statusCode = '';
 
-
         try {
+            // IDENTICACION
+            $identificacion = [];
+            $identificacion['version'] = 3;
+            $identificacion['ambiente'] = "00";
+            $identificacion['tipoDte'] = $tipoDTE;
+            $identificacion['numeroControl'] =  $numeroDTE;
+            $identificacion['codigoGeneracion'] = Generator::generateCodeGeneration();
+            $identificacion['tipoOperacion'] = 1;
+            $identificacion['tipoModelo'] = 1;
+            $identificacion['tipoContingencia'] = null;
+            $identificacion['motivoContin'] = null;
+            $identificacion['fecEmi'] = $fechaEmision;
+            $identificacion['horEmi'] = $horaEmision;
+            $identificacion['tipoMoneda'] = "USD";
 
-            $idCliente = Help::getClienteId($dte['receptor']['nit']);
+            $newDTE['identificacion'] = $identificacion;
+
+            // EMISOR
+            if (array_key_exists('emisor', $dte))
+                $newDTE['emisor'] = $dte['emisor'];
+            else
+                $newDTE['emisor'] = Identificacion::emisor('03', '20', null);
+            // $newDTE['emisor'] = Help::getEmisorDefault();
+
+            $newDTE['receptor'] = Identificacion::receptorCCF($dte['receptor']);
+
+            // DOCUMENTO RELACIONADO
+            if (array_key_exists('documentoRelacionado', $dte))
+                $newDTE['documentoRelacionado'] = $dte['documentoRelacionado'];
+            else
+                $newDTE['documentoRelacionado'] = null;
+
+            //  RECEPTOR
+            $newDTE['otrosDocumentos'] = $dte['otrosDocumentos'];
+            $newDTE['ventaTercero'] = $dte['ventaTercero'];
+
+            // Cuerpo Documento
+            $newDTE['cuerpoDocumento'] = $dte['cuerpoDocumento'];
+
+            // En el json, periodo pago y plazo pago son opcionales a colocar, pero codigo pago es obligatorio
+            // El valor de codigo pago, debe ser alguno de los codigo de la tabla mh_forma_pago
+            // El valor de plazo debe de venir de alguno de los codigos de la tabla mh plazo
+            // El valor de periodo debe de se tipo numerico
+            // RESUMEN DEL CUERPO
+            $codigoPago = $body['codigo_pago'];
+            $periodoPago = isset($body['periodo_pago']) ? $body['periodo_pago'] : null;
+            $plazoPago = isset($body['plazo_pago']) ? $body['plazo_pago'] : null;
+
+            $newDTE['resumen'] = CCFDTE::Resumen($dte['cuerpoDocumento'], $codigoPago, $periodoPago, $plazoPago);
+
+            $newDTE['extension'] = $dte['extension'];
+            $newDTE['apendice'] = $dte['apendice'];
+
+
+            // $idCliente = Help::getClienteId($dte['receptor']['nit']);
             $registoDTE = RegistroDTE::create([
                 'id_cliente' => $idCliente,
                 'numero_dte' => $numeroDTE,
@@ -270,13 +269,13 @@ class DteController extends Controller
         return response()->json($responseData, $statusCode);
 
 
-      
+
 
 
         //$nombreCliente = 'Francisco Navas';
-      //  $correoEmpresa = Crypt::decryptString($empresa->correo_electronico);
-       // $telefono = Crypt::decryptString($empresa->telefono);
-       // $nombreEmpresa = Crypt::decryptString($empresa->nombre);
+        //  $correoEmpresa = Crypt::decryptString($empresa->correo_electronico);
+        // $telefono = Crypt::decryptString($empresa->telefono);
+        // $nombreEmpresa = Crypt::decryptString($empresa->nombre);
         //return WhatsappSender::send();
 
         /*  Mail::to('francisco.navas@datasys.la')
@@ -290,10 +289,10 @@ class DteController extends Controller
     {
 
         //PASO 1 , HACER LOGIN EN HACIENDA
-      
+
         $responseLogin = LoginMH::login();
         if ($responseLogin['code'] != 200)
-        return response()->json(DteCodeValidator::code404($responseLogin['error']), 404);
+            return response()->json(DteCodeValidator::code404($responseLogin['error']), 404);
 
 
         //PASO 2 OBTENER INFORMACION Y DESFRAGMENTARLA
@@ -315,12 +314,12 @@ class DteController extends Controller
         $identificacion = Identificacion::identidad('01');
         $emisor = Identificacion::emisor('01', null, null, null);
         $receptor = Identificacion::receptorFactura($dte['receptor']);
- 
+
         $newDTE['extension'] = null;
         $newDTE['receptor'] = $receptor;
         $newDTE['identificacion'] = $identificacion;
         $newDTE['resumen'] = FACTDTE::Resumen($dte['cuerpoDocumento'], $codigoPago, $periodoPago, $plazoPago, $body['forma_pago'], $body['numPagoElectronico']);
-        
+
         $newDTE['cuerpoDocumento'] = $dte['cuerpoDocumento'];
         $newDTE['otrosDocumentos'] = $dte['otrosDocumentos'] ?? null;
         $newDTE['ventaTercero'] = $dte['ventaTercero'] ?? null;
@@ -329,14 +328,14 @@ class DteController extends Controller
             $newDTE['documentoRelacionado'] = $dte['documentoRelacionado'];
         else
             $newDTE['documentoRelacionado'] = null;
-        
+
         $newDTE['emisor'] = $emisor;
 
         try {
             $idCliente = Help::getClienteId($dte['receptor']['numDocumento']);
-           
+
             $DTESigned = FirmadorElectronico::firmador($newDTE);
-            
+
             $statusSigner =  $DTESigned['status'];
 
             if ($statusSigner > 201)
@@ -345,7 +344,7 @@ class DteController extends Controller
                 ], $statusSigner);
 
             $documento = $DTESigned['msg'];
-            
+
 
             $jsonRequest = [
                 'ambiente' => $empresa->ambiente,
@@ -386,10 +385,10 @@ class DteController extends Controller
                 'tipo_documento' => $tipoDTE,
                 'dte' => json_encode($newDTE),
                 'estado' => true,
-                'empresa_id'=> $empresa->id
+                'empresa_id' => $empresa->id
             ]);
             Generator::saveNumeroControl($tipoDTE);
-           
+
             return response()->json($responseData, $statusCode);
         } catch (Exception $e) {
             $logDTE = LogDTE::create([
@@ -400,13 +399,11 @@ class DteController extends Controller
                 'hora' => $horaEmision,
                 'error' => $e->getMessage(),
                 'estado' => false,
-                'empresa_id'=> $empresa->id
+                'empresa_id' => $empresa->id
             ]);
 
             $logDTE->save();
             return response()->json($responseData, $statusCode);
         }
-
-        
     }
 }

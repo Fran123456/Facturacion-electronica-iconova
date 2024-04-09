@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('cliente', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger("id_tipo_cliente");
             $table->string('tipo_documento', 10)->nullable();
             $table->string('nit', 50)->unique()->nullable();
             $table->string('nrc', 50)->unique()->nullable();
@@ -30,6 +31,7 @@ return new class extends Migration
             $table->string('correo', 255)->nullable();
             $table->boolean('estado')->default(true)->nullable();
             $table->timestamps();
+            $table->foreign("id_tipo_cliente")->references("id")->on("tipo_cliente")->onDelete("cascade")->onUpdate("cascade");
         });
 
     }

@@ -13,6 +13,7 @@ class Cliente extends Model
 
     protected $fillable = [
         'id',
+        'id_tipo_cliente',
         'tipo_documento',
         'nit',
         'nrc',
@@ -35,5 +36,9 @@ class Cliente extends Model
 
     public function registroDTE(){
         return $this->hasMany(RegistroDTE::class, 'id_cliente', 'id');
+    }
+
+    public function tipoCliente(){
+        $this->belongsToMany(TipoCliente::class, 'id_tipo_cliente')->withDefault();
     }
 }
