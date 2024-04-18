@@ -17,8 +17,7 @@ return new class extends Migration
             $table->id();
             $table->text("nombre");
             $table->string("nombre_comercial", 300)->nullable();
-            $table->text("nit");
-            $table->string("nit", 200)->nullable();
+    $table->string("nit", 200)->nullable();
             $table->text("credenciales_api");
             $table->text("password_mh");
             $table->text("public_key");
@@ -37,8 +36,7 @@ return new class extends Migration
             $table->string('ambiente', 10)->nullable();
             $table->string('correlativo_fex', 200)->nullable();
             $table->string('correlativo_ccf', 200)->nullable();
-            $table->string('correlativo_ccf', 200)->nullable();
-            $table->string("correlativo_fact",200)->nullable();
+            $table->string("correlativo_fact", 200)->nullable();
             $table->timestamps();
         });
     }
