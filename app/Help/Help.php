@@ -210,7 +210,11 @@ class Help
         if ($cliente == null)
             throw new Exception("No existe ningun registro para cliente con nit/dui $numDocumento");
 
-        return $cliente->id;
+        // return $cliente->id;
+        return [
+            'id' => $cliente->id,
+            'tipoCliente' => $cliente->id_tipo_cliente
+        ];
     }
 
 

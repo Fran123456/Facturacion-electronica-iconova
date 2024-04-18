@@ -38,6 +38,9 @@ class CCFDTE
             $totalExenta += $value['ventaExenta'];
             $subTotal += $ventaGravada;
             $totalDescu += $value['montoDescu'];
+            if ( $idTipoCliente == 3 && $ventaGravada >= 100 )
+                $ivaRetenida += $ventaGravada * 0.01;
+
             // $dte['cuerpoDocumento'][$key]['ventaGravada'] = $ventaGravada;
 
             foreach ($value['tributos'] as $tributo) {

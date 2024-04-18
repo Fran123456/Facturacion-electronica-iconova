@@ -52,6 +52,7 @@ class DteController extends Controller
 
         $body = json_decode($request->getContent(), true);
         $dte = $body['dteJson'];
+        $cliente = Help::getClienteId($dte['receptor']['nit']);
 
         $newDTE = [];
 
@@ -59,7 +60,7 @@ class DteController extends Controller
         $numeroDTE = Generator::generateNumControl($tipoDTE);
         $fechaEmision = date('Y-m-d');
         $horaEmision =  date('h:i:s');
-        $idCliente = Help::getClienteId($dte['receptor']['nit']);
+        $idCliente = $cliente['id'];
         $registoDTE = null;
         $idCliente = 0;
         $responseData = '';
@@ -114,7 +115,7 @@ class DteController extends Controller
             $periodoPago = isset($body['periodo_pago']) ? $body['periodo_pago'] : null;
             $plazoPago = isset($body['plazo_pago']) ? $body['plazo_pago'] : null;
 
-            $newDTE['resumen'] = CCFDTE::Resumen($dte['cuerpoDocumento'], $codigoPago, $periodoPago, $plazoPago);
+            $newDTE['resumen'] = CCFDTE::Resumen($dte['cuerpoDocumento'], $codigoPago, $cliente['tipoCliente'], $periodoPago, $plazoPago);
 
             $newDTE['extension'] = $dte['extension'];
             $newDTE['apendice'] = $dte['apendice'];
