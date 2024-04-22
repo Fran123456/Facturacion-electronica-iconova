@@ -47,7 +47,7 @@ class DteController extends Controller
         $dteJson = $request;
 
         if ($dteJson == null)
-            return response()->json(["error" => "DTE no valido o nulo"], Response::HTTP_BAD_REQUEST);
+        return response()->json(["error" => "DTE no valido o nulo"], Response::HTTP_BAD_REQUEST);
 
 
         $body = json_decode($request->getContent(), true);
@@ -62,7 +62,7 @@ class DteController extends Controller
         $horaEmision =  date('h:i:s');
         $idCliente = $cliente['id'];
         $registoDTE = null;
-        $idCliente = 0;
+        // $idCliente = 0;
         $responseData = '';
         $statusCode = '';
 
@@ -120,7 +120,7 @@ class DteController extends Controller
             $newDTE['extension'] = $dte['extension'];
             $newDTE['apendice'] = $dte['apendice'];
 
-
+            // return response()->json($newDTE);
             // $idCliente = Help::getClienteId($dte['receptor']['nit']);
             $registoDTE = RegistroDTE::create([
                 'id_cliente' => $idCliente,
@@ -190,6 +190,7 @@ class DteController extends Controller
             $logDTE->save();
             $registoDTE->estado = false;
         } finally {
+            // return response()->json($registoDTE);
             $registoDTE->save();
         }
 

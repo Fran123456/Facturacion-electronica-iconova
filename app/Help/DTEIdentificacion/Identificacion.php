@@ -28,7 +28,7 @@ class Identificacion
             "tipoOperacion" => 1,
             "tipoModelo" => 1,
             "tipoContingencia" => null,
-           
+
             "fecEmi" => $fecha_actual->format('Y-m-d'),
             "horEmi" => $fecha_actual->format('H:i:s'),
             "tipoMoneda" => "USD"

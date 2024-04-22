@@ -39,7 +39,7 @@ class CCFDTE
             $subTotal += $ventaGravada;
             $totalDescu += $value['montoDescu'];
             if ( $idTipoCliente == 3 && $ventaGravada >= 100 )
-                $ivaRetenida += $ventaGravada * 0.01;
+                $ivaRetenida += round(($ventaGravada * 0.01), 2);
 
             // $dte['cuerpoDocumento'][$key]['ventaGravada'] = $ventaGravada;
 
@@ -69,16 +69,13 @@ class CCFDTE
                     ];
                 }
 
-                // return response()->json([
-                //     'value' => $impuesto
-                // ]);
                 $totalImpuestos += $impuesto;
                 $impuestoTotalItem += $impuesto;
             }
 
             $pagos[] = [
                 "codigo" => $codigoPago,
-                "montoPago" => $impuestoTotalItem + $ventaGravada,
+                "montoPago" => $impuestoTotalItem + $ventaGravada ,
                 "referencia" => $descripcionPago,
                 "periodo" => $periodoPago,
                 "plazo" => $plazoPago
@@ -106,7 +103,7 @@ class CCFDTE
         $resumen['montoTotalOperacion'] = $totalPagar;
         $resumen['totalNoGravado'] = 0;
 
-        $resumen['totalPagar'] = $totalPagar;
+        $resumen['totalPagar'] = $totalPagar - $ivaRetenida;
 
         $numero_str = strval($totalPagar);
         $partes = explode('.', $numero_str);

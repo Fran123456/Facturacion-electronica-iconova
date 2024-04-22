@@ -21,8 +21,8 @@ return new class extends Migration
             $table->string('nrc', 50)->unique()->nullable();
             $table->string('dui', 50)->unique()->nullable();
             $table->string('nombre', 255)->nullable();
-            $table->string('codigo_activad', 50)->nullable();
-            $table->text('descripcion_activad')->nullable();
+            $table->string('codigo_actividad', 50)->nullable();
+            $table->text('descripcion_actividad')->nullable();
             $table->string('nombre_comercial', 255)->nullable();
             $table->string('departamento', 255)->nullable();
             $table->string('municipio', 255)->nullable();

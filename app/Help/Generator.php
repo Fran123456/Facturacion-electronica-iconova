@@ -31,7 +31,8 @@ class Generator
             $registroContadorDTE = $empresa->correlativo_fex;
         }
         if ($tipoDoc == '03') {
-            $registroContadorDTE =  $empresa->correlativo_ccf;
+            $registroContadorDTE =  $empresa->correlativo_ccf++;
+            // $empresa->correlativo_ccf += 1;
         }
         if ($tipoDoc == '01') {
             $registroContadorDTE =  $empresa->correlativo_fact != null ? $empresa->correlativo_fact : '0';
@@ -48,7 +49,7 @@ class Generator
 
             $registroContadorDTE = $contadorDTEs;
 
-            
+            $empresa->save();
             return $generated;
         }
 
