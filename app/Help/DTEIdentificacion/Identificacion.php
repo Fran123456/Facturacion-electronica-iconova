@@ -19,8 +19,16 @@ class Identificacion
     {
         $empresa = Help::getEmpresa();
         $fecha_actual = new \DateTime();
+
+        $version = 1;
+        if($tipoDoc== '03'){
+            $version = 3;
+        }else{
+
+        }
+
         $identificacion =  [
-            "version" => 1,
+            "version" => $version,
             "ambiente" => $empresa->ambiente,
             "tipoDte" => $tipoDoc,
             "numeroControl" =>  Generator::generateNumControl($tipoDoc),
@@ -28,13 +36,12 @@ class Identificacion
             "tipoOperacion" => 1,
             "tipoModelo" => 1,
             "tipoContingencia" => null,
-
             "fecEmi" => $fecha_actual->format('Y-m-d'),
             "horEmi" => $fecha_actual->format('H:i:s'),
             "tipoMoneda" => "USD"
         ];
 
-        if($tipoDoc=="01") //factura
+        if($tipoDoc=="01" || $tipoDoc=="03") //factura y ccf
         {
             $identificacion['motivoContin']=null;
         }else{
@@ -148,9 +155,22 @@ class Identificacion
 
     public static function receptorCCF($receptor)
     {
-
-        $nit = $receptor['nit'];
+        $nit = null;
+        $dui  = null;
+        if(isset($receptor['nit'])){
+            $nit = $receptor['nit'];
+        }
+        if(isset($receptor['dui'])){
+            $dui = $receptor['dui'];
+        }
+        if($nit == null){
+            $nit = $dui;
+        }
+        
         $cliente = Cliente::where('nit', $nit)->first();
+        if($cliente == null){
+            $cliente = Cliente::where('dui', $dui)->first();
+        }
 
         $nrc = $receptor['nrc'];
         $nombre = $receptor['nombre'];
@@ -169,7 +189,7 @@ class Identificacion
                 'tipo_documento' => '03',
                 'nit' => $nit,
                 'nrc' => $nrc,
-                'dui' => Generator::generateCodeGeneration(),
+                'dui' => $dui,
                 'nombre' => $nombre,
                 'codigo_actividad' => $codigoActividad,
                 'descripcion_actividad' => $descripcionActividad,
@@ -183,14 +203,14 @@ class Identificacion
 
             $cliente->save();
 
-            return $receptor;
+        
         } else {
 
             Cliente::where('id', $cliente->id)->update([
                 'tipo_documento' => '03',
                 'nit' => $nit,
                 'nrc' => $nrc,
-                'dui' => Generator::generateCodeGeneration(),
+                'dui' => $dui,
                 'nombre' => $nombre,
                 'codigo_actividad' => $codigoActividad,
                 'descripcion_actividad' => $descripcionActividad,
@@ -205,7 +225,7 @@ class Identificacion
 
         $newReceptor = [];
 
-        $newReceptor['nit'] = $cliente->nit;
+        $newReceptor['nit'] = $cliente->nit??$cliente->dui;
         $newReceptor['nrc'] = $cliente->nrc;
         $newReceptor['nombre'] = $cliente->nombre;
         $newReceptor['codActividad'] = $cliente->codigo_actividad;

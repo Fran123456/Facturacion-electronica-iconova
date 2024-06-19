@@ -36,69 +36,48 @@ class DteController extends Controller
 {
     public function enviarDteUnitarioCCF(Request $request)
     {
-        //login para generar token de hacienda.
+        //PASO 1 , HACER LOGIN EN HACIENDA
         $responseLogin = LoginMH::login();
-
         if ($responseLogin['code'] != 200)
             return response()->json(DteCodeValidator::code404($responseLogin['error']), 404);
+
+
+        //PASO 2 OBTENER INFORMACION Y DESFRAGMENTARLA
 
         $empresa = Help::getEmpresa();
         $url = Help::mhUrl();
         $dteJson = $request;
-
         if ($dteJson == null)
         return response()->json(["error" => "DTE no valido o nulo"], Response::HTTP_BAD_REQUEST);
 
-
         $body = json_decode($request->getContent(), true);
         $dte = $body['dteJson'];
-        $cliente = Help::getClienteId($dte['receptor']['nit']);
-
         $newDTE = [];
-
         $tipoDTE = '03';
         $numeroDTE = Generator::generateNumControl($tipoDTE);
         $fechaEmision = date('Y-m-d');
         $horaEmision =  date('h:i:s');
-        $idCliente = $cliente['id'];
         $registoDTE = null;
-        // $idCliente = 0;
         $responseData = '';
         $statusCode = '';
+        $cliente = null;
 
+        //PASO 3 GENERAR JSON VALIDO PARA  HACIENDA
+        $identificacion = Identificacion::identidad($tipoDTE);
+        $emisor = Identificacion::emisor('03', '20', null, null);
+        $receptor = Identificacion::receptorCCF($dte['receptor']);
+    
         try {
-            // IDENTICACION
-            $identificacion = [];
-            $identificacion['version'] = 3;
-            $identificacion['ambiente'] = "00";
-            $identificacion['tipoDte'] = $tipoDTE;
-            $identificacion['numeroControl'] =  $numeroDTE;
-            $identificacion['codigoGeneracion'] = Generator::generateCodeGeneration();
-            $identificacion['tipoOperacion'] = 1;
-            $identificacion['tipoModelo'] = 1;
-            $identificacion['tipoContingencia'] = null;
-            $identificacion['motivoContin'] = null;
-            $identificacion['fecEmi'] = $fechaEmision;
-            $identificacion['horEmi'] = $horaEmision;
-            $identificacion['tipoMoneda'] = "USD";
-
             $newDTE['identificacion'] = $identificacion;
-
-            // EMISOR
-            if (array_key_exists('emisor', $dte))
-                $newDTE['emisor'] = $dte['emisor'];
-            else
-                $newDTE['emisor'] = Identificacion::emisor('03', '20', null);
-            // $newDTE['emisor'] = Help::getEmisorDefault();
-
-            $newDTE['receptor'] = Identificacion::receptorCCF($dte['receptor']);
-
+            $newDTE['emisor'] = $emisor;
+            $newDTE['receptor'] = $receptor;
+           
             // DOCUMENTO RELACIONADO
             if (array_key_exists('documentoRelacionado', $dte))
                 $newDTE['documentoRelacionado'] = $dte['documentoRelacionado'];
             else
                 $newDTE['documentoRelacionado'] = null;
-
+              
             //  RECEPTOR
             $newDTE['otrosDocumentos'] = $dte['otrosDocumentos'];
             $newDTE['ventaTercero'] = $dte['ventaTercero'];
@@ -114,24 +93,17 @@ class DteController extends Controller
             $codigoPago = $body['codigo_pago'];
             $periodoPago = isset($body['periodo_pago']) ? $body['periodo_pago'] : null;
             $plazoPago = isset($body['plazo_pago']) ? $body['plazo_pago'] : null;
-
+           
+            $docCliente = null;
+            if(isset($dte['receptor']['nit'])) $docCliente = $dte['receptor']['nit'];
+            if(isset($dte['receptor']['dui'])) $docCliente = $dte['receptor']['dui'];
+            $cliente = Help::getClienteId($docCliente);
             $newDTE['resumen'] = CCFDTE::Resumen($dte['cuerpoDocumento'], $codigoPago, $cliente['tipoCliente'], $periodoPago, $plazoPago);
 
             $newDTE['extension'] = $dte['extension'];
             $newDTE['apendice'] = $dte['apendice'];
-
-            // return response()->json($newDTE);
-            // $idCliente = Help::getClienteId($dte['receptor']['nit']);
-            $registoDTE = RegistroDTE::create([
-                'id_cliente' => $idCliente,
-                'numero_dte' => $numeroDTE,
-                'tipo_documento' => $tipoDTE,
-                'dte' => json_encode($newDTE),
-                'estado' => true,
-            ]);
-
+           
             $DTESigned = FirmadorElectronico::firmador($newDTE);
-
             $statusSigner =  $DTESigned['status'];
 
             if ($statusSigner > 201)
@@ -172,13 +144,23 @@ class DteController extends Controller
 
             if ($statusCode >= 400) {
                 $errorMessage = "Error $statusCode: " . json_encode($responseData);
-
                 throw new Exception($errorMessage);
             }
-        } catch (Exception $e) {
 
+            $registoDTE = RegistroDTE::create([
+                'id_cliente' =>  $cliente['id'],
+                'numero_dte' => $numeroDTE,
+                'tipo_documento' => $tipoDTE,
+                'dte' => json_encode($newDTE),
+                'estado' => true,
+            ]);
+            Generator::saveNumeroControl($tipoDTE);
+            return response()->json($responseData, $statusCode);
+
+        } catch (Exception $e) {
+          
             $logDTE = LogDTE::create([
-                'id_cliente' => $idCliente,
+                'id_cliente' =>  $cliente['id'],
                 'numero_dte' => $numeroDTE,
                 'tipo_documento' => $tipoDTE,
                 'fecha' => $fechaEmision,
@@ -186,15 +168,10 @@ class DteController extends Controller
                 'error' => $e->getMessage(),
                 'estado' => false,
             ]);
-
             $logDTE->save();
-            $registoDTE->estado = false;
-        } finally {
-            // return response()->json($registoDTE);
-            $registoDTE->save();
-        }
+            return response()->json($responseData, $statusCode);
+        } 
 
-        return response()->json($responseData, $statusCode);
     }
 
     public function enviarDteUnitarioFacturaExterior(Request $request)
@@ -291,7 +268,6 @@ class DteController extends Controller
     {
 
         //PASO 1 , HACER LOGIN EN HACIENDA
-
         $responseLogin = LoginMH::login();
         if ($responseLogin['code'] != 200)
             return response()->json(DteCodeValidator::code404($responseLogin['error']), 404);
@@ -321,7 +297,6 @@ class DteController extends Controller
         $newDTE['receptor'] = $receptor;
         $newDTE['identificacion'] = $identificacion;
         $newDTE['resumen'] = FACTDTE::Resumen($dte['cuerpoDocumento'], $codigoPago, $periodoPago, $plazoPago, $body['forma_pago'], $body['numPagoElectronico']);
-
         $newDTE['cuerpoDocumento'] = $dte['cuerpoDocumento'];
         $newDTE['otrosDocumentos'] = $dte['otrosDocumentos'] ?? null;
         $newDTE['ventaTercero'] = $dte['ventaTercero'] ?? null;
