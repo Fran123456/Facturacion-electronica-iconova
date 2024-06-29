@@ -75,7 +75,7 @@ class CCFDTE
 
             $pagos[] = [
                 "codigo" => $codigoPago,
-                "montoPago" => $impuestoTotalItem + $ventaGravada ,
+                "montoPago" => round(($impuestoTotalItem + $ventaGravada), 2),
                 "referencia" => $descripcionPago,
                 "periodo" => $periodoPago,
                 "plazo" => $plazoPago
@@ -119,5 +119,10 @@ class CCFDTE
         $resumen['numPagoElectronico'] = null;
 
         return $resumen;
+    }
+
+    // TODO: calculate cuerpoDocumento
+    public static function CuerpoDocumento(){
+
     }
 }
