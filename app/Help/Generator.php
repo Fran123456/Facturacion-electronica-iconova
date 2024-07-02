@@ -41,6 +41,10 @@ class Generator
             $registroContadorDTE =  $empresa->correlativo_fact != null ? $empresa->correlativo_fact : '0';
         }
 
+        if ($tipoDoc == '05') {
+            $registroContadorDTE = $empresa->correlativo_nota_credito != null ? $empresa->correlativo_fact : '0';
+        }
+
         if ($registroContadorDTE != null) {
             $contadorDTEs = (int)$registroContadorDTE;
 

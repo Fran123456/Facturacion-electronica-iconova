@@ -59,16 +59,20 @@ class DteNotasController extends Controller{
          $emisor = Identificacion::emisor('05', null, null, null);
          $receptor = Identificacion::receptorNotaCredito($dte['receptor']);
 
+         $newDTE['emisor']=$emisor;
          $newDTE['extension'] = NOTACREDITODTE::extension("obj");
          $newDTE['receptor'] = $receptor;
          $newDTE['identificacion'] = $identificacion;
-         return $newDTE;
-     /*    $newDTE['resumen'] = FACTDTE::Resumen($dte['cuerpoDocumento'], $codigoPago, $periodoPago, $plazoPago, $body['forma_pago'], $body['numPagoElectronico']);
-
-         $newDTE['cuerpoDocumento'] = $dte['cuerpoDocumento'];
-         $newDTE['otrosDocumentos'] = $dte['otrosDocumentos'] ?? null;
+         $newDTE['cuerpoDocumento'] =  NOTACREDITODTE::cuerpo($dte['cuerpoDocumento']);
          $newDTE['ventaTercero'] = $dte['ventaTercero'] ?? null;
          $newDTE['apendice'] = $dte['apendice'] ?? null;
+         $newDTE['documentoRelacionado'] = NOTACREDITODTE::documentosRelacionados($dte['documentoRelacionado']);
+         $newDTE['resumen']= NOTACREDITODTE::resumen($dte['cuerpoDocumento']);
+         return $newDTE;
+
+        /* $newDTE['otrosDocumentos'] = $dte['otrosDocumentos'] ?? null;
+         $newDTE['ventaTercero'] = $dte['ventaTercero'] ?? null;
+
          if (array_key_exists('documentoRelacionado', $dte))
              $newDTE['documentoRelacionado'] = $dte['documentoRelacionado'];
          else
