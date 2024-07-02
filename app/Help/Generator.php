@@ -19,6 +19,9 @@ class Generator
         if ($tipoDoc == '01') {
             $empresa->correlativo_fact = (int) $empresa->correlativo_fact+1;
         }
+        if ($tipoDoc == '05') {
+            $empresa->correlativo_nota_credito = (int) $empresa->correlativo_nota_credito+1;
+        }
         $empresa->save();
     }
 

@@ -5,6 +5,7 @@ use App\Http\Controllers\ServicesController;
 use App\Http\Controllers\DteSeparadoController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DteNotasController;
 use App\Http\Controllers\DteController;
 use App\Http\Controllers\TestController;
 use App\Models\User;
@@ -33,10 +34,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/encriptador', [ServicesController::class, 'encriptador']);
         Route::get('/desencriptador', [ServicesController::class, 'desencriptador']);
         Route::post('/mh/enviar/dte/unitario/ccf/individual', [DteSeparadoController::class, 'enviarDteUnitarioCCF']);
-        Route::post('/mh/enviar/dte/unitario/ccf', [DteController::class, 'enviarDteUnitarioCCF']);
 
+
+        Route::post('/mh/enviar/dte/unitario/ccf', [DteController::class, 'enviarDteUnitarioCCF']);
         Route::post('/mh/enviar/dte/unitario/factura-exterior', [DteController::class, 'enviarDteUnitarioFacturaExterior']);
         Route::post('/mh/enviar/dte/unitario/factura', [DteController::class, 'enviarDteUnitarioFactura']);
+        Route::post('/mh/enviar/dte/unitario/nota-credito', [DteNotasController::class, 'enviarNotaCreditoUnitaria']);
     });
 });
 

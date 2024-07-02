@@ -17,7 +17,7 @@ class Empresa extends Model
         'public_key',
         'private_key', 'token_mh',
         'correo_electronico', 'telefono', 'celular', 'correlativo_fex', 'codigo_actividad', 'nombre_comercial', 'departamento', 'municipio', 'direccion',
-        'nrc', 'codigo_establecimiento', 'ambiente'
+        'nrc', 'codigo_establecimiento', 'ambiente','correlativo_nota_credito'
     ];
 
     public function empresa()

@@ -34,7 +34,7 @@ class Identificacion
             "tipoMoneda" => "USD"
         ];
 
-        if($tipoDoc=="01") //factura
+        if($tipoDoc=="01" || $tipoDoc=="05") //factura
         {
             $identificacion['motivoContin']=null;
         }else{
@@ -288,6 +288,82 @@ class Identificacion
         $newReceptor['telefono'] = $cliente->telefono;
         $newReceptor['nombre'] = $cliente->nombre;
         $newReceptor['nrc'] = $cliente->nrc==""?null:$cliente->nrc;
+
+        return $newReceptor;
+    }
+
+
+
+
+    public static function receptorNotaCredito($receptor)
+    {
+        $nit = $receptor['nit'];
+        $cliente = Cliente::where('nit', $nit)->first();
+
+        $nrc = $receptor['nrc'];
+        $nombre = $receptor['nombre'];
+        $codigoActividad = $receptor['codActividad'];
+        $descripcionActividad = $receptor['descActividad'];
+        $nombreComercial = $receptor['nombreComercial'];
+        $departamento = $receptor['direccion']['departamento'];
+        $municipio = $receptor['direccion']['municipio'];
+        $complemento = isset($receptor['direccion']['complemento']) ? $receptor['direccion']['complemento'] : 'Sin complemento';
+        $telefono = $receptor['telefono'];
+        $correo = $receptor['correo'];
+
+        if ($cliente == null) {
+
+            $cliente = Cliente::create([
+                'tipo_documento' => '03',
+                'nit' => $nit,
+                'nrc' => $nrc,
+                'dui' => Generator::generateCodeGeneration(),
+                'nombre' => $nombre,
+                'codigo_actividad' => $codigoActividad,
+                'descripcion_actividad' => $descripcionActividad,
+                'nombre_comercial' => $nombreComercial,
+                'departamento' => $departamento,
+                'municipio' => $municipio,
+                'complemento' => $complemento,
+                'telefono' => $telefono,
+                'correo' => $correo,
+            ]);
+
+            $cliente->save();
+
+            return $receptor;
+        } else {
+
+            Cliente::where('id', $cliente->id)->update([
+                'tipo_documento' => '03',
+                'nit' => $nit,
+                'nrc' => $nrc,
+                'dui' => Generator::generateCodeGeneration(),
+                'nombre' => $nombre,
+                'codigo_actividad' => $codigoActividad,
+                'descripcion_actividad' => $descripcionActividad,
+                'nombre_comercial' => $nombreComercial,
+                'departamento' => $departamento,
+                'municipio' => $municipio,
+                'complemento' => $complemento,
+                'telefono' => $telefono,
+                'correo' => $correo,
+            ]);
+        }
+
+        $newReceptor = [];
+
+        $newReceptor['nit'] = $cliente->nit;
+        $newReceptor['nrc'] = $cliente->nrc;
+        $newReceptor['nombre'] = $cliente->nombre;
+        $newReceptor['codActividad'] = $cliente->codigo_actividad;
+        $newReceptor['descActividad'] = $cliente->descripcion_actividad;
+        $newReceptor['nombreComercial'] = $cliente->nombre_comercial;
+        $newReceptor['direccion']['departamento'] = $cliente->departamento;
+        $newReceptor['direccion']['municipio'] = $cliente->municipio;
+        $newReceptor['direccion']['complemento'] = $cliente->complemento;
+        $newReceptor['telefono'] = $cliente->telefono;
+        $newReceptor['correo'] = $cliente->correo;
 
         return $newReceptor;
     }
