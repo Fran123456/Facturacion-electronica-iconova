@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Help\Services\DteApiMHService;
 use App\Models\User;
 use Exception;
 use Illuminate\Auth\AuthenticationException;
@@ -34,168 +35,282 @@ use Illuminate\Http\Client\ConnectionException;
 
 class DteController extends Controller
 {
+    // public function enviarDteUnitarioCCF(Request $request)
+    // {
+    //     //login para generar token de hacienda.
+    //     $responseLogin = LoginMH::login();
+
+    //     if ($responseLogin['code'] != 200)
+    //         return response()->json(DteCodeValidator::code404($responseLogin['error']), 404);
+
+    //     $empresa = Help::getEmpresa();
+    //     $url = Help::mhUrl();
+    //     $dteJson = $request;
+
+    //     if ($dteJson == null)
+    //     return response()->json(["error" => "DTE no valido o nulo"], Response::HTTP_BAD_REQUEST);
+
+
+    //     $body = json_decode($request->getContent(), true);
+    //     $dte = $body['dteJson'];
+    //     $cliente = Help::getClienteId($dte['receptor']['nit']);
+
+    //     $newDTE = [];
+
+    //     $tipoDTE = '03';
+    //     $numeroDTE = Generator::generateNumControl($tipoDTE);
+    //     $fechaEmision = date('Y-m-d');
+    //     $horaEmision =  date('h:i:s');
+    //     $idCliente = $cliente['id'];
+    //     $registoDTE = null;
+    //     // $idCliente = 0;
+    //     $responseData = '';
+    //     $statusCode = '';
+
+    //     try {
+    //         // IDENTICACION
+    //         $identificacion = [];
+    //         $identificacion['version'] = 3;
+    //         $identificacion['ambiente'] = "00";
+    //         $identificacion['tipoDte'] = $tipoDTE;
+    //         $identificacion['numeroControl'] =  $numeroDTE;
+    //         $identificacion['codigoGeneracion'] = Generator::generateCodeGeneration();
+    //         $identificacion['tipoOperacion'] = 1;
+    //         $identificacion['tipoModelo'] = 1;
+    //         $identificacion['tipoContingencia'] = null;
+    //         $identificacion['motivoContin'] = null;
+    //         $identificacion['fecEmi'] = $fechaEmision;
+    //         $identificacion['horEmi'] = $horaEmision;
+    //         $identificacion['tipoMoneda'] = "USD";
+
+    //         $newDTE['identificacion'] = $identificacion;
+
+    //         // EMISOR
+    //         if (array_key_exists('emisor', $dte))
+    //             $newDTE['emisor'] = $dte['emisor'];
+    //         else
+    //             $newDTE['emisor'] = Identificacion::emisor('03', '20', null);
+    //         // $newDTE['emisor'] = Help::getEmisorDefault();
+
+    //         $newDTE['receptor'] = Identificacion::receptorCCF($dte['receptor']);
+
+    //         // DOCUMENTO RELACIONADO
+    //         if (array_key_exists('documentoRelacionado', $dte))
+    //             $newDTE['documentoRelacionado'] = $dte['documentoRelacionado'];
+    //         else
+    //             $newDTE['documentoRelacionado'] = null;
+
+    //         //  RECEPTOR
+    //         $newDTE['otrosDocumentos'] = $dte['otrosDocumentos'];
+    //         $newDTE['ventaTercero'] = $dte['ventaTercero'];
+
+    //         // Cuerpo Documento
+    //         $newDTE['cuerpoDocumento'] = $dte['cuerpoDocumento'];
+
+    //         // En el json, periodo pago y plazo pago son opcionales a colocar, pero codigo pago es obligatorio
+    //         // El valor de codigo pago, debe ser alguno de los codigo de la tabla mh_forma_pago
+    //         // El valor de plazo debe de venir de alguno de los codigos de la tabla mh plazo
+    //         // El valor de periodo debe de se tipo numerico
+    //         // RESUMEN DEL CUERPO
+    //         $codigoPago = $body['codigo_pago'];
+    //         $periodoPago = isset($body['periodo_pago']) ? $body['periodo_pago'] : null;
+    //         $plazoPago = isset($body['plazo_pago']) ? $body['plazo_pago'] : null;
+
+    //         $newDTE['resumen'] = CCFDTE::Resumen($dte['cuerpoDocumento'], $codigoPago, $cliente['tipoCliente'], $periodoPago, $plazoPago);
+
+    //         $newDTE['extension'] = $dte['extension'];
+    //         $newDTE['apendice'] = $dte['apendice'];
+
+    //         // return response()->json($newDTE);
+    //         // $idCliente = Help::getClienteId($dte['receptor']['nit']);
+    //         $registoDTE = RegistroDTE::create([
+    //             'id_cliente' => $idCliente,
+    //             'numero_dte' => $numeroDTE,
+    //             'tipo_documento' => $tipoDTE,
+    //             'dte' => json_encode($newDTE),
+    //             'estado' => true,
+    //         ]);
+
+    //         $DTESigned = FirmadorElectronico::firmador($newDTE);
+
+    //         $statusSigner =  $DTESigned['status'];
+
+    //         if ($statusSigner > 201)
+    //             return response()->json([
+    //                 "error" => $DTESigned['error']
+    //             ], $statusSigner);
+
+    //         $tokenDTE = $DTESigned['msg'];
+
+    //         $jsonRequest = [
+    //             'ambiente' => $empresa->ambiente,
+    //             'idEnvio' => 1,
+    //             'version' => 3,
+    //             'tipoDte' => $tipoDTE,
+    //             "documento" => $tokenDTE,
+    //             "codigoGeneracion" => "341CA743-70F1-4CFE-88BC7E4AE72E60CB",
+    //             "nitEmisor" => "06141802161055"
+    //         ];
+
+    //         $requestResponse = Http::withHeaders([
+    //             'Authorization' => $empresa->token_mh,
+    //             'User-Agent' => 'ApiLaravel/1.0',
+    //             'Content-Type' => 'application/JSON'
+    //         ])->post($url . "fesv/recepciondte", $jsonRequest);
+
+    //         $responseData = $requestResponse->json();
+    //         $statusCode = $requestResponse->status();
+
+    //         //415 Unsupported Media Type
+    //         if ($statusCode == 415)
+    //             $responseData = DteCodeValidator::code415($responseData);
+    //         // 401 Unauthorized de parte de login hacienda.
+    //         if ($statusCode == 401)
+    //             $responseData = DteCodeValidator::code401();
+
+    //         if ($statusCode == 404)
+    //             $responseData = DteCodeValidator::code404();
+
+    //         if ($statusCode >= 400) {
+    //             $errorMessage = "Error $statusCode: " . json_encode($responseData);
+
+    //             throw new Exception($errorMessage);
+    //         }
+    //     } catch (Exception $e) {
+
+    //         $logDTE = LogDTE::create([
+    //             'id_cliente' => $idCliente,
+    //             'numero_dte' => $numeroDTE,
+    //             'tipo_documento' => $tipoDTE,
+    //             'fecha' => $fechaEmision,
+    //             'hora' => $horaEmision,
+    //             'error' => $e->getMessage(),
+    //             'estado' => false,
+    //         ]);
+
+    //         $logDTE->save();
+    //         $registoDTE->estado = false;
+    //     } finally {
+    //         // return response()->json($registoDTE);
+    //         $registoDTE->save();
+    //     }
+
+    //     return response()->json($responseData, $statusCode);
+    // }
+
+
     public function enviarDteUnitarioCCF(Request $request)
     {
-        //login para generar token de hacienda.
+        // Login para generar token de Hacienda.
         $responseLogin = LoginMH::login();
-
-        if ($responseLogin['code'] != 200)
+        if ($responseLogin['code'] != 200) {
             return response()->json(DteCodeValidator::code404($responseLogin['error']), 404);
+        }
 
-        $empresa = Help::getEmpresa();
-        $url = Help::mhUrl();
-        $dteJson = $request;
+        $dteJson = $request->json()->all();
 
-        if ($dteJson == null)
-        return response()->json(["error" => "DTE no valido o nulo"], Response::HTTP_BAD_REQUEST);
+        if (!$dteJson) {
+            return response()->json(["error" => "DTE no válido o nulo"], Response::HTTP_BAD_REQUEST);
+        }
 
-
-        $body = json_decode($request->getContent(), true);
-        $dte = $body['dteJson'];
+        // VARAIBLES DE CONFIGURACION DEL DTE
+        $dte = $dteJson['dteJson'];
         $cliente = Help::getClienteId($dte['receptor']['nit']);
-
-        $newDTE = [];
-
         $tipoDTE = '03';
         $numeroDTE = Generator::generateNumControl($tipoDTE);
         $fechaEmision = date('Y-m-d');
-        $horaEmision =  date('h:i:s');
+        $horaEmision = date('h:i:s');
         $idCliente = $cliente['id'];
-        $registoDTE = null;
-        // $idCliente = 0;
+
+        // VARIABLES DE RESPUESTA DEL SERVICIO
         $responseData = '';
         $statusCode = '';
 
-        try {
-            // IDENTICACION
-            $identificacion = [];
-            $identificacion['version'] = 3;
-            $identificacion['ambiente'] = "00";
-            $identificacion['tipoDte'] = $tipoDTE;
-            $identificacion['numeroControl'] =  $numeroDTE;
-            $identificacion['codigoGeneracion'] = Generator::generateCodeGeneration();
-            $identificacion['tipoOperacion'] = 1;
-            $identificacion['tipoModelo'] = 1;
-            $identificacion['tipoContingencia'] = null;
-            $identificacion['motivoContin'] = null;
-            $identificacion['fecEmi'] = $fechaEmision;
-            $identificacion['horEmi'] = $horaEmision;
-            $identificacion['tipoMoneda'] = "USD";
+        // Variables de Identificación
+        $identificacion = [
+            'version' => 3,
+            'ambiente' => "00",
+            'tipoDte' => $tipoDTE,
+            'numeroControl' => $numeroDTE,
+            'codigoGeneracion' => Generator::generateCodeGeneration(),
+            'tipoOperacion' => 1,
+            'tipoModelo' => 1,
+            'fecEmi' => $fechaEmision,
+            'horEmi' => $horaEmision,
+            'tipoMoneda' => "USD",
+            'tipoContingencia' => null,
+            'motivoContin' => null
+        ];
 
-            $newDTE['identificacion'] = $identificacion;
+        // $identificacion = [];
+    //         $identificacion['version'] = 3;
+    //         $identificacion['ambiente'] = "00";
+    //         $identificacion['tipoDte'] = $tipoDTE;
+    //         $identificacion['numeroControl'] =  $numeroDTE;
+    //         $identificacion['codigoGeneracion'] = Generator::generateCodeGeneration();
+    //         $identificacion['tipoOperacion'] = 1;
+    //         $identificacion['tipoModelo'] = 1;
+    //         $identificacion['tipoContingencia'] = null;
+    //         $identificacion['motivoContin'] = null;
+    //         $identificacion['fecEmi'] = $fechaEmision;
+    //         $identificacion['horEmi'] = $horaEmision;
+    //         $identificacion['tipoMoneda'] = "USD";
 
-            // EMISOR
-            if (array_key_exists('emisor', $dte))
-                $newDTE['emisor'] = $dte['emisor'];
-            else
-                $newDTE['emisor'] = Identificacion::emisor('03', '20', null);
-            // $newDTE['emisor'] = Help::getEmisorDefault();
+        // Variables de Emisor y Receptor
+        $emisor = $dte['emisor'] ?? Identificacion::emisor('03', '20', null);
+        $receptor = Identificacion::receptorCCF($dte['receptor']);
 
-            $newDTE['receptor'] = Identificacion::receptorCCF($dte['receptor']);
+        // Variables de Documento Relacionado y Cuerpo del Documento
+        $documentoRelacionado = $dte['documentoRelacionado'] ?? null;
+        $otrosDocumentos = $dte['otrosDocumentos'];
+        $ventaTercero = $dte['ventaTercero'];
+        $cuerpoDocumento = CCFDTE::getCuerpoDocumento($dte['cuerpoDocumento']);
 
-            // DOCUMENTO RELACIONADO
-            if (array_key_exists('documentoRelacionado', $dte))
-                $newDTE['documentoRelacionado'] = $dte['documentoRelacionado'];
-            else
-                $newDTE['documentoRelacionado'] = null;
+        // Variables de Resumen
+        $codigoPago = $dteJson['codigo_pago'];
+        $periodoPago = $dteJson['periodo_pago'] ?? null;
+        $plazoPago = $dteJson['plazo_pago'] ?? null;
+        $resumen = CCFDTE::Resumen($cuerpoDocumento, $codigoPago, $cliente['tipoCliente'], $periodoPago, $plazoPago);
 
-            //  RECEPTOR
-            $newDTE['otrosDocumentos'] = $dte['otrosDocumentos'];
-            $newDTE['ventaTercero'] = $dte['ventaTercero'];
+        // Variables de Extensión y Apéndice
+        $extension = $dte['extension'];
+        $apendice = $dte['apendice'];
 
-            // Cuerpo Documento
-            $newDTE['cuerpoDocumento'] = $dte['cuerpoDocumento'];
+        // Creación de newDTE
+        $newDTE = [
+            'identificacion' => $identificacion,
+            'emisor' => $emisor,
+            'receptor' => $receptor,
+            'documentoRelacionado' => $documentoRelacionado,
+            'otrosDocumentos' => $otrosDocumentos,
+            'ventaTercero' => $ventaTercero,
+            'cuerpoDocumento' => $cuerpoDocumento,
+            'resumen' => $resumen,
+            'extension' => $extension,
+            'apendice' => $apendice
+        ];
 
-            // En el json, periodo pago y plazo pago son opcionales a colocar, pero codigo pago es obligatorio
-            // El valor de codigo pago, debe ser alguno de los codigo de la tabla mh_forma_pago
-            // El valor de plazo debe de venir de alguno de los codigos de la tabla mh plazo
-            // El valor de periodo debe de se tipo numerico
-            // RESUMEN DEL CUERPO
-            $codigoPago = $body['codigo_pago'];
-            $periodoPago = isset($body['periodo_pago']) ? $body['periodo_pago'] : null;
-            $plazoPago = isset($body['plazo_pago']) ? $body['plazo_pago'] : null;
+            // return response()->json($newDTE, 200);
 
-            $newDTE['resumen'] = CCFDTE::Resumen($dte['cuerpoDocumento'], $codigoPago, $cliente['tipoCliente'], $periodoPago, $plazoPago);
-
-            $newDTE['extension'] = $dte['extension'];
-            $newDTE['apendice'] = $dte['apendice'];
-
-            // return response()->json($newDTE);
-            // $idCliente = Help::getClienteId($dte['receptor']['nit']);
-            $registoDTE = RegistroDTE::create([
-                'id_cliente' => $idCliente,
-                'numero_dte' => $numeroDTE,
-                'tipo_documento' => $tipoDTE,
-                'dte' => json_encode($newDTE),
-                'estado' => true,
-            ]);
-
-            $DTESigned = FirmadorElectronico::firmador($newDTE);
-
-            $statusSigner =  $DTESigned['status'];
-
-            if ($statusSigner > 201)
-                return response()->json([
-                    "error" => $DTESigned['error']
-                ], $statusSigner);
-
-            $tokenDTE = $DTESigned['msg'];
-
-            $jsonRequest = [
-                'ambiente' => $empresa->ambiente,
-                'idEnvio' => 1,
-                'version' => 3,
-                'tipoDte' => $tipoDTE,
-                "documento" => $tokenDTE,
-                "codigoGeneracion" => "341CA743-70F1-4CFE-88BC7E4AE72E60CB",
-                "nitEmisor" => "06141802161055"
-            ];
-
-            $requestResponse = Http::withHeaders([
-                'Authorization' => $empresa->token_mh,
-                'User-Agent' => 'ApiLaravel/1.0',
-                'Content-Type' => 'application/JSON'
-            ])->post($url . "fesv/recepciondte", $jsonRequest);
-
-            $responseData = $requestResponse->json();
-            $statusCode = $requestResponse->status();
-
-            //415 Unsupported Media Type
-            if ($statusCode == 415)
-                $responseData = DteCodeValidator::code415($responseData);
-            // 401 Unauthorized de parte de login hacienda.
-            if ($statusCode == 401)
-                $responseData = DteCodeValidator::code401();
-
-            if ($statusCode == 404)
-                $responseData = DteCodeValidator::code404();
-
-            if ($statusCode >= 400) {
-                $errorMessage = "Error $statusCode: " . json_encode($responseData);
-
-                throw new Exception($errorMessage);
-            }
-        } catch (Exception $e) {
-
-            $logDTE = LogDTE::create([
-                'id_cliente' => $idCliente,
-                'numero_dte' => $numeroDTE,
-                'tipo_documento' => $tipoDTE,
-                'fecha' => $fechaEmision,
-                'hora' => $horaEmision,
-                'error' => $e->getMessage(),
-                'estado' => false,
-            ]);
-
-            $logDTE->save();
-            $registoDTE->estado = false;
-        } finally {
-            // return response()->json($registoDTE);
-            $registoDTE->save();
-        }
+        [$responseData, $statusCode] = DteApiMHService::envidarDTE( $newDTE, $idCliente,$numeroDTE,$tipoDTE,$fechaEmision,$horaEmision );
 
         return response()->json($responseData, $statusCode);
     }
+
+    private function handleErrorResponse($statusCode, $responseData)
+    {
+        switch ($statusCode) {
+            case 415:
+                return DteCodeValidator::code415($responseData);
+            case 401:
+                return DteCodeValidator::code401();
+            case 404:
+                return DteCodeValidator::code404();
+            default:
+                return $responseData;
+        }
+    }
+
 
     public function enviarDteUnitarioFacturaExterior(Request $request)
     {

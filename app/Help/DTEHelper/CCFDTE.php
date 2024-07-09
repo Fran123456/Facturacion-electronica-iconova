@@ -8,121 +8,257 @@ class CCFDTE
 {
     // public static function
 
+    // public static function Resumen($cuerpo, $codigoPago, $idTipoCliente, $plazoPago = null, $periodoPago = null)
+    // {
+
+    //     $resumen = [];
+    //     $descripcionPago = Help::getPayWay($codigoPago);
+
+    //     $totalNoSuj = 0.0;
+    //     $totalExenta = 0.0;
+    //     $subTotal = 0.0;
+    //     $totalDescu = 0.0;
+    //     $totalPagar = 0.0;
+    //     $ivaRetenida = 0.0;
+
+    //     $totalImpuestos = 0.0;
+    //     $tributos = [];
+    //     $pagos = [];
+
+
+    //     foreach ($cuerpo as $key => $value) {
+
+    //         $ventaGravada = round($value['cantidad'] * $value['precioUni'], 2);
+    //         $impuestoTotalItem = 0.0;
+
+    //         // return response()->json([
+    //         //         'value' => $ventaGravada
+    //         //     ]);
+    //         $totalNoSuj += $value['ventaNoSuj'];
+    //         $totalExenta += $value['ventaExenta'];
+    //         $subTotal += $ventaGravada;
+    //         $totalDescu += $value['montoDescu'];
+
+    //         if ($idTipoCliente == 3 && $ventaGravada >= 100)
+    //             $ivaRetenida += round(($ventaGravada * 0.01), 2);
+
+    //         // $dte['cuerpoDocumento'][$key]['ventaGravada'] = $ventaGravada;
+
+    //         foreach ($value['tributos'] as $tributo) {
+
+    //             $encontrado = false;
+    //             $impuesto = 0.0;
+
+    //             $impuesto = round(Help::getTax($tributo, $ventaGravada), 2);
+
+    //             foreach ($tributos as $clave => $valor) {
+
+    //                 $codigo = $valor['codigo'];
+
+    //                 if ($codigo == $tributo) {
+    //                     $encontrado = true;
+    //                     $tributos[$clave]['valor'] += $impuesto;
+    //                     break;
+    //                 }
+    //             }
+
+    //             if (!$encontrado) {
+    //                 $tributos[] = [
+    //                     'codigo' => $tributo,
+    //                     'descripcion' => Help::getTributo($tributo),
+    //                     'valor' => $impuesto
+    //                 ];
+    //             }
+
+    //             $totalImpuestos += $impuesto;
+    //             $impuestoTotalItem += $impuesto;
+    //         }
+
+    //         $pagos[] = [
+    //             "codigo" => $codigoPago,
+    //             "montoPago" => round(($impuestoTotalItem + $ventaGravada), 2),
+    //             "referencia" => $descripcionPago,
+    //             "periodo" => $periodoPago,
+    //             "plazo" => $plazoPago
+    //         ];
+    //     }
+
+    //     $subTotal = round($subTotal, 2);
+    //     $totalPagar = round($subTotal + $totalImpuestos, 2);
+
+    //     $resumen['totalNoSuj'] = $totalNoSuj;
+    //     $resumen['totalExenta'] = $totalExenta;
+    //     $resumen['totalGravada'] = $subTotal;
+    //     $resumen['subTotalVentas'] = $subTotal;
+    //     $resumen['descuNoSuj'] = 0.0;
+    //     $resumen['descuExenta'] = 0.0;
+    //     $resumen['descuGravada'] = 0.0;
+    //     $resumen['porcentajeDescuento'] = 0.0;
+
+    //     $resumen['totalDescu'] = $totalDescu;
+    //     $resumen['tributos'] = $tributos;
+    //     $resumen['subTotal'] = $subTotal;
+    //     $resumen['ivaPerci1'] = 0.0;
+    //     $resumen['ivaRete1'] = $ivaRetenida;
+    //     $resumen['reteRenta'] = 0.0;
+    //     // $resumen['montoTotalOperacion'] = $totalPagar;
+    //     $resumen['montoTotalOperacion'] = $totalPagar - $ivaRetenida;
+    //     $resumen['totalNoGravado'] = 0;
+
+    //     $resumen['totalPagar'] = $totalPagar - $ivaRetenida;
+    //     // $resumen['totalPagar'] = $totalPagar;
+
+    //     $numero_str = strval($totalPagar);
+    //     $partes = explode('.', $numero_str);
+    //     $entero = isset($partes[0]) ? intval($partes[0]) : 0;
+    //     $decimal = isset($partes[1]) ? intval($partes[1]) : 0;
+    //     $numero_en_letras = Help::numberToString($entero) . " con " . Help::numberToString($decimal);
+
+    //     $resumen['totalLetras'] = 'USD ' . $numero_en_letras;
+
+    //     $resumen['saldoFavor'] = 0;
+    //     $resumen['condicionOperacion'] = 1;
+    //     $resumen['pagos'] = $pagos;
+    //     $resumen['numPagoElectronico'] = null;
+
+    //     return $resumen;
+    // }
+
     public static function Resumen($cuerpo, $codigoPago, $idTipoCliente, $plazoPago = null, $periodoPago = null)
-    {
+{
+    $resumen = [];
+    $descripcionPago = Help::getPayWay($codigoPago);
 
-        $resumen = [];
-        $descripcionPago = Help::getPayWay($codigoPago);
+    $totalNoSuj = 0.0;
+    $totalExenta = 0.0;
+    $subTotal = 0.0;
+    $totalDescu = 0.0;
+    $totalPagar = 0.0;
+    $ivaRetenida = 0.0;
+    $totalImpuestos = 0.0;
+    $tributos = [];
+    $pagos = [];
 
-        $totalNoSuj = 0.0;
-        $totalExenta = 0.0;
-        $subTotal = 0.0;
-        $totalDescu = 0.0;
-        $totalPagar = 0.0;
-        $ivaRetenida = 0.0;
+    foreach ($cuerpo as $key => $value) {
+        $ventaGravada = round($value['cantidad'] * $value['precioUni'], 2);
+        $impuestoTotalItem = 0.0;
 
-        $totalImpuestos = 0.0;
-        $tributos = [];
-        $pagos = [];
+        $totalNoSuj += $value['ventaNoSuj'];
+        $totalExenta += $value['ventaExenta'];
+        $subTotal += $ventaGravada;
+        $totalDescu += $value['montoDescu'];
 
-
-        foreach ($cuerpo as $key => $value) {
-
-            $ventaGravada = round($value['cantidad'] * $value['precioUni'], 2);
-            $impuestoTotalItem = 0.0;
-
-            // return response()->json([
-            //         'value' => $ventaGravada
-            //     ]);
-            $totalNoSuj += $value['ventaNoSuj'];
-            $totalExenta += $value['ventaExenta'];
-            $subTotal += $ventaGravada;
-            $totalDescu += $value['montoDescu'];
-            if ( $idTipoCliente == 3 && $ventaGravada >= 100 )
-                $ivaRetenida += round(($ventaGravada * 0.01), 2);
-
-            // $dte['cuerpoDocumento'][$key]['ventaGravada'] = $ventaGravada;
-
-            foreach ($value['tributos'] as $tributo) {
-
-                $encontrado = false;
-                $impuesto = 0.0;
-
-                $impuesto = round(Help::getTax($tributo, $ventaGravada), 2);
-
-                foreach ($tributos as $clave => $valor) {
-
-                    $codigo = $valor['codigo'];
-
-                    if ($codigo == $tributo) {
-                        $encontrado = true;
-                        $tributos[$clave]['valor'] += $impuesto;
-                        break;
-                    }
-                }
-
-                if (!$encontrado) {
-                    $tributos[] = [
-                        'codigo' => $tributo,
-                        'descripcion' => Help::getTributo($tributo),
-                        'valor' => $impuesto
-                    ];
-                }
-
-                $totalImpuestos += $impuesto;
-                $impuestoTotalItem += $impuesto;
-            }
-
-            $pagos[] = [
-                "codigo" => $codigoPago,
-                "montoPago" => round(($impuestoTotalItem + $ventaGravada), 2),
-                "referencia" => $descripcionPago,
-                "periodo" => $periodoPago,
-                "plazo" => $plazoPago
-            ];
+        if ($idTipoCliente == 3 && $ventaGravada >= 100) {
+            $ivaRetenida += round(($ventaGravada * 0.01), 2);
         }
 
-        $subTotal = round($subTotal, 2);
-        $totalPagar = round($subTotal + $totalImpuestos, 2);
+        foreach ($value['tributos'] as $tributo) {
+            $encontrado = false;
+            $impuesto = round(Help::getTax($tributo, $ventaGravada), 2);
 
-        $resumen['totalNoSuj'] = $totalNoSuj;
-        $resumen['totalExenta'] = $totalExenta;
-        $resumen['totalGravada'] = $subTotal;
-        $resumen['subTotalVentas'] = $subTotal;
-        $resumen['descuNoSuj'] = 0.0;
-        $resumen['descuExenta'] = 0.0;
-        $resumen['descuGravada'] = 0.0;
-        $resumen['porcentajeDescuento'] = 0.0;
+            foreach ($tributos as $clave => $valor) {
+                if ($valor['codigo'] == $tributo) {
+                    $encontrado = true;
+                    $tributos[$clave]['valor'] += $impuesto;
+                    break;
+                }
+            }
 
-        $resumen['totalDescu'] = $totalDescu;
-        $resumen['tributos'] = $tributos;
-        $resumen['subTotal'] = $subTotal;
-        $resumen['ivaPerci1'] = 0.0;
-        $resumen['ivaRete1'] = $ivaRetenida;
-        $resumen['reteRenta'] = 0.0;
-        $resumen['montoTotalOperacion'] = $totalPagar;
-        $resumen['totalNoGravado'] = 0;
+            if (!$encontrado) {
+                $tributos[] = [
+                    'codigo' => $tributo,
+                    'descripcion' => Help::getTributo($tributo),
+                    'valor' => $impuesto
+                ];
+            }
 
-        $resumen['totalPagar'] = $totalPagar - $ivaRetenida;
+            $totalImpuestos += $impuesto;
+            $impuestoTotalItem += $impuesto;
+        }
 
-        $numero_str = strval($totalPagar);
-        $partes = explode('.', $numero_str);
-        $entero = isset($partes[0]) ? intval($partes[0]) : 0;
-        $decimal = isset($partes[1]) ? intval($partes[1]) : 0;
-        $numero_en_letras = Help::numberToString($entero) . " con " . Help::numberToString($decimal);
-
-        $resumen['totalLetras'] = 'USD ' . $numero_en_letras;
-
-        $resumen['saldoFavor'] = 0;
-        $resumen['condicionOperacion'] = 1;
-        $resumen['pagos'] = $pagos;
-        $resumen['numPagoElectronico'] = null;
-
-        return $resumen;
+        $pagos[] = [
+            "codigo" => $codigoPago,
+            "montoPago" => round(($impuestoTotalItem + $ventaGravada), 2),
+            "referencia" => $descripcionPago,
+            "periodo" => $periodoPago,
+            "plazo" => $plazoPago
+        ];
     }
 
-    // TODO: calculate cuerpoDocumento
-    public static function CuerpoDocumento(){
+    $subTotal = round($subTotal, 2);
+    $totalPagar = round($subTotal + $totalImpuestos, 2);
 
+    $resumen['totalNoSuj'] = $totalNoSuj;
+    $resumen['totalExenta'] = $totalExenta;
+    $resumen['totalGravada'] = $subTotal;
+    $resumen['subTotalVentas'] = $subTotal;
+    $resumen['descuNoSuj'] = 0.0;
+    $resumen['descuExenta'] = 0.0;
+    $resumen['descuGravada'] = 0.0;
+    $resumen['porcentajeDescuento'] = 0.0;
+    $resumen['totalDescu'] = $totalDescu;
+    $resumen['tributos'] = $tributos;
+    $resumen['subTotal'] = $subTotal;
+    $resumen['ivaPerci1'] = 0.0;
+    $resumen['ivaRete1'] = $ivaRetenida;
+    $resumen['reteRenta'] = 0.0;
+    $resumen['montoTotalOperacion'] = $totalPagar;
+    $resumen['totalNoGravado'] = 0;
+    // $resumen['totalPagar'] = $totalPagar;
+    $resumen['totalPagar'] = $totalPagar - $ivaRetenida;
+
+    $numero_str = strval($totalPagar);
+    $partes = explode('.', $numero_str);
+    $entero = isset($partes[0]) ? intval($partes[0]) : 0;
+    $decimal = isset($partes[1]) ? intval($partes[1]) : 0;
+    $numero_en_letras = Help::numberToString($entero) . " con " . Help::numberToString($decimal);
+
+    $resumen['totalLetras'] = 'USD ' . $numero_en_letras;
+    $resumen['saldoFavor'] = 0;
+    $resumen['condicionOperacion'] = 1;
+    $resumen['pagos'] = $pagos;
+    $resumen['numPagoElectronico'] = null;
+
+    return $resumen;
+}
+
+
+    // TODO: calculate cuerpoDocumento
+    public static function getCuerpoDocumento($items)
+    {
+        if ( $items == null)
+            return null;
+
+        foreach ($items as $key => $item) {
+            $totalImpuestos = 0;
+
+            $cantidad = $item['cantidad'];
+            $precio = $item['precioUni'];
+            $montoDescu = round($item['montoDescu'], 2);
+            $ventaNoSuj = round($item['ventaNoSuj'], 2);
+            $ventaExenta = round($item['ventaExenta'], 2);
+            $ventaGravada = $cantidad * $precio;
+
+            foreach ($item['tributos'] as $tributo) {
+
+                $impuesto = 0.0;
+
+                $impuesto = round(Help::getTax($tributo, $ventaGravada));
+
+                // $totalImpuestos += number_format($impuesto, 2);
+            }
+
+            $ventaGravada += $totalImpuestos;
+
+            $items[$key]['cantidad'] = $cantidad;
+            $items[$key]['montoDescu'] = $montoDescu;
+            $items[$key]['ventaNoSuj'] = $ventaNoSuj;
+            $items[$key]['ventaExenta'] = $ventaExenta;
+            $items[$key]['ventaGravada'] = round($ventaGravada, 2);
+            $items[$key]['precioUni'] = $precio;
+
+        }
+
+        return $items;
     }
 }

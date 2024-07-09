@@ -29,7 +29,7 @@ class NOTACREDITODTE
 
     public static function documentosRelacionados($relacionados){
 
-        foreach ($relacionados as &$value) {
+        foreach ($relacionados as $value) {
             $value['tipoGeneracion']= 2;
         }
         return $relacionados;
@@ -54,7 +54,6 @@ class NOTACREDITODTE
             "ivaRete1"=>0,
             "subTotalVentas"=> 0,
             "subTotal"=> 0,
-            "reteRenta"=> 0,
             "reteRenta"=> 0,
             "tributos"=> array(
                 "descripcion"=> "Impuesto al Valor Agregado 13%",

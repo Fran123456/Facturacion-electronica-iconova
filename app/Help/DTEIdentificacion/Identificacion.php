@@ -15,12 +15,12 @@ use App\Models\Cliente;
 class Identificacion
 {
 
-    public static function identidad($tipoDoc)
+    public static function identidad($tipoDoc, $version = 1)
     {
         $empresa = Help::getEmpresa();
         $fecha_actual = new \DateTime();
         $identificacion =  [
-            "version" => 1,
+            "version" => $version,
             "ambiente" => $empresa->ambiente,
             "tipoDte" => $tipoDoc,
             "numeroControl" =>  Generator::generateNumControl($tipoDoc),
@@ -40,6 +40,7 @@ class Identificacion
         }else{
             $identificacion['motivoContigencia']=  null;
         }
+
         return $identificacion;
     }
 

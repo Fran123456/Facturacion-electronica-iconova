@@ -31,45 +31,149 @@ use App\Models\RegistroDTE;
 use Carbon\Carbon;
 use Illuminate\Http\Client\ConnectionException;
 
-class DteNotasController extends Controller{
+class DteNotasController extends Controller
+{
 
     public function enviarNotaCreditoUnitaria(Request $request)
     {
 
-         //PASO 1 , HACER LOGIN EN HACIENDA
-         $responseLogin = LoginMH::login();
-         if ($responseLogin['code'] != 200)
-             return response()->json(DteCodeValidator::code404($responseLogin['error']), 404);
+        //PASO 1 , HACER LOGIN EN HACIENDA
+        $responseLogin = LoginMH::login();
+        if ($responseLogin['code'] != 200)
+            return response()->json(DteCodeValidator::code404($responseLogin['error']), 404);
+
+        //PASO 2 OBTENER INFORMACION Y DESFRAGMENTARLA
+        $body = json_decode($request->getContent(), true);
+        $dte = $body['dteJson']; //OBTENER EL DTE
+        $newDTE = [];
+        $tipoDTE = '05';
+
+        $empresa = Help::getEmpresa();
+        $url = Help::mhUrl();
+
+        //PASO 3 GENERAR JSON VALIDO PARA  HACIENDA
+        $identificacion = Identificacion::identidad('05', 3);
+        $emisor = Identificacion::emisor($tipoDTE, null, null, null);
+        $receptor = Identificacion::receptorNotaCredito($dte['receptor']);
+
+        $documentoRelacionado = null;
+        $ventaTercero = null;
+        $cuerpoDocumento = null;
+        $resumen = null;
+        $extension = null;
+        $apendice = null;
+
+        // $newDTE['emisor'] = $emisor;
+        // $newDTE['extension'] = NOTACREDITODTE::extension("obj");
+        // $newDTE['receptor'] = $receptor;
+        // $newDTE['identificacion'] = $identificacion;
+        // $newDTE['cuerpoDocumento'] =  NOTACREDITODTE::cuerpo($dte['cuerpoDocumento']);
+        // $newDTE['ventaTercero'] = $dte['ventaTercero'] ?? null;
+        // $newDTE['apendice'] = $dte['apendice'] ?? null;
+        // $newDTE['documentoRelacionado'] = NOTACREDITODTE::documentosRelacionados($dte['documentoRelacionado']);
+        // $newDTE['resumen'] = NOTACREDITODTE::resumen($dte['cuerpoDocumento']);
 
 
-         //PASO 2 OBTENER INFORMACION Y DESFRAGMENTARLA
-         $body = json_decode($request->getContent(), true);
-         $dte = $body['dteJson']; //OBTENER EL DTE
-         $newDTE = [];
-         $tipoDTE = '05';
-         $numeroDTE = Generator::generateNumControl($tipoDTE);
-         $fechaEmision = Carbon::now()->format('Y-m-d');
-         $horaEmision = Carbon::now()->format('H:i:s'); //24 horas
+        $documentoRelacionado = NOTACREDITODTE::documentosRelacionados($dte['documentoRelacionado']);
+        $ventaTercero = $dte['ventaTercero'] ?? null;
+        $cuerpoDocumento =  NOTACREDITODTE::cuerpo($dte['cuerpoDocumento']);
+        $resumen = NOTACREDITODTE::resumen($dte['cuerpoDocumento']);
+        $extension = NOTACREDITODTE::extension("obj");
+        $apendice = $dte['apendice'] ?? null;
 
-         $empresa = Help::getEmpresa();
-         $url = Help::mhUrl();
+        $newDTE = [
+            "identificacion" => $identificacion,
+            "documentoRelacionado" => $documentoRelacionado,
+            "emisor" => $emisor,
+            "receptor" => $receptor,
+            "ventaTercero" => $ventaTercero,
+            "cuerpoDocumento" => $cuerpoDocumento,
+            "resumen" => $resumen,
+            "extension" => $extension,
+            "apendice" => $apendice,
+        ];
 
-         //PASO 3 GENERAR JSON VALIDO PARA  HACIENDA
-         $identificacion = Identificacion::identidad('05');
-         $emisor = Identificacion::emisor('05', null, null, null);
-         $receptor = Identificacion::receptorNotaCredito($dte['receptor']);
+        return $newDTE;
 
-         $newDTE['emisor']=$emisor;
-         $newDTE['extension'] = NOTACREDITODTE::extension("obj");
-         $newDTE['receptor'] = $receptor;
-         $newDTE['identificacion'] = $identificacion;
-         $newDTE['cuerpoDocumento'] =  NOTACREDITODTE::cuerpo($dte['cuerpoDocumento']);
-         $newDTE['ventaTercero'] = $dte['ventaTercero'] ?? null;
-         $newDTE['apendice'] = $dte['apendice'] ?? null;
-         $newDTE['documentoRelacionado'] = NOTACREDITODTE::documentosRelacionados($dte['documentoRelacionado']);
-         $newDTE['resumen']= NOTACREDITODTE::resumen($dte['cuerpoDocumento']);
-         return $newDTE;
+        // PASO 4 MANDAR A HACIENDA EL NUEVO DTE FORMADO SEGUN EL DTE JSON SCHEMA DE LA DOCUMENTACION
 
+        try {
+            $idCliente = Help::getClienteId($dte['receptor']['numDocumento']);
+
+            $DTESigned = FirmadorElectronico::firmador($newDTE);
+
+            $statusSigner =  $DTESigned['status'];
+
+            if ($statusSigner > 201)
+                return response()->json([
+                    "error" => $DTESigned['error']
+                ], $statusSigner);
+
+            $documento = $DTESigned['msg'];
+
+            $jsonRequest = [
+                'ambiente' => $empresa->ambiente,
+                'idEnvio' => 1,
+                'version' => 1,
+                'tipoDte' => $tipoDTE,
+                "documento" => $documento,
+                "codigoGeneracion" => Generator::generateCodeGeneration(),
+                "nitEmisor" => $empresa->nit
+            ];
+
+            $requestResponse = Http::withHeaders([
+                'Authorization' => $empresa->token_mh,
+                'User-Agent' => 'ApiLaravel/1.0',
+                'Content-Type' => 'application/JSON'
+            ])->post($url . "fesv/recepciondte", $jsonRequest);
+
+            $responseData = $requestResponse->json();
+            $statusCode = $requestResponse->status();
+
+            switch($statusCode){
+                case 415:
+                    $responseData = DteCodeValidator::code415($responseData);
+                break;
+                case 401:
+                    $responseData = DteCodeValidator::code401();
+                break;
+                case 404:
+                    $responseData = DteCodeValidator::code404();
+                break;
+                case 400:
+                    $errorMessage = "Error $statusCode: " . json_encode($responseData);
+                    throw new Exception($errorMessage);
+                break;
+            }
+
+            // $registroDTE = RegistroDTE::create([
+            //     'id_cliente' => $idCliente,
+            //     'numero_dte' => $numeroDTE,
+            //     'tipo_documento' => $tipoDTE,
+            //     'dte' => json_encode($newDTE),
+            //     'estado' => true,
+            //     'empresa_id' => $empresa->id
+            // ]);
+
+            Generator::saveNumeroControl($tipoDTE);
+
+            return response()->json($responseData, $statusCode);
+
+        } catch (Exception $e) {
+
+            // $logDTE = LogDTE::create([
+            //     'id_cliente' => $idCliente,
+            //     'numero_dte' => $numeroDTE,
+            //     'tipo_documento' => $tipoDTE,
+            //     'fecha' => $fechaEmision,
+            //     'hora' => $horaEmision,
+            //     'error' => $e->getMessage(),
+            //     'estado' => false,
+            //     'empresa_id' => $empresa->id
+            // ]);
+
+            // $logDTE->save();
+        }
         /* $newDTE['otrosDocumentos'] = $dte['otrosDocumentos'] ?? null;
          $newDTE['ventaTercero'] = $dte['ventaTercero'] ?? null;
 
