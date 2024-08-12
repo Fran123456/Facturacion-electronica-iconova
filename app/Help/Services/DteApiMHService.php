@@ -9,20 +9,27 @@ use App\Help\DteCodeValidator;
 use App\Help\FirmadorElectronico;
 use App\Models\LogDTE;
 use App\Models\RegistroDTE;
+use DateTime;
 
 class DteApiMHService
 {
-    public static function envidarDTE($newDTE, $idCliente, $numeroDTE, $tipoDTE, $fechaEmision, $horaEmision)
+    public static function envidarDTE($newDTE, $idCliente, $identificacion)
     {
         $url = Help::mhUrl();
         $empresa = Help::getEmpresa();
         $responseData = "";
         $statusCode = 0;
 
+        $codigoGeneracionDTE = $identificacion['numeroControl'];
+        $tipoDTE = $identificacion['tipoDte'];
+        $fechaEmision = $identificacion['fecEmi'];
+        $horaEmision = $identificacion['horEmi'];
+        $version = $identificacion['version'];
+
         // CREACION DEL REGISTRO DEL DTE PARA RESPALDO EN LA DB
         $registoDTE = RegistroDTE::create([
             'id_cliente' => $idCliente,
-            'numero_dte' => $numeroDTE,
+            'codigo_generacion' => $codigoGeneracionDTE,
             'tipo_documento' => $tipoDTE,
             'dte' => json_encode($newDTE),
             'estado' => true,
@@ -39,7 +46,7 @@ class DteApiMHService
             $jsonRequest = [
                 'ambiente' => $empresa->ambiente,
                 'idEnvio' => 1,
-                'version' => 3,
+                'version' => $version,
                 'tipoDte' => $tipoDTE,
                 'documento' => $DTESigned['msg'],
                 'codigoGeneracion' => "341CA743-70F1-4CFE-88BC7E4AE72E60CB",
@@ -55,6 +62,23 @@ class DteApiMHService
             $responseData = $requestResponse->json();
             $statusCode = $requestResponse->status();
 
+            $registoDTE['sello'] = $responseData['selloRecibido'];
+            $registoDTE['numero_dte'] = $responseData['codigoGeneracion'];
+
+            $fechaCompleta = $responseData['fhProcesamiento'];
+
+            // Convierte la cadena en un objeto DateTime
+            $dateTime = DateTime::createFromFormat('d/m/Y H:i:s', $fechaCompleta);
+
+            // Obtiene solo la parte de la fecha
+            $fechaSolo = $dateTime->format('Y-m-d');
+            // Asigna la fecha a tu variable $registoDTE['fecha_recibido']
+            $registoDTE['fecha_recibido'] = $fechaSolo;
+
+            // $registoDTE['descripcion_recibido'] = $responseData['descripcionMsg'];
+            $registoDTE['observaciones'] = json_encode(self::observaciones($responseData['observaciones']));
+
+
             if ($statusCode >= 400) {
                 $responseData = self::handleErrorResponse($statusCode, $responseData);
                 throw new Exception("Error $statusCode: " . json_encode($responseData));
@@ -65,7 +89,7 @@ class DteApiMHService
 
             LogDTE::create([
                 'id_cliente' => $idCliente,
-                'numero_dte' => $numeroDTE,
+                'numero_dte' => $codigoGeneracionDTE,
                 'tipo_documento' => $tipoDTE,
                 'fecha' => $fechaEmision,
                 'hora' => $horaEmision,
@@ -95,5 +119,20 @@ class DteApiMHService
             default:
                 return $responseData;
         }
+    }
+
+    private static function observaciones($observaciones){
+
+        $obj = [];
+
+        if ( count( $observaciones ) == 0 )
+            return [];
+
+        foreach ( $observaciones as $key => $item ){
+            $obj[ "observacion" . $key + 1 ] = $item;
+        }
+
+        return $obj;
+
     }
 }

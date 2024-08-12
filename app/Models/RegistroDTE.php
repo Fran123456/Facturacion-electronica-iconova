@@ -14,10 +14,15 @@ class RegistroDTE extends Model
     protected $fillable = [
         'id',
         'id_cliente',
-        'numero_dte',
+        'codigo_generacion',
         'tipo_documento',
         'dte',
-        'estado','empresa_id'
+        'numero_dte',
+        'sello',
+        'fecha_recibido',
+        'observaciones',
+        'estado',
+        'empresa_id'
     ];
 
     public function cliente(){
