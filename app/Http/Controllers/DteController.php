@@ -383,4 +383,9 @@ class DteController extends Controller
             return response()->json($responseData, $statusCode);
         }
     }
+
+
+    public function notaCredito(Request $request){
+
+    }
 }
