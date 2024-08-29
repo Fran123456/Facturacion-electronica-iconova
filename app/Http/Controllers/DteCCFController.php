@@ -55,6 +55,21 @@ class DteCCFController extends Controller
                 "msg" => "El campo pagoTributos tiene que tener la misma longitud que cuerpoDocumento"
             ]);
 
+
+        // $schemaValidacion = [
+        //     'dteJson.receptor' => 'required|array',
+        //     'dteJson.cuerpoDocumento' => 'required|array',
+        //     'dteJson.emisor' => 'nullable|array',
+        //     'dteJson.documentoRelacionado' => 'nullable|array',
+        //     'dteJson.otrosDocumentos' => 'nullable|array',
+        //     'dteJson.ventaTercero' => 'nullable|array',
+        //     'dteJson.extension' => 'nullable|array',
+        //     'dteJson.apendice' => 'nullable|array',
+
+        // ];
+
+        // $request->validate($schemaValidacion);
+
         // VARAIBLES DE CONFIGURACION DEL DTE
         $dte = $json['dteJson'];
         $cliente = Help::getClienteId($dte['receptor']['nit']);

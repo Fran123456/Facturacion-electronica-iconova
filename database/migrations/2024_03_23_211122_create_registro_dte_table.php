@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('numero_dte');
             $table->string('tipo_documento');
             $table->json('dte');
-            $table->string('sello');
+            $table->string('sello')->nullable();
             $table->string('fecha_recibido');
             $table->json('observaciones')->nullable();
             $table->boolean('estado');
