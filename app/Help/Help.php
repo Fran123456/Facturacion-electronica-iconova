@@ -218,4 +218,36 @@ class Help
     }
 
 
+    public static function ValidarCliente($numDocumento, $clienteF)
+    {
+
+        $cliente = Cliente::where('nit', $numDocumento)->orWhere('dui', $numDocumento)->first();
+
+        if($cliente ==null){
+            $cliente = Cliente::create([
+                'nit'=> $clienteF['nit'],
+                'nrc'=> $clienteF['nrc'],
+                'dui'=> $clienteF['dui'],
+                'nombre'=> $clienteF['nombre'],
+                'codigo_actividad'=> $clienteF['codActividad'],
+                'descripcion_actividad'=> $clienteF['descActividad'],
+                'nombre_comercial'=> $clienteF['nombreComercial'],
+                'departamento'=>  $clienteF['direccion']['departamento'],
+                'municipio'=> $clienteF['direccion']['municipio'],
+                'complemento'=> $clienteF['direccion']['complemento'],
+                'telefono'=> $clienteF['telefono'],
+                'correo'=> $clienteF['correo'],
+                'estado'=> 1,
+            ]);
+        }
+   
+
+        // return $cliente->id;
+        return [
+            'id' => $cliente->id,
+            'tipoCliente' => $cliente->id_tipo_cliente
+        ];
+    }
+
+
 }

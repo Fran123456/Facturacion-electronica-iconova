@@ -57,7 +57,9 @@ class DteCCFController extends Controller
 
         // VARAIBLES DE CONFIGURACION DEL DTE
         $dte = $json['dteJson'];
-        $cliente = Help::getClienteId($dte['receptor']['nit']);
+       
+        $cliente = Help::ValidarCliente($dte['receptor']['nit'],$dte['receptor']);
+        
         $tipoDTE = '03';
         $idCliente = $cliente['id'];
 
