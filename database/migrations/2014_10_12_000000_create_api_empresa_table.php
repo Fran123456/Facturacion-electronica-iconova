@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->text("nombre");
             $table->string("nombre_comercial", 300)->nullable();
-    $table->string("nit", 200)->nullable();
+            $table->string("nit", 200)->nullable();
             $table->text("credenciales_api");
             $table->text("password_mh");
             $table->text("public_key");
@@ -26,13 +26,15 @@ return new class extends Migration
             $table->text("telefono");
             $table->text("celular");
 
+            $table->boolean("estado")->default(true);
+
             // Campos agregados
             $table->string('departamento', 200)->nullable();
             $table->string('municipio', 100)->nullable();
             $table->text('direccion')->nullable();
             $table->string('codigo_establecimiento', 20)->nullable();
-            $table->text('token_mh')->nullable();
             $table->string('codigo_actividad', 200)->nullable();
+            $table->text('token_mh')->nullable();
             $table->string('ambiente', 10)->nullable();
             $table->string('correlativo_ccf', 9)->nullable()->default("0");
             $table->string('correlativo_cd', 9)->nullable()->default("0");
