@@ -26,20 +26,14 @@
                     "const" : "03"
                 },
                 "numeroControl" : {
-                    "type" : [
-                        "string",
-                        "null"
-                    ],
+                    "type" : "string",
                     "description" : "Número de Control",
                     "maxLength" : 31,
                     "minLength" : 31,
                     "pattern" : "^DTE-03-[A-Z0-9]{8}-[0-9]{15}$"
                 },
                 "codigoGeneracion" : {
-                    "type" : [
-                        "string",
-                        "null"
-                    ],
+                    "type" : "string",
                     "description" : "Código de Generación",
                     "maxLength" : 36,
                     "minLength" : 36,

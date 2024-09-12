@@ -1,11 +1,14 @@
 <?php
+
 namespace App\Help\DTEHelper;
+
 use App\Models\MH\MHIncoterms;
 use App\Help\Help;
 
 class FEXDTE
 {
-    public static function BuildDetalle($detalles){
+    public static function BuildDetalle($detalles)
+    {
         /*
             "numItem": 1,
             "codigo": null,
@@ -20,33 +23,56 @@ class FEXDTE
          */
         $data = array();
         foreach ($detalles as $key => $value) {
-            $unidad='99';
-            if(  isset($value['uniMedida'] )  ){
-                $unidad=$value['uniMedida'] ;
-            }else{
-
+            $unidad = '99';
+            if (isset($value['uniMedida'])) {
+                $unidad = $value['uniMedida'];
+            } else {
             }
 
             $ar = array(
-                "numItem"=> $key+1, 
-                "codigo"=>null,
-                "descripcion"=> $value['descripcion'],
-                "cantidad"=> $value['cantidad'],
-                "uniMedida"=> $unidad, 
-                "precioUni"=> $value['precioUni'],
-                "montoDescu"=> $value['montoDescu'],
-                "ventaGravada"=> $value['ventaGravada'],
-                "tributos"=> null,
-                "noGravado"=> $value['noGravado'],
+                "numItem" => $key + 1,
+                "codigo" => null,
+                "descripcion" => $value['descripcion'],
+                "cantidad" => $value['cantidad'],
+                "uniMedida" => $unidad,
+                "precioUni" => $value['precioUni'],
+                "montoDescu" => $value['montoDescu'],
+                "ventaGravada" => $value['ventaGravada'],
+                "tributos" => null,
+                "noGravado" => $value['noGravado'],
             );
 
             array_push($data, $ar);
         }
         return $data;
-
     }
 
-    public static function Resumen($detalles, $condicionPago=1,  $pagos, $incoterms='05'){
+
+    // TODO: calculate cuerpoDocumento
+    public static function getCuerpoDocumento($items)
+    {
+        if ($items == null)
+            return null;
+
+        foreach ($items as $key => $item) {
+
+            $item[$key]["numItem"] = $key + 1;
+
+            // REDONDENANDO VALORES DEFINIDOS POR LE USUARIO
+            $cantidad = intval($item['cantidad']);
+
+
+            // CAMPOS CON VALORES PREDEFINIDOS
+
+            // CAMPOS CON VALORES DEFINIDOS POR EL USUARIO
+            $items[$key]['cantidad'] = $cantidad;
+        }
+
+        return $items;
+    }
+
+    public static function Resumen($cuerpoDocumento, $pagos, $codigoPago, $plazoPago = null, $periodoPago = null, $condicionPago = 1, $incoterms = '05')
+    {
         /*
          * "resumen": {
                 "totalGravada": 47400.0,
@@ -74,82 +100,102 @@ class FEXDTE
                 "descIncoterms": "CIF- Costo seguro y flete",
                 "observaciones": null
             },
-         * 
+         *
          */
-        
-        $totalGravadas=0;
-        $totalDescuentos=0;
-        $porcentajeDescuento=0;
-        $totalDescu=0;
-        $seguro=0;
-        $flete=0;
-        $montoTotalOperacion=0;
-        $totalNoGravado=0;
-        $totalPagar=0;
-        foreach ($detalles as $key => $value) {
-            $totalGravadas=$totalGravadas+$value['ventaGravada'];
-            $totalDescuentos=$totalDescuentos+$value['montoDescu'];
-            $totalDescu=$totalDescu+$totalDescuentos+$value['montoDescu'];
-            $montoTotalOperacion=$montoTotalOperacion+$value['ventaGravada'];
-            $totalPagar=$totalPagar+$value['ventaGravada'];
+        $impuestos = 0.0;
 
+        $totalGravadas = 0;
+        $totalDescuentos = 0;
+        $porcentajeDescuento = 0;
+        $totalDescu = 0;
+        $seguro = 0;
+        $flete = 0;
+        $montoTotalOperacion = 0;
+        $totalNoGravado = 0;
+        $totalPagar = 0;
+
+        $pagosAux = null;
+
+        foreach ($cuerpoDocumento as $key => $value) {
+
+            $gravadaItem = $value['ventaGravada'];
+            $descuentoItem = $value['montoDescu'];
+            $noGravadaItem = $value['noGravado'];
+
+            $totalGravadas += $gravadaItem;
+            $totalDescuentos += $descuentoItem;
+            $totalNoGravado += $noGravadaItem;
+
+            $ivaItem = 0;
+            $impuestosItem = 0;
+
+            // Procesar tributos si existen
+            if ($pagos != null) {
+                $pagoTributo = $pagos[$key];
+
+                foreach ($pagoTributo as $keyObjec => $valorObjec) {
+
+                    // 20 es la clave para el item en la tabla MH_Tributo para identificar el iva
+                    if ( $keyObjec == "20" ){
+                        $ivaItem = $valorObjec;
+                        continue;
+                    }
+
+                    $impuestosItem += $valorObjec;
+                    $impuestos += $impuestosItem;
+                }
+            }
+
+            $totalPagarItem = $gravadaItem + $noGravadaItem + $ivaItem + $impuestosItem - $descuentoItem;
+            $totalPagar += $totalPagarItem;
+
+            $pagosAux[] = [
+                "codigo" => $codigoPago,
+                "montoPago" =>  $totalPagarItem,
+                "referencia" => "Sin referencia",
+                "periodo" => $periodoPago,
+                "plazo" => $plazoPago
+            ];
         }
-        $totalLetras=Help::numberToString($totalPagar);
-        $arrayPagos = array();
-        $pagosAux=[
-                "codigo"=> $pagos['codigo']??'01',
-                "montoPago"=>  $totalPagar,
-                "referencia"=>  $pagos['referencia']??"Sin referencia",
-                "periodo"=> null,
-                "plazo"=>$pagos['plazo']??'01'
-        ];
-        array_push($arrayPagos, $pagosAux);
 
-        $inco =MHIncoterms::where('codigo', $incoterms)->first();
+        $totalLetras = Help::numberToString($totalPagar);
+
+        $inco = null;
+        if ( is_null($incoterms) ||  empty ($incoterms) )
+        $inco = MHIncoterms::where('codigo', $incoterms)->first();
+
+        $montoTotalOperacion = $totalGravadas + $totalNoGravado + $impuestos;
 
         $resumen = [
-            "totalGravada"=> $totalGravadas,
-            "descuento"=> $totalDescuentos,
-            "porcentajeDescuento"=> $porcentajeDescuento,
-            "totalDescu"=> $totalDescu,
-            "seguro"=> $seguro,
-            "flete"=> $flete,
-            "montoTotalOperacion"=> $montoTotalOperacion,
-            "totalNoGravado"=> $totalNoGravado,
-            "totalPagar"=>  $totalPagar,
-            "totalLetras"=>$totalLetras,
-            "condicionOperacion"=> $condicionPago,
-            "pagos"=> [$pagosAux],
-            "numPagoElectronico"=> null,
-            "codIncoterms"=>$inco->codigo,
-            "descIncoterms"=> $inco->valor,
-            "observaciones"=>null
+            "totalDescu" => $totalDescu,
+            "totalNoGravado" => $totalNoGravado,
+            "totalGravada" => $totalGravadas,
+            "totalPagar" =>  $totalPagar,
+
+            "montoTotalOperacion" => $montoTotalOperacion,
+            "porcentajeDescuento" => $porcentajeDescuento,
+            "seguro" => $seguro,
+            "flete" => $flete,
+
+
+            "descuento" => $totalDescuentos,
+            "codIncoterms" => $inco ? $inco->codigo : null,
+            "descIncoterms" => $inco ? $inco->valor : null,
+            "totalLetras" => $totalLetras,
+            "pagos" => $pagosAux,
+            "numPagoElectronico" => null,
+            "observaciones" => null,
+            "condicionOperacion" => $condicionPago
         ];
         return $resumen;
-
-
-
     }
 
-    public static function Apendice(){
+    public static function Apendice()
+    {
         return [
             "campo" => "Datos del Vendedor",
             "etiqueta" => "Nombre del Vendedor",
             "valor" => "000000000 - Administrador"
         ];
-        
     }
-
 }
-
-
-
-
-
-
-
-
-
-
-
-

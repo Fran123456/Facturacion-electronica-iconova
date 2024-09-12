@@ -15,10 +15,32 @@ class Empresa extends Model
         'id_usuario',
         'nombre',
         'public_key',
-        'private_key', 'token_mh',
-        'correo_electronico', 'telefono', 'celular', 'correlativo_fex', 'codigo_actividad', 'nombre_comercial', 'departamento', 'municipio', 'direccion',
-        'nrc', 'codigo_establecimiento', 'ambiente'
+        'private_key',
+        'token_mh',
+        'correo_electronico',
+        'telefono',
+        'celular',
+        'codigo_actividad',
+        'nombre_comercial',
+        'departamento',
+        'municipio',
+        'direccion',
+        'nrc',
+        'codigo_establecimiento',
+        'ambiente',
+        'correlativo_ccf',
+        'correlativo_cd',
+        'correlativo_cl',
+        'correlativo_cr',
+        'correlativo_dcl',
+        'correlativo_fc',
+        'correlativo_fex',
+        'correlativo_fse',
+        'correlativo_nota_credito',
+        'correlativo_nd',
+        'correlativo_nr'
     ];
+
 
     public function empresa()
     {
