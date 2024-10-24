@@ -20,7 +20,7 @@ class Cliente extends Model
         'dui',
         'nombre',
         'descripcion_actividad',
-        'descripcion_actividad',
+        'codigo_actividad',
         'nombre_comercial',
         'departamento',
         'municipio',

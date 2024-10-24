@@ -89,6 +89,7 @@ class DteCCFController extends Controller
         // Variables de Emisor y Receptor
         $emisor = isset($json['emisor']) ? $json['emisor'] : Identificacion::emisor('03', '20', null);
         [$faltan, $receptor] = Receptor::generar($dte['receptor'], $tipoDTE);
+        
 
         if ( $faltan )
             return response()->json($receptor, 404);
@@ -104,7 +105,8 @@ class DteCCFController extends Controller
         $codigoPago = isset($json['codigo_pago']) ? $json['codigo_pago'] : "01";
         $periodoPago = isset($json['periodo_pago']) ? $json['periodo_pago'] : null;
         $plazoPago = isset($json['plazo_pago']) ? $json['plazo_pago'] : null;
-        $resumen = CCFDTE::Resumen($cuerpoDocumento, $cliente['tipoCliente'], $pagoTributo, $codigoPago, $periodoPago, $plazoPago);
+        $resumen = CCFDTE::Resumen($cuerpoDocumento, 
+        $cliente['tipoCliente'], $pagoTributo, $codigoPago, $periodoPago, $plazoPago);
 
         // Variables de Extensión y Apéndice
         $extension = isset($json['extension']) ? $json['extension'] : null;
@@ -125,7 +127,8 @@ class DteCCFController extends Controller
         ];
 
         // return response()->json($newDTE, 200);
-
+        //return $newDTE;
+       
         [$responseData, $statusCode] = DteApiMHService::envidarDTE( $newDTE, $idCliente, $identificacion );
 
         return response()->json($responseData, $statusCode);

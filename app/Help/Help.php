@@ -227,7 +227,7 @@ class Help
             $cliente = Cliente::create([
                 'nit'=> $clienteF['nit'],
                 'nrc'=> $clienteF['nrc'],
-                'dui'=> $clienteF['dui'],
+                'dui'=> $clienteF['dui']??null,
                 'nombre'=> $clienteF['nombre'],
                 'codigo_actividad'=> $clienteF['codActividad'],
                 'descripcion_actividad'=> $clienteF['descActividad'],
