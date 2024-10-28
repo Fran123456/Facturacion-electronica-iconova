@@ -37,6 +37,21 @@ class DteCCFController extends Controller
 {
     public function enviarDteUnitarioCCF(Request $request)
     {
+
+        // Crear validation
+        $schemaValidacion = [
+            'dteJson.receptor' => 'required|array',
+            'dteJson.cuerpoDocumento' => 'required|array',
+            'dteJson.emisor' => 'nullable|array',
+            'dteJson.documentoRelacionado' => 'nullable|array',
+            'dteJson.otrosDocumentos' => 'nullable|array',
+            'dteJson.ventaTercero' => 'nullable|array',
+            'dteJson.extension' => 'nullable|array',
+            'dteJson.apendice' => 'nullable|array',
+        ];
+        $request->validate($schemaValidacion);
+
+
         // Login para generar token de Hacienda.
         $responseLogin = LoginMH::login();
         if ($responseLogin['code'] != 200) {
@@ -72,9 +87,9 @@ class DteCCFController extends Controller
 
         // VARAIBLES DE CONFIGURACION DEL DTE
         $dte = $json['dteJson'];
-       
+
         $cliente = Help::ValidarCliente($dte['receptor']['nit'],$dte['receptor']);
-        
+
         $tipoDTE = '03';
         $idCliente = $cliente['id'];
 
@@ -89,7 +104,7 @@ class DteCCFController extends Controller
         // Variables de Emisor y Receptor
         $emisor = isset($json['emisor']) ? $json['emisor'] : Identificacion::emisor('03', '20', null);
         [$faltan, $receptor] = Receptor::generar($dte['receptor'], $tipoDTE);
-        
+
 
         if ( $faltan )
             return response()->json($receptor, 404);
@@ -105,7 +120,7 @@ class DteCCFController extends Controller
         $codigoPago = isset($json['codigo_pago']) ? $json['codigo_pago'] : "01";
         $periodoPago = isset($json['periodo_pago']) ? $json['periodo_pago'] : null;
         $plazoPago = isset($json['plazo_pago']) ? $json['plazo_pago'] : null;
-        $resumen = CCFDTE::Resumen($cuerpoDocumento, 
+        $resumen = CCFDTE::Resumen($cuerpoDocumento,
         $cliente['tipoCliente'], $pagoTributo, $codigoPago, $periodoPago, $plazoPago);
 
         // Variables de Extensión y Apéndice
@@ -128,7 +143,7 @@ class DteCCFController extends Controller
 
         // return response()->json($newDTE, 200);
         //return $newDTE;
-       
+
         [$responseData, $statusCode] = DteApiMHService::envidarDTE( $newDTE, $idCliente, $identificacion );
 
         return response()->json($responseData, $statusCode);
