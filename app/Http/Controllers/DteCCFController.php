@@ -85,6 +85,7 @@ class DteCCFController extends Controller
         // Variables de Identificación
         $contingencia = isset($json['contingencia']) ? $json['contingencia'] : null;
         $identificacion = Identificacion::identidad($tipoDTE, 3, $contingencia);
+        
 
         // Variables de Emisor y Receptor
         $emisor = isset($json['emisor']) ? $json['emisor'] : Identificacion::emisor('03', '20', null);
@@ -131,7 +132,16 @@ class DteCCFController extends Controller
        
         [$responseData, $statusCode] = DteApiMHService::envidarDTE( $newDTE, $idCliente, $identificacion );
 
-        return response()->json($responseData, $statusCode);
+        return response()->json(  
+            array(
+                'responseData'=>$responseData,
+                'statusCode'=>$statusCode,
+                'dte'=> $newDTE,
+                'numeroControl'=>$identificacion['numeroControl'],
+                'fecEmi'=> $identificacion['fecEmi'],
+                'horEmi'=> $identificacion['horEmi'],
+            )
+            , $statusCode);
     }
 
 }
