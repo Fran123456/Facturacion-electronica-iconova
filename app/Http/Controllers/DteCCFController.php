@@ -140,6 +140,7 @@ class DteCCFController extends Controller
                 'numeroControl'=>$identificacion['numeroControl'],
                 'fecEmi'=> $identificacion['fecEmi'],
                 'horEmi'=> $identificacion['horEmi'],
+                'codigoGeneracion'=> $identificacion['codigoGeneracion'],
             )
             , $statusCode);
     }
