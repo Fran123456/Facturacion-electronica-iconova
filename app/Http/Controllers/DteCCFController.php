@@ -43,36 +43,20 @@ class DteCCFController extends Controller
             return response()->json(DteCodeValidator::code404($responseLogin['error']), 404);
         }
 
+        //obtenemos el json desde el request
         $json = $request->json()->all();
 
+        //Se valida que si venga algo en el body.
         if (!$json) {
             return response()->json(["error" => "DTE no válido o nulo"], Response::HTTP_BAD_REQUEST);
         }
 
-        if ( ( isset($json['pagoTributos'] ) || $json['pagoTributos']  != null)
-            && count($json['pagoTributos']) != count($json['dteJson']['cuerpoDocumento']) )
-            return request()->json(401, [
-                "msg" => "El campo pagoTributos tiene que tener la misma longitud que cuerpoDocumento"
-            ]);
-
-
-        // $schemaValidacion = [
-        //     'dteJson.receptor' => 'required|array',
-        //     'dteJson.cuerpoDocumento' => 'required|array',
-        //     'dteJson.emisor' => 'nullable|array',
-        //     'dteJson.documentoRelacionado' => 'nullable|array',
-        //     'dteJson.otrosDocumentos' => 'nullable|array',
-        //     'dteJson.ventaTercero' => 'nullable|array',
-        //     'dteJson.extension' => 'nullable|array',
-        //     'dteJson.apendice' => 'nullable|array',
-
-        // ];
-
-        // $request->validate($schemaValidacion);
+        //Generamos los pagos tributos
+        $json['pagoTributos']=CCFDTE::makePagoTributo($json['dteJson']['cuerpoDocumento']);
+      
 
         // VARAIBLES DE CONFIGURACION DEL DTE
         $dte = $json['dteJson'];
-       
         $cliente = Help::ValidarCliente($dte['receptor']['nit'],$dte['receptor']);
         
         $tipoDTE = '03';
@@ -100,20 +84,27 @@ class DteCCFController extends Controller
         $otrosDocumentos = isset($json['otrosDocumentos']) ? $json['otrosDocumentos'] : null;
         $ventaTercero = isset($json['ventaTercero']) ? $json['ventaTercero'] : null;
         $cuerpoDocumento = CCFDTE::getCuerpoDocumento($dte['cuerpoDocumento']);
-
+        $cuerpoDocumento = CCFDTE::makeCuerpoDocumento($cuerpoDocumento);
+        
         // Variables de Resumen
-        $pagoTributo = isset($json['pagoTributos']) ? $json['pagoTributos'] : null;
+       
         $codigoPago = isset($json['codigo_pago']) ? $json['codigo_pago'] : "01";
         $periodoPago = isset($json['periodo_pago']) ? $json['periodo_pago'] : null;
         $plazoPago = isset($json['plazo_pago']) ? $json['plazo_pago'] : null;
+        
+        
+        
+     
         $resumen = CCFDTE::Resumen($cuerpoDocumento, 
-        $cliente['tipoCliente'], $pagoTributo, $codigoPago, $periodoPago, $plazoPago);
+        $cliente['tipoCliente'], $json['pagoTributos'], $codigoPago, $periodoPago, $plazoPago);
+        
 
         // Variables de Extensión y Apéndice
         $extension = isset($json['extension']) ? $json['extension'] : null;
         $apendice = isset($json['apendice']) ? $json['apendice'] : null;
 
         // Creación de newDTE
+        
         $newDTE = [
             'identificacion' => $identificacion,
             'emisor' => $emisor,
@@ -126,6 +117,7 @@ class DteCCFController extends Controller
             'extension' => $extension,
             'apendice' => $apendice
         ];
+        
 
         // return response()->json($newDTE, 200);
         //return $newDTE;
