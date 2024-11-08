@@ -84,6 +84,8 @@ class DteCCFController extends Controller
         $otrosDocumentos = isset($json['otrosDocumentos']) ? $json['otrosDocumentos'] : null;
         $ventaTercero = isset($json['ventaTercero']) ? $json['ventaTercero'] : null;
         $cuerpoDocumento = CCFDTE::getCuerpoDocumento($dte['cuerpoDocumento']);
+
+        $resumen = CCFDTE::Resumen($cuerpoDocumento, $cliente['tipoCliente'], $json['pagoTributos'], $codigoPago, $periodoPago, $plazoPago);
         $cuerpoDocumento = CCFDTE::makeCuerpoDocumento($cuerpoDocumento);
         
         // Variables de Resumen
@@ -95,8 +97,7 @@ class DteCCFController extends Controller
         
         
      
-        $resumen = CCFDTE::Resumen($cuerpoDocumento, 
-        $cliente['tipoCliente'], $json['pagoTributos'], $codigoPago, $periodoPago, $plazoPago);
+        
         
 
         // Variables de Extensión y Apéndice
