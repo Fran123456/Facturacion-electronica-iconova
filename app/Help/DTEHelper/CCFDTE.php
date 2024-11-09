@@ -14,6 +14,7 @@ class CCFDTE
 
         // Obtener la descripción del método de pago
         $descripcionPago = Help::getPayWay($codigoPago);
+        return $descripcionPago;
 
         // Inicializar variables para almacenar totales
         $totalNoSuj = 0.0;
@@ -89,14 +90,10 @@ class CCFDTE
             $montoPago = $subTotal + $impuestoTotalItem - $ivaRetenidoItem;
 
             // Agregar el pago al array de pagos
-            $pagos[] = [
-                "codigo" => $codigoPago,
-                "montoPago" => $montoPago,
-                "referencia" => $descripcionPago,
-                "periodo" => $periodoPago,
-                "plazo" => $plazoPago
-            ];
+            
         }
+
+       
 
         // Redondear el subtotal
         $subTotal = round($subTotal, 2);
@@ -106,6 +103,14 @@ class CCFDTE
 
         // Calcular el total a pagar
         $totalPagar = $subTotal + $totalImpuestos - $ivaRetenida;
+
+        $pagos[] = [
+            "codigo" => $codigoPago,
+            "montoPago" => $totalPagar,
+            "referencia" => $descripcionPago,
+            "periodo" => $periodoPago,
+            "plazo" => $plazoPago
+        ];
 
         // Generar el total en letras
         $numero_en_letras = Generator::generateStringFromNumber($totalPagar);

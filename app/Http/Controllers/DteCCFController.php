@@ -112,11 +112,11 @@ class DteCCFController extends Controller
             'extension' => $extension,
             'apendice' => $apendice
         ];
+ 
 
 
         // return response()->json($newDTE, 200);
-        //return $newDTE;
-       
+  
         [$responseData, $statusCode] = DteApiMHService::envidarDTE( $newDTE, $idCliente, $identificacion );
         
 

@@ -195,7 +195,7 @@ class Help
     {
         $forma = MHFormaPago::where('codigo', $way)->first();
 
-        if (!$forma->id) {
+        if ($forma!=null) {
             return $forma->valor;
         }
 
