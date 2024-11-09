@@ -36,7 +36,7 @@ use Illuminate\Http\Client\ConnectionException;
 class DteCCFController extends Controller
 {
     public function enviarDteUnitarioCCF(Request $request)
-    {
+    { $empresa = Help::getEmpresa();
         // Login para generar token de Hacienda.
         $responseLogin = LoginMH::login();
         if ($responseLogin['code'] != 200) {
@@ -93,10 +93,6 @@ class DteCCFController extends Controller
         $plazoPago = isset($json['plazo_pago']) ? $json['plazo_pago'] : null;
         $resumen = CCFDTE::Resumen($cuerpoDocumento, $dte['receptor']['grancontribuyente'], $json['pagoTributos'], $codigoPago, $periodoPago, $plazoPago);
         
-        
-     
-        
-        
 
         // Variables de Extensión y Apéndice
         $extension = isset($json['extension']) ? $json['extension'] : null;
@@ -116,23 +112,39 @@ class DteCCFController extends Controller
             'extension' => $extension,
             'apendice' => $apendice
         ];
-        
+
 
         // return response()->json($newDTE, 200);
         //return $newDTE;
        
         [$responseData, $statusCode] = DteApiMHService::envidarDTE( $newDTE, $idCliente, $identificacion );
+        
+
+       
+        $correoEmpresa = Crypt::decryptString($empresa->correo_electronico);
+    
+        $telefono = Crypt::decryptString($empresa->telefono);
+        $nombreEmpresa = Crypt::decryptString($empresa->nombre);
+         //return WhatsappSender::send();
+        $nombreCliente = $receptor['nombre'];
+
+
+        $mailInfo = array(
+            'responseData'=>$responseData,
+            'statusCode'=>$statusCode,
+            'dte'=> $newDTE,
+            'numeroControl'=>$identificacion['numeroControl'],
+            'fecEmi'=> $identificacion['fecEmi'],
+            'horEmi'=> $identificacion['horEmi'],
+            'codigoGeneracion'=> $identificacion['codigoGeneracion'],
+        );
+
+        Mail::to($receptor['correo'])
+        ->send((new DteMail($nombreCliente, $correoEmpresa, $telefono, $mailInfo))
+        ->from($correoEmpresa, $nombreEmpresa));
 
         return response()->json(  
-            array(
-                'responseData'=>$responseData,
-                'statusCode'=>$statusCode,
-                'dte'=> $newDTE,
-                'numeroControl'=>$identificacion['numeroControl'],
-                'fecEmi'=> $identificacion['fecEmi'],
-                'horEmi'=> $identificacion['horEmi'],
-                'codigoGeneracion'=> $identificacion['codigoGeneracion'],
-            )
+            $mailInfo 
             , $statusCode);
     }
 

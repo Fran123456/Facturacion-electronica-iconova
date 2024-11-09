@@ -25,10 +25,16 @@
    <p>Estimado cliente  {{ strtoupper($nombreCliente) }}</p>
 <p>¡Esperamos que estés teniendo un día excelente!</p>
 <p>Te adjuntamos con mucho gusto la <strong>factura electrónica</strong> correspondiente a tu compra.</p>
-</span><p>A continuación, te compartimos el código de generación: {{ $dte }} y 
-    sello de recepción número:  que necesitas para realizar cualquier gestión 
-    relacionada con este documento.</p>
-<p>Si necesitas más información sobre tu factura código: {{ $dte }}  o 
+</span><p>A continuación, te compartimos los siguientes datos que necesitas para realizar cualquier gestión 
+  relacionada con este documento.
+  <br><br>
+  <strong>código de generación:</strong> {{ $mailinfo['responseData']['codigoGeneracion'] }}  <br>
+  <strong>sello de recibido:</strong> {{ $mailinfo['responseData']['selloRecibido']  }}  <br>
+  <strong>Número de control:</strong> {{ $mailinfo['dte']['identificacion']['numeroControl'] }}
+
+  <br>
+    </p>
+<p>Si necesitas más información sobre tu factura o 
     tienes alguna consulta, por favor no dudes en comunicarte con nosotros a 
     través del 2520-2520 o escribemos al correo
     <a href="mailto:{{ $correoEmpresa }}" 

@@ -21,12 +21,12 @@ class DteMail extends Mailable
      *
      * @return void
      */
-    public function __construct($nombreCliente, $correoEmpresa, $telefonoEmpresa, $dte)
+    public function __construct($nombreCliente, $correoEmpresa, $telefonoEmpresa, $mailinfo)
     {
         $this->nombreCliente = $nombreCliente;
         $this->correoEmpresa = $correoEmpresa;
         $this->telefonoEmpresa = $telefonoEmpresa;
-        $this->dte = $dte;
+        $this->mailinfo = $mailinfo;
     }
 
     /**
@@ -56,12 +56,22 @@ class DteMail extends Mailable
 
     public function build()
     {
+
+
+      $jsonContent = json_encode($this->mailinfo['dte'], JSON_PRETTY_PRINT);
+      $tempPath = tempnam(sys_get_temp_dir(), 'dte_') . '.json';
+      file_put_contents($tempPath, $jsonContent); // Guarda el JSON en el archivo temporal
+
         return $this->view('mail.mail')
                     ->with([
                         'nombreliente' =>  $this->nombreCliente,
                         'correoEmpresa' =>  $this->correoEmpresa,
                         'telefonoEmpresa' =>  $this->telefonoEmpresa,
-                        'dte'=> $this->dte
+                        'mailinfo'=> $this->mailinfo
+                    ])
+                    ->attach($tempPath, [
+                        'as' => $this->mailinfo['dte']['identificacion']['numeroControl'].'.json',
+                        'mime' => 'application/json',
                     ]);
     }
 
