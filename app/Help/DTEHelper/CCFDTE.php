@@ -8,7 +8,7 @@ use App\help\Help;
 class CCFDTE
 {
 
-    public static function Resumen($cuerpo, $idTipoCliente, $pagoTributos, $codigoPago, $plazoPago = null, $periodoPago = null)
+    public static function Resumen($cuerpo, $granContribuyente, $pagoTributos, $codigoPago, $plazoPago = null, $periodoPago = null)
     {
         $resumen = [];
 
@@ -41,7 +41,7 @@ class CCFDTE
             $totalDescu += $descuentoItem;
 
             // Sumar el subtotal de ventas gravadas
-            $subTotal += ($value['ventaGravada']+$value['ventaExenta']);
+            $subTotal += ($value['ventaGravada']+$value['ventaExenta']+$value['ventaNoSuj']);
 
             $impuestoTotalItem = 0.0;
             $ivaRetenidoItem = 0;
@@ -50,7 +50,7 @@ class CCFDTE
             $ventaSinDescuento = round(($value['precioUni'] * $value['cantidad']), 2);
 
             // Calcular el IVA retenido si aplica
-            if ($idTipoCliente == 3 && $ventaSinDescuento >= 100) {
+            if ($granContribuyente && $ventaSinDescuento >= 100) {
                 $ivaRetenidoItem = round($ventaSinDescuento * 0.01, 2);
                 $ivaRetenida += $ivaRetenidoItem;
             }
@@ -86,7 +86,7 @@ class CCFDTE
             }
 
             // Calcular el monto de pago
-            $montoPago = $ventaGravada + $impuestoTotalItem - $ivaRetenidoItem;
+            $montoPago = $subTotal + $impuestoTotalItem - $ivaRetenidoItem;
 
             // Agregar el pago al array de pagos
             $pagos[] = [

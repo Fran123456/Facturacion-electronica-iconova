@@ -85,15 +85,13 @@ class DteCCFController extends Controller
         $ventaTercero = isset($json['ventaTercero']) ? $json['ventaTercero'] : null;
         $cuerpoDocumento = CCFDTE::getCuerpoDocumento($dte['cuerpoDocumento']);
 
-        $resumen = CCFDTE::Resumen($cuerpoDocumento, $cliente['tipoCliente'], $json['pagoTributos'], $codigoPago, $periodoPago, $plazoPago);
-        $cuerpoDocumento = CCFDTE::makeCuerpoDocumento($cuerpoDocumento);
-        
-        // Variables de Resumen
        
+       
+        $cuerpoDocumento = CCFDTE::makeCuerpoDocumento($cuerpoDocumento);
         $codigoPago = isset($json['codigo_pago']) ? $json['codigo_pago'] : "01";
         $periodoPago = isset($json['periodo_pago']) ? $json['periodo_pago'] : null;
         $plazoPago = isset($json['plazo_pago']) ? $json['plazo_pago'] : null;
-        
+        $resumen = CCFDTE::Resumen($cuerpoDocumento, $dte['receptor']['grancontribuyente'], $json['pagoTributos'], $codigoPago, $periodoPago, $plazoPago);
         
         
      
