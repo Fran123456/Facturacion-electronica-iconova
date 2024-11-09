@@ -139,9 +139,9 @@ class DteCCFController extends Controller
             'codigoGeneracion'=> $identificacion['codigoGeneracion'],
         );
 
-        Mail::to($receptor['correo'])
+       /* Mail::to($receptor['correo'])
         ->send((new DteMail($nombreCliente, $correoEmpresa, $telefono, $mailInfo))
-        ->from($correoEmpresa, $nombreEmpresa));
+        ->from($correoEmpresa, $nombreEmpresa));*/
 
         return response()->json(  
             $mailInfo 
