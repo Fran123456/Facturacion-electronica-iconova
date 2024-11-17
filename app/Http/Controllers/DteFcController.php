@@ -100,7 +100,7 @@ class DteFcController extends Controller
             'extension' => $extension,
             'apendice' => $apendice
         ];
-        
+      
 
             // return response()->json($newDTE, 200);
 

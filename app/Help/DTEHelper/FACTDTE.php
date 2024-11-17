@@ -277,7 +277,7 @@ class FACTDTE
 
             // CAMPOS JSON DE FACTURA
             'descuGravada' => $subTotal - ($subTotal - $totalDescu),
-            'tributos' => $tributos ? $tributos :  null,
+            'tributos' => null,
             'ivaRete1' => $ivaRetenida,
             'porcentajeDescuento' => 0.0,
             'saldoFavor' => 0,
