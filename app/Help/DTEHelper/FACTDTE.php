@@ -290,4 +290,19 @@ class FACTDTE
 
         return $resumen;
     }
+
+
+    public static function makePagoTributo($cuerpoDocumento){
+        $pagosTributos = array();
+        foreach ($cuerpoDocumento as $key => $value) {
+            if($value['ivaItem']>0){
+                $aux = array("20"=> $value['ivaItem']);
+                array_push($pagosTributos, $aux);
+            }else{
+                $aux = array("D5"=> 0);
+                array_push($pagosTributos, $aux);
+            }
+        }
+        return  $pagosTributos;
+    }
 }

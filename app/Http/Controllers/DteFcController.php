@@ -32,15 +32,14 @@ class DteFcController extends Controller
             return response()->json(["error" => "DTE no válido o nulo"], Response::HTTP_BAD_REQUEST);
         }
 
-        if ( ( isset($json['pagoTributos'] ) || $json['pagoTributos']  != null)
-            && count($json['pagoTributos']) != count($json['dteJson']['cuerpoDocumento']) )
-            return request()->json(401, [
-                "msg" => "El campo pagoTributos tiene que tener la misma longitud que cuerpoDocumento"
-            ]);
+        //Generamos los pagos tributos
+        $json['pagoTributos']=FACTDTE::makePagoTributo($json['dteJson']['cuerpoDocumento']);
+
+        
 
         // VARAIBLES DE CONFIGURACION DEL DTE
         $dte = $json['dteJson'];
-        $cliente = Help::getClienteId($dte['receptor']['nit']);
+        $cliente = Help::ValidarClienteByEmail($dte['receptor']['numDocumento'],$dte['receptor']['correo'], $dte['receptor']);
         $tipoDTE = "01";
         $idCliente = $cliente['id'];
 
@@ -62,6 +61,7 @@ class DteFcController extends Controller
             return response()->json($receptor, 404);
 
         $cuerpoDocumento = FACTDTE::getCuerpoDocumento($dte['cuerpoDocumento']);
+        
 
         $pagoTributos = $json['pagoTributos'] ?? null;
         $codigoPago = isset($json['codigo_pago']) ? $json['codigo_pago'] : "01";
@@ -78,14 +78,14 @@ class DteFcController extends Controller
 
 
         // Variables de Documento Relacionado y Cuerpo del Documento
-        $documentoRelacionado = $dte['documentoRelacionado'] ?? null;
-        $otrosDocumentos = $dte['otrosDocumentos'];
-        $ventaTercero = $dte['ventaTercero'];
+        $documentoRelacionado = $json['documentoRelacionado'] ?? null;
+        $otrosDocumentos = $json['otrosDocumentos']??null;
+        $ventaTercero = $json['ventaTercero'];
 
 
         // Variables de Extensión y Apéndice
-        $extension = isset($dte['extension']) ? $dte['extension'] : null;
-        $apendice = $dte['apendice'];
+        $extension = isset($json['extension']) ? $json['extension'] : null;
+        $apendice = isset($json['apendice']) ? $json['apendice'] : null;
 
         // Creación de newDTE
         $newDTE = [
@@ -100,6 +100,7 @@ class DteFcController extends Controller
             'extension' => $extension,
             'apendice' => $apendice
         ];
+        
 
             // return response()->json($newDTE, 200);
 

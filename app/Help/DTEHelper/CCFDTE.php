@@ -14,7 +14,6 @@ class CCFDTE
 
         // Obtener la descripción del método de pago
         $descripcionPago = Help::getPayWay($codigoPago);
-        return $descripcionPago;
 
         // Inicializar variables para almacenar totales
         $totalNoSuj = 0.0;

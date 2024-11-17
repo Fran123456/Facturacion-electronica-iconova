@@ -225,8 +225,8 @@ class Help
 
         if($cliente ==null){
             $cliente = Cliente::create([
-                'nit'=> $clienteF['nit'],
-                'nrc'=> $clienteF['nrc'],
+                'nit'=> $clienteF['nit']??null,
+                'nrc'=> $clienteF['nrc']??null,
                 'dui'=> $clienteF['dui']??null,
                 'nombre'=> $clienteF['nombre'],
                 'codigo_actividad'=> $clienteF['codActividad'],
@@ -240,9 +240,37 @@ class Help
                 'estado'=> 1,
             ]);
         }
-   
+        return [
+            'id' => $cliente->id,
+            'tipoCliente' => $cliente->id_tipo_cliente
+        ];
+    }
 
-        // return $cliente->id;
+
+    public static function ValidarClienteByEmail($numDocumento,$correo, $clienteF)
+    {
+        $cliente = Cliente::where('nit', $numDocumento)->orWhere('dui', $numDocumento)->first();
+        if($cliente == null){
+            $cliente = Cliente::where('correo', $correo)->first();
+        }
+        
+        if($cliente ==null){
+            $cliente = Cliente::create([
+                'nit'=> $clienteF['nit']??null,
+                'nrc'=> $clienteF['nrc']??null,
+                'dui'=> $clienteF['dui']??null,
+                'nombre'=> $clienteF['nombre'],
+                'codigo_actividad'=> $clienteF['codActividad'],
+                'descripcion_actividad'=> $clienteF['descActividad'],
+                'nombre_comercial'=> $clienteF['nombreComercial'],
+                'departamento'=>  $clienteF['direccion']['departamento'],
+                'municipio'=> $clienteF['direccion']['municipio'],
+                'complemento'=> $clienteF['direccion']['complemento'],
+                'telefono'=> $clienteF['telefono'],
+                'correo'=> $clienteF['correo']??null,
+                'estado'=> 1,
+            ]);
+        }
         return [
             'id' => $cliente->id,
             'tipoCliente' => $cliente->id_tipo_cliente
