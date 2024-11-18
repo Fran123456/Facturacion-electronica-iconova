@@ -52,6 +52,7 @@ class DteFcController extends Controller
         $emisor = $dte['emisor'] ?? Identificacion::emisor($tipoDTE, '20', null);
 
         [$faltan, $receptor] = Receptor::generar($dte['receptor'], $tipoDTE);
+       
 
         if ( $faltan )
             return response()->json($receptor, 404);
@@ -97,7 +98,7 @@ class DteFcController extends Controller
         ];
 
 
-            // return response()->json($newDTE, 200);
+           //  return response()->json($newDTE, 200);
 
         [$responseData, $statusCode] = DteApiMHService::envidarDTE($newDTE, $idCliente, $identificacion);
 

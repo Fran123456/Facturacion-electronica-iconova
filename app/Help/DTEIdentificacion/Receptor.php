@@ -190,6 +190,7 @@ class Receptor
 
     public static function compretarReceptor($receptor, $cliente, $complemento, $tipoDTE)
     {
+        
 
         // CCF 03 | CD 15 | CL 08 | CR 07 | DCL 09 | FC 01 | FEX 11 | FSE 14 | NC 05 | NC 06 | NR 04
 
@@ -205,6 +206,7 @@ class Receptor
             if (in_array($tipoDTE, $grupoNit))
                 $receptor["nit"] = $cliente->nit;
         }
+        
 
         // PARA CAMPOS NUMDOCUMENTO, TIPODOCUMENTO
         $grupo2 = ["07", "01", "11", "04"];
@@ -214,6 +216,11 @@ class Receptor
                 ? $cliente->nit
                 : (($complemento["tipoDocumento"] == "13") ? $cliente->dui : $complemento["numDocumento"]);
         }
+        
+        if($tipoDTE == "01"){
+            $receptor["numDocumento"] = $complemento["numDocumento"];
+        }
+    
 
 
         // Campos para DCL
@@ -230,6 +237,8 @@ class Receptor
             $receptor["complemento"] = $complemento["complemento"];
             $receptor["tipoPersona"] = $complemento["tipoPersona"] ;
         }
+
+        
 
         if ($tipoDTE == "04")
             $receptor["bienTitulo"] = $complemento->bienTitulo;
