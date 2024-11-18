@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Help\DteCodeValidator;
 use App\Help\DTEIdentificacion\Identificacion;
 use App\Help\DTEIdentificacion\Receptor;
+use App\Help\DTEIdentificacion\ReceptorCR;
 use App\help\Help;
 use App\Help\LoginMH;
 use App\Help\Services\DteApiMHService;
@@ -31,7 +32,7 @@ class DteCrController extends Controller
 
         // VARAIBLES DE CONFIGURACION DEL DTE
         $dte = $json['dteJson'];
-        $cliente = Help::getClienteId($dte['receptor']['numeroDocumento']);
+        $cliente = ReceptorCR::cliente($dte['receptor']);
         $tipoDTE = '07';
         $idCliente = $cliente['id'];
 
@@ -69,11 +70,11 @@ class DteCrController extends Controller
             "apendice" => $apendice,
         ];
 
-
+        
         [$responseData, $statusCode] = DteApiMHService::envidarDTE($newDTE, $idCliente, $identificacion);
-
+        
         return response()->json($responseData, $statusCode);
-
+        
         return response()->json($newDTE, 200);
 
 
