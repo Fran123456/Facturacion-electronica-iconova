@@ -33,12 +33,6 @@ class DteFcController extends Controller
             return response()->json(["error" => "DTE no válido o nulo"], Response::HTTP_BAD_REQUEST);
         }
 
-        if ( ( isset($json['pagoTributos'] ) )
-            && count($json['pagoTributos']) != count($json['dteJson']['cuerpoDocumento']) )
-            return request()->json(401, [
-                "msg" => "El campo pagoTributos tiene que tener la misma longitud que cuerpoDocumento"
-            ]);
-
         // VARAIBLES DE CONFIGURACION DEL DTE
         $dte = $json['dteJson'];
         $cliente = Help::ValidarClienteByEmail($dte['receptor']['numDocumento'],$dte['receptor']['correo'], $dte['receptor']);
