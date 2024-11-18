@@ -10,9 +10,22 @@ class Receptor
     public static function generar($receptorDte, $tipoDte)
     {
 
-        $nit = $receptorDte['nit'];
+        $nit = $receptorDte['nit']??null;
         $cliente = Cliente::where('nit', $nit)->first();
 
+        $dui = $receptorDte['dui']??null;
+        if($cliente == null){
+            $nit = $receptorDte['dui']??null;
+            $cliente = Cliente::where('dui', $dui)->first();
+        }
+
+        $correo = $receptorDte['correo']??null;
+        if($cliente == null){
+            $nit = $receptorDte['correo']??null;
+            $cliente = Cliente::where('correo', $dui)->first();
+        }
+
+        
         // SI NO EXISTE USUARIO CON EL NIT INGRESADO, SE CREA EL NUEVO USUARIO
         if ($cliente == null) {
 

@@ -90,6 +90,7 @@ class ServicesController extends Controller
         $url = Help::mhUrl();
         $nit = Crypt::decryptString($empresa->nit);
         $pwd = Crypt::decryptString($empresa->credenciales_api);
+        return $pwd;
 
         $jsonRequest = [
             "user" => $nit,

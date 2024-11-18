@@ -41,7 +41,7 @@ class DteFcController extends Controller
 
         // VARAIBLES DE CONFIGURACION DEL DTE
         $dte = $json['dteJson'];
-        $cliente = Help::getClienteId($dte['receptor']['nit']);
+        $cliente = Help::ValidarClienteByEmail($dte['receptor']['numDocumento'],$dte['receptor']['correo'], $dte['receptor']);
         $tipoDTE = "01";
         $idCliente = $cliente['id'];
 
@@ -79,14 +79,14 @@ class DteFcController extends Controller
 
 
         // Variables de Documento Relacionado y Cuerpo del Documento
-        $documentoRelacionado = $dte['documentoRelacionado'] ?? null;
-        $otrosDocumentos = $dte['otrosDocumentos'];
-        $ventaTercero = $dte['ventaTercero'];
+        $documentoRelacionado = $json['documentoRelacionado'] ?? null;
+        $otrosDocumentos = $json['otrosDocumentos']??null;
+        $ventaTercero = $json['ventaTercero'];
 
 
         // Variables de Extensión y Apéndice
-        $extension = isset($dte['extension']) ? $dte['extension'] : null;
-        $apendice = $dte['apendice'];
+        $extension = isset($json['extension']) ? $json['extension'] : null;
+        $apendice = isset($json['apendice']) ? $json['apendice'] : null;
 
         // Creación de newDTE
         $newDTE = [
@@ -101,6 +101,7 @@ class DteFcController extends Controller
             'extension' => $extension,
             'apendice' => $apendice
         ];
+
 
             // return response()->json($newDTE, 200);
 
