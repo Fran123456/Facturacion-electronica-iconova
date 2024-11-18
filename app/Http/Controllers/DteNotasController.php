@@ -34,6 +34,7 @@ use App\Models\RegistroDTE;
 use Carbon\Carbon;
 use Illuminate\Http\Client\ConnectionException;
 
+// ^ NOTAS DE CREDITO
 class DteNotasController extends Controller
 {
 

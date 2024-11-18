@@ -10,6 +10,7 @@ use App\Help\LoginMH;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+// ^ COMPROBANTE DE DONACION
 class DteCdController extends Controller
 {
     public function unitario(Request $request){

@@ -96,11 +96,20 @@ class Identificacion
             $emisor["regimen"] =  $regimen ?? null;
         }
 
-        if ($tipoDoc !== '05') { //PARA FACTURA DIFERENTE DE EXPORTACION
+        if ($tipoDoc !== '05' && $tipoDoc !== '07') { //PARA FACTURA DIFERENTE DE EXPORTACION
             $emisor["codEstableMH"] = $empresa->codigo_establecimiento;
             $emisor["codEstable"] =  null;
             $emisor["codPuntoVenta"] =  null;
             $emisor["codPuntoVentaMH"] =  $puntoDeVentaCodigo ?? $empresa->codigo_establecimiento;
+        }
+
+        if ( $tipoDoc == '07') {
+
+            $emisor["codigoMH"] = $empresa->codigo_establecimiento;
+            $emisor["codigo"] =  null;
+            $emisor["puntoVenta"] =  null;
+            $emisor["puntoVentaMH"] =  $puntoDeVentaCodigo ?? $empresa->codigo_establecimiento;
+
         }
 
         return $emisor;

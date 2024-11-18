@@ -12,6 +12,7 @@ use App\Help\Services\DteApiMHService;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+// ^ FACTURAS DE EXPORTACION
 class DteFexController extends Controller
 {
     public function unitario(Request $request)

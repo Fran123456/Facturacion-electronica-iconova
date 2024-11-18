@@ -7,12 +7,15 @@ use App\Help\DTEIdentificacion\Identificacion;
 use App\Help\DTEIdentificacion\Receptor;
 use App\help\Help;
 use App\Help\LoginMH;
+use App\Help\Services\DteApiMHService;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+// ^ COMPROBANTE DE RETENCIÓN
 class DteCrController extends Controller
 {
-    public function unitario(Request $request){
+    public function unitario(Request $request)
+    {
 
         // Login para generar token de Hacienda.
         $responseLogin = LoginMH::login();
@@ -28,8 +31,8 @@ class DteCrController extends Controller
 
         // VARAIBLES DE CONFIGURACION DEL DTE
         $dte = $json['dteJson'];
-        $cliente = Help::getClienteId($dte['receptor']['nit']);
-        $tipoDTE = '03';
+        $cliente = Help::getClienteId($dte['receptor']['numeroDocumento']);
+        $tipoDTE = '07';
         $idCliente = $cliente['id'];
 
         // VARIABLES DE RESPUESTA DEL SERVICIO
@@ -39,16 +42,39 @@ class DteCrController extends Controller
         // Variables de Identificación
         // $identificacion = Identificacion::identidad($tipoDTE, 3);
         $contingencia = isset($json['contingencia']) ? $json['contingencia'] : null;
-        $identificacion = Identificacion::identidad($tipoDTE, 3, $contingencia);
+        $identificacion = Identificacion::identidad($tipoDTE, 1, $contingencia);
 
         // Variables de Emisor y Receptor
-        $emisor = $dte['emisor'] ?? Identificacion::emisor('03', '20', null);
-            // $receptor = Identificacion::receptorCCF($dte['receptor']);
+        $emisor = $dte['emisor'] ?? Identificacion::emisor($tipoDTE, '20', null);
+        // $receptor = Identificacion::receptorCCF($dte['receptor']);
         // [$faltan, $receptor] = Receptor::generar($dte['receptor'], $tipoDTE);
         [$faltan, $receptor] = Receptor::generar($dte['receptor'], $tipoDTE);
 
-        if ( $faltan )
+        if ($faltan)
             return response()->json($receptor, 404);
+
+        $resumen = $dte['resumen'];
+
+        $cuerpoDocumento = $dte['cuerpoDocumento'];
+        $extension = $dte['extension'] ?? null;
+        $apendice = $dte['apendice'] ?? null;
+
+        $newDTE = [
+            "identificacion" => $identificacion,
+            "emisor" => $emisor,
+            "receptor" => $receptor,
+            "cuerpoDocumento" => $cuerpoDocumento,
+            "resumen" => $resumen,
+            "extension" => $extension,
+            "apendice" => $apendice,
+        ];
+
+
+        [$responseData, $statusCode] = DteApiMHService::envidarDTE($newDTE, $idCliente, $identificacion);
+
+        return response()->json($responseData, $statusCode);
+
+        return response()->json($newDTE, 200);
 
 
         // return response()->json([

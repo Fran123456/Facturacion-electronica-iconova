@@ -33,6 +33,8 @@ use App\Models\RegistroDTE;
 use Carbon\Carbon;
 use Illuminate\Http\Client\ConnectionException;
 
+
+// ^ COMPROBANTE CREDITO FISCAL
 class DteCCFController extends Controller
 {
     public function enviarDteUnitarioCCF(Request $request)
@@ -63,12 +65,6 @@ class DteCCFController extends Controller
         if (!$json) {
             return response()->json(["error" => "DTE no válido o nulo"], Response::HTTP_BAD_REQUEST);
         }
-
-        if ( ( isset($json['pagoTributos'] ) || $json['pagoTributos']  != null)
-            && count($json['pagoTributos']) != count($json['dteJson']['cuerpoDocumento']) )
-            return request()->json(401, [
-                "msg" => "El campo pagoTributos tiene que tener la misma longitud que cuerpoDocumento"
-            ]);
 
 
         // $schemaValidacion = [

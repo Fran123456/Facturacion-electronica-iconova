@@ -13,6 +13,7 @@ use App\Help\Services\DteApiMHService;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+// ^ FACTURA
 class DteFcController extends Controller
 {
 
@@ -32,7 +33,7 @@ class DteFcController extends Controller
             return response()->json(["error" => "DTE no válido o nulo"], Response::HTTP_BAD_REQUEST);
         }
 
-        if ( ( isset($json['pagoTributos'] ) || $json['pagoTributos']  != null)
+        if ( ( isset($json['pagoTributos'] ) )
             && count($json['pagoTributos']) != count($json['dteJson']['cuerpoDocumento']) )
             return request()->json(401, [
                 "msg" => "El campo pagoTributos tiene que tener la misma longitud que cuerpoDocumento"
@@ -63,7 +64,7 @@ class DteFcController extends Controller
 
         $cuerpoDocumento = FACTDTE::getCuerpoDocumento($dte['cuerpoDocumento']);
 
-        $pagoTributos = $json['pagoTributos'] ?? null;
+        $pagoTributos = isset($json['pagoTributos']) ? $json['pagoTributos'] : null;
         $codigoPago = isset($json['codigo_pago']) ? $json['codigo_pago'] : "01";
         $periodoPago = isset($json['periodo_pago']) ? $json['periodo_pago'] :  null;
         $plazoPago = isset($json['plazo_pago']) ? $json['plazo_pago'] :  null;

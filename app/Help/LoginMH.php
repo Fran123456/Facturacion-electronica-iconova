@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Http;
 use App\Help\Help;
 use App\Help\DteCodeValidator;
 use App\Http\Controllers\ServicesController;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Request;
 class LoginMH {
 
@@ -44,13 +45,13 @@ class LoginMH {
                 'Content-Type' => 'application/x-www-form-urlencoded',
                 'User-Agent' => 'ApiLaravel/1.0',
                 "Accept" => "application/json"
-    
+
             ])->asForm()->post($url . "seguridad/auth", $jsonRequest);
         } catch (ConnectionException $e) {
             return array(["error" => "No se pudo conectar con la  API de Ministerio hacienda",'code'=>500])[0];
         }
 
-      
+
 
         $responseData = $requestResponse->json();
         $statusCode = $requestResponse->status();
@@ -60,6 +61,6 @@ class LoginMH {
 
     }
 
-    
+
 }
 
