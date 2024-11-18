@@ -53,12 +53,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/mh/enviar/dte/unitario/fex', [DteFexController::class, 'unitario']);
         Route::post('/mh/enviar/dte/unitario/fc', [DteFcController::class, 'unitario']);
 
+        // ^ Testeando
+        Route::post('/mh/enviar/dte/unitario/cr', [DteCrController::class, 'unitario']);
+        Route::post('/mh/enviar/dte/unitario/fse', [DteFseController::class, 'unitario']);
+
+
         // TODO: por completar
         Route::post('/mh/enviar/dte/unitario/cd', [DteCdController::class, 'unitario']);
         Route::post('/mh/enviar/dte/unitario/cl', [DteClController::class, 'unitario']);
-        Route::post('/mh/enviar/dte/unitario/cr', [DteCrController::class, 'unitario']);
         Route::post('/mh/enviar/dte/unitario/dcl', [DteDclController::class, 'unitario']);
-        Route::post('/mh/enviar/dte/unitario/fse', [DteFseController::class, 'unitario']);
         Route::post('/mh/enviar/dte/unitario/nd', [DteNdController::class, 'unitario']);
         Route::post('/mh/enviar/dte/unitario/nr', [DteNrController::class, 'unitario']);
     });

@@ -64,10 +64,14 @@ class Receptor
             "correo" => $cliente->correo,
         ];
 
+        if ( $tipoDte == "14" ){
+            $receptor["codActividad"] = $cliente->codigo_actividad;
+        }
+
         // CCF 03 | CD 15 | CL 08 | CR 07 | DCL 09 | FC 01 | FEX 11 | FSE 14 | NC 05 | NC 06 | NR 04
 
         // DTE QUE NO LLEVA EL CAMPO "NOMBRE COMERCIAL"
-        $excepciones = ["01"];
+        $excepciones = ["01", "14"];
             if ( !in_array($tipoDte, $excepciones ))
                 $receptor["nombreComercial"] = $cliente->nombre_comercial;
 
@@ -242,6 +246,13 @@ class Receptor
 
         if ($tipoDTE == "04")
             $receptor["bienTitulo"] = $complemento->bienTitulo;
+
+        if ( $tipoDTE == "14" ) {
+            $receptor["tipoDocumento"] = $complemento["tipoDocumento"];
+            $receptor["numDocumento"] = $complemento["numDocumento"];
+
+        }
+            
 
         return $receptor;
     }

@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('registro_dte', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('id_cliente');
+            $table->unsignedBigInteger('id_cliente')->nullable();
             $table->string('codigo_generacion');
             $table->string('numero_dte');
             $table->string('tipo_documento');

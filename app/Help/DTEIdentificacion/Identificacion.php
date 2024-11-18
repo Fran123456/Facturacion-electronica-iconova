@@ -51,7 +51,7 @@ class Identificacion
         // else
 
 
-        if ( $tipoDoc == "11" )
+        if ($tipoDoc == "11")
             $identificacion['motivoContigencia'] =  isset($contingencia["motivoContigencia"]) ? $contingencia["motivoContigencia"] : null;
         else
             $identificacion['motivoContin'] = isset($contingencia["motivoContin"]) ? $contingencia["motivoContin"] : null;
@@ -78,8 +78,6 @@ class Identificacion
             "nombre" => $nombreEmpresa,
             "codActividad" => $empresa->codigo_actividad,
             "descActividad" => $actividad->valor,
-            "nombreComercial" => $empresa->nombre_comercial,
-            "tipoEstablecimiento" => $tipoEstablecimiento ?? '02',
             "direccion" => [
                 "departamento" => $empresa->departamento,
                 "municipio" => $empresa->municipio,
@@ -89,6 +87,10 @@ class Identificacion
             "correo" => $correo,
         ];
 
+        if ($tipoDoc != "14") {
+            $emisor["tipoEstablecimiento"] = $tipoEstablecimiento ?? '02';
+            $emisor["nombreComercial"] = $empresa->nombre_comercial;
+        }
 
         if ($tipoDoc == '11') { //PARA FACTURA  DE EXPORTACION
             $emisor["tipoItemExpor"] = $tipoItem ?? null;
@@ -103,13 +105,12 @@ class Identificacion
             $emisor["codPuntoVentaMH"] =  $puntoDeVentaCodigo ?? $empresa->codigo_establecimiento;
         }
 
-        if ( $tipoDoc == '07') {
+        if ($tipoDoc == '07') {
 
             $emisor["codigoMH"] = $empresa->codigo_establecimiento;
             $emisor["codigo"] =  null;
             $emisor["puntoVenta"] =  null;
             $emisor["puntoVentaMH"] =  $puntoDeVentaCodigo ?? $empresa->codigo_establecimiento;
-
         }
 
         return $emisor;

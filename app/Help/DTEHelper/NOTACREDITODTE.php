@@ -17,7 +17,6 @@ class NOTACREDITODTE
         ];
     }
 
-    // TODO: CUERPO DEL DOCUMENTO
     public static function cuerpo($cuerpo){
 
 
@@ -32,7 +31,6 @@ class NOTACREDITODTE
         return $cuerpo;
     }
 
-    // TODO: RESUMEN DEL DOCUMENTO
     public static function resumen($cuerpo, $tipoCliente, $pagoTributos){
         $resumen = [];
 
