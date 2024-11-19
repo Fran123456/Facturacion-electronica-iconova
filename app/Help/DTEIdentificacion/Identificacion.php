@@ -98,7 +98,7 @@ class Identificacion
             $emisor["regimen"] =  $regimen ?? null;
         }
 
-        if ($tipoDoc !== '05' && $tipoDoc !== '07') { //PARA FACTURA DIFERENTE DE EXPORTACION
+        if ($tipoDoc !== '05' && $tipoDoc !== '07' && $tipoDoc !== '06') { //PARA FACTURA DIFERENTE DE EXPORTACION
             $emisor["codEstableMH"] = $empresa->codigo_establecimiento;
             $emisor["codEstable"] =  null;
             $emisor["codPuntoVenta"] =  null;

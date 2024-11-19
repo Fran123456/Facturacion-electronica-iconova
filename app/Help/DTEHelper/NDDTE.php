@@ -28,13 +28,26 @@ class NDDTE
 
         // AGREGAR NUMERO DE ITEM
         foreach ($cuerpo as $key => $item) {
+            $object = $cuerpo[$key];
             $cuerpo[$key]['numItem'] = $key + 1;
+
+            $ivaItem = $object['iva'];
+            $renta = $object['renta'];
+
+            $tributos = [];
+            if ($ivaItem > 0)
+                $tributos[] = "20";
+
+            unset($cuerpo[$key]['iva']);
+            unset($cuerpo[$key]['renta']);
+
+            $cuerpo[$key]['tributos'] = $tributos;
         }
 
         return $cuerpo;
     }
 
-    public static function resumen($cuerpo, $tipoCliente, $pagoTributos)
+    public static function resumen($cuerpo, $tipoCliente, $pagoTributos = null)
     {
         $resumen = [];
 
@@ -52,7 +65,7 @@ class NDDTE
         $subTotal = 0.0;
 
         $ivaPerci1 = 0.0;
-        $ivaRetenida = 0.0;
+        $ivaRete1 = 0.0;
         $reteRenta = 0.0;
 
         $tributos = [];
@@ -73,74 +86,75 @@ class NDDTE
 
             $ventaSinDescuento = round(($value['precioUni'] * $value['cantidad']), 2);
 
+            $ivaRetenidoItem = 0.0;
+
             // Calcular el IVA retenido si aplica
-            if ($tipoCliente == 3 && $ventaSinDescuento >= 100) {
+            if ($tipoCliente && $ventaSinDescuento >= 100) {
                 $ivaRetenidoItem = round($ventaSinDescuento * 0.01, 2);
-                $ivaRetenida += $ivaRetenidoItem;
+                $ivaRete1 += $ivaRetenidoItem;
             }
 
             // Procesar tributos si existen
-            if ($pagoTributos != null) {
-                $pagoTributo = $pagoTributos[$key];
+            $isIva = $value['iva'] > 0.0;
 
-                foreach ($pagoTributo as $keyObjec => $valorObjec) {
-                    $totalImpuestos += $valorObjec;
-                    $impuestoTotalItem += $valorObjec;
+            if ($isIva) {
+                $clave = array_search("20", array_column($tributos, 'codigo'));
 
-                    // Buscar si el tributo ya existe en el array
-                    $clave = array_search($keyObjec, array_column($tributos, 'codigo'));
+                $ivaItem = $value['iva'];
 
-                    if ($clave !== false) {
-                        // Si el tributo ya existe, actualizar su valor
-                        $tributos[$clave]['valor'] += $valorObjec;
-                        continue;
-                    }
+                $impuestoTotalItem += $ivaItem;
+                $totalImpuestos += $ivaItem;
 
-                    // Si no existe, agregar un nuevo tributo al array
-                    $tributos[] = [
-                        'codigo' => strval($keyObjec),
-                        'descripcion' => Help::getTributo($keyObjec),
-                        'valor' => round($valorObjec, 2)
-                    ];
+                if ($clave !== false) {
+                    // Si el tributo ya existe, actualizar su valor
+                    $tributos[$clave]['valor'] += round($ivaItem, 2);
+                    continue;
                 }
+
+                // Si no existe, agregar un nuevo tributo al array
+                $tributos[] = [
+                    'codigo' => "20",
+                    'descripcion' => Help::getTributo("20"),
+                    'valor' => round($ivaItem, 2)
+                ];
             }
         }
 
         $subTotal = round($subTotal, 2);
-        $montoTotalOperacion = round($subTotal + $totalImpuestos - $ivaRetenida, 2);
+        $subTotalVentas = $subTotal;
+        $montoTotalOperacion = round($subTotal + $totalImpuestos + $ivaRete1, 2);
 
-        $numero_en_letras = Generator::generateStringFromNumber($montoTotalOperacion);
+        $totalLetras = 'USD ' . Generator::generateStringFromNumber($montoTotalOperacion);
+
+        $condicionOperacion = 1;
+        $numPagoElectronico = null;
 
 
-        $resumen = [
-            'totalNoSuj' => $totalNoSuj,
-            'totalExenta' => $totalExenta,
-            'totalGravada' => $totalGravada,
-            'totalDescu' => $totalDescu,
-            'montoTotalOperacion' => $montoTotalOperacion,
-
-            'descuNoSuj' => $descuNoSuj,
-            'descuGravada' => $descuGravada,
-            'descuExenta' => $descuExenta,
-
-            'subTotalVentas' => $subTotal,
-            'subTotal' => $subTotal,
-
-            'ivaPerci1' => $ivaPerci1,
-            'ivaRete1' => $ivaRetenida,
-            'reteRenta' => $reteRenta,
-
-            'tributos' => $tributos,
-            'totalLetras' => 'USD ' . $numero_en_letras,
-            'condicionOperacion' => 1,
-        ];
+        $resumen = compact(
+            'totalNoSuj',
+            'totalExenta',
+            'totalGravada',
+            'totalDescu',
+            'montoTotalOperacion',
+            'descuNoSuj',
+            'descuGravada',
+            'descuExenta',
+            'subTotalVentas',
+            'subTotal',
+            'ivaPerci1',
+            'ivaRete1',
+            'reteRenta',
+            'tributos',
+            'totalLetras',
+            'condicionOperacion',
+            'numPagoElectronico'
+        );
 
         return $resumen;
     }
 
     public static function documentosRelacionados($relacionados)
     {
-
         foreach ($relacionados as $value) {
             $value['tipoGeneracion'] = 2;
         }

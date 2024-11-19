@@ -31,12 +31,6 @@ class DteNdController extends Controller
             return response()->json(["error" => "DTE no válido o nulo"], Response::HTTP_BAD_REQUEST);
         }
 
-        if ( ( isset($json['pagoTributos'] ) || $json['pagoTributos']  != null)
-            && count($json['pagoTributos']) != count($json['dteJson']['cuerpoDocumento']) )
-            return request()->json(401, [
-                "msg" => "El campo pagoTributos tiene que tener la misma longitud que cuerpoDocumento"
-            ]);
-
         $dte = $json['dteJson']; //OBTENER EL DTE
 
         $pagoTributos = $json['pagoTributos'] ?? null;
@@ -44,16 +38,17 @@ class DteNdController extends Controller
         $cliente = Help::getClienteId($dte['receptor']['nit']);
         $idCliente = $cliente['id'];
         $newDTE = [];
-        $tipoDTE = '05';
-
-
-        // return response()->json(Generator::generateNumControl("01"), 200);
+        $tipoDTE = '06';
 
         //PASO 3 GENERAR JSON VALIDO PARA  HACIENDA
-        $identificacion = Identificacion::identidad('05', 3);
+        $identificacion = Identificacion::identidad($tipoDTE, 3);
 
 
         $emisor = Identificacion::emisor($tipoDTE, null, null, null);
+
+        $tipoCliente = $dte['receptor']['granContribuyente'] ?? null;
+        unset($dte['receptor']['granContribuyente']);
+
         [$faltan, $receptor] = Receptor::generar($dte['receptor'], $tipoDTE);
 
         if ( $faltan )
@@ -61,36 +56,34 @@ class DteNdController extends Controller
 
         $documentoRelacionado = null;
         $ventaTercero = null;
-        $cuerpoDocumento = CCFDTE::getCuerpoDocumento($dte['cuerpoDocumento']);
+        // $cuerpoDocumento = CCFDTE::getCuerpoDocumento($dte['cuerpoDocumento']);
 
         $resumen = null;
         $extension = null;
         $apendice = null;
 
-
         //  return response()->json($dte['documentoRelacionado'], 200);
         $documentoRelacionado = NDDTE::documentosRelacionados($dte['documentoRelacionado']);
         $ventaTercero = $dte['ventaTercero'] ?? null;
         $cuerpoDocumento =  NDDTE::cuerpo($dte['cuerpoDocumento']);
-        $resumen = NDDTE::resumen($cuerpoDocumento, $cliente['tipoCliente'], $pagoTributos);
+        
+        $resumen = NDDTE::resumen($dte['cuerpoDocumento'], $tipoCliente);
+        // return response()->json(compact('cuerpoDocumento', 'resumen'), 200);
+
         $extension = $dte['extension'];
         $apendice = $dte['apendice'] ?? null;
 
-        $newDTE = [
-            "identificacion" => $identificacion,
-            "documentoRelacionado" => $documentoRelacionado,
-            "emisor" => $emisor,
-            "receptor" => $receptor,
-            "ventaTercero" => $ventaTercero,
-            "cuerpoDocumento" => $cuerpoDocumento,
-            "resumen" => $resumen,
-            "extension" => $extension,
-            "apendice" => $apendice,
-        ];
-
-        // return $newDTE;
-
-        // PASO 4 MANDAR A HACIENDA EL NUEVO DTE FORMADO SEGUN EL DTE JSON SCHEMA DE LA DOCUMENTACION
+        $newDTE = compact(
+            'identificacion',
+            'documentoRelacionado',
+            'emisor',
+            'receptor',
+            'cuerpoDocumento',
+            'resumen',
+            'ventaTercero',
+            'extension',
+            'apendice'
+        );
 
         // return response()->json($newDTE, 200);
 
