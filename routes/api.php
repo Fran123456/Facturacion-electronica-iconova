@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ApiController;
+use App\Http\Controllers\ConsultasController;
 use App\Http\Controllers\ServicesController;
 use App\Http\Controllers\DteSeparadoController;
 use App\Http\Controllers\DteCCF;
@@ -19,6 +20,7 @@ use App\Http\Controllers\DteFexController;
 use App\Http\Controllers\DteFseController;
 use App\Http\Controllers\DteNdController;
 use App\Http\Controllers\DteNrController;
+use App\Http\Controllers\PruebasController;
 use App\Http\Controllers\ReceptorController;
 use App\Http\Controllers\TestController;
 use App\Models\User;
@@ -34,6 +36,7 @@ use Illuminate\Support\Facades\Hash;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
 Route::post('/login', [ApiController::class, 'login']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
@@ -41,6 +44,16 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::middleware('auth:sanctum')->group(function () {
+    //! Endpoint de prueba
+    Route::get('/prueba/empresa', [PruebasController::class, 'empresa']);
+
+    //^ ENDPOINTS CONSULTAS DE DTE
+    Route::prefix('/consultas/dte')->group(function () {
+        Route::get('/listar', [ConsultasController::class, 'index']);
+        Route::get('/listar/{id}', [ConsultasController::class, 'show']);
+        Route::post('/reenviar', [ConsultasController::class, 'update']);
+    });
+
     Route::prefix('services')->group(function () {
         Route::get('/mh/login', [ServicesController::class, 'loginMH']);
         Route::post('/firmado', [ServicesController::class, 'obtenerFirmaDTE']);
@@ -74,4 +87,3 @@ Route::get('/token', [ApiController::class, 'pruebaToken']);
 Route::get('/generator', [TestController::class, 'numControl']);
 Route::get('/generatorCode', [TestController::class, 'codeGeneration']);
 Route::post('/receptor', [ReceptorController::class, 'receptor']);
-

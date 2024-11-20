@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('log_dte', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('id_empresa');
             $table->unsignedBigInteger('id_cliente');
             $table->string('numero_dte');
             $table->string('tipo_documento');
@@ -23,7 +24,8 @@ return new class extends Migration
             $table->text('error');
             $table->boolean('estado');
             $table->timestamps();
-            $table->foreign('id_cliente')->references('id')->on('cliente')->onUpdate('cascade');
+            $table->foreign('id_empresa')->references('id')->on('empresa')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('id_cliente')->references('id')->on('cliente')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 
