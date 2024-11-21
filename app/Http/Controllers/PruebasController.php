@@ -13,4 +13,10 @@ class PruebasController extends Controller
             Help::getEmpresa()
         ]);
     }
+
+    public function usuario(Request $request){
+        return response()->json([
+            Help::getUsuario()
+        ]);
+    }
 }

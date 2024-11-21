@@ -47,6 +47,10 @@ class Help
         $empresa  =  Empresa::find($usuario->empresa_id);
         return $empresa;
     }
+    
+    public static function getUsuario(){
+        return Auth::user();
+    }
 
     public static function getEmisorDefault()
     {
