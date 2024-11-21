@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('registro_dte', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('id_empresa');
+            $table->unsignedBigInteger('empresa_id');
             $table->unsignedBigInteger('id_cliente')->nullable();
             $table->string('codigo_generacion');
             $table->string('numero_dte');
@@ -26,7 +26,7 @@ return new class extends Migration
             $table->json('observaciones')->nullable();
             $table->boolean('estado');
             $table->foreign('id_cliente')->references('id')->on('cliente')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreign('id_empresa')->references('id')->on('empresa')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('empresa_id')->references('id')->on('empresa')->onUpdate('cascade')->onDelete('cascade');
             $table->timestamps();
         });
     }

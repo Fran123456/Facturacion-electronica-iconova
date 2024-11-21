@@ -42,7 +42,7 @@ class ConsultasController extends Controller
             // Inicializar la consulta y cargar la relación 'tipoDocumento' 
             $query = RegistroDTE::with('tipoDocumento');
     
-            $query->where('id_empresa', Help::getEmpresa()->id);
+            $query->where('empresa_id', Help::getEmpresa()->id);
     
             if ($tipodocumento) {
                 $query->where('tipo_documento', $tipodocumento);

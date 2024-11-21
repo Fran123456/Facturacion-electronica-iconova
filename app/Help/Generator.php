@@ -4,7 +4,7 @@ namespace App\Help;
 
 use App\Models\Config;
 use App\Help\Help;
-
+use Ramsey\Uuid\Uuid;
 class Generator
 {
 
@@ -74,6 +74,7 @@ class Generator
 
     public static function generateCodeGeneration()
     {
+        return strtoupper(Uuid::uuid4()->toString());
         $characters = '0123456789ABCDEF';
         $generatedCode = '';
 

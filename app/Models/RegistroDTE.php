@@ -24,7 +24,9 @@ class RegistroDTE extends Model
         'fecha_recibido',
         'observaciones',
         'estado',
-        'empresa_id'
+        'empresa_id',
+        'response',
+        'dte_firmado'
     ];
 
     public function cliente(){
