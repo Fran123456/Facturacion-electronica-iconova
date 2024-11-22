@@ -38,7 +38,8 @@ use Illuminate\Http\Client\ConnectionException;
 class DteCCFController extends Controller
 {
     public function enviarDteUnitarioCCF(Request $request)
-    { $empresa = Help::getEmpresa();
+    { 
+        $empresa = Help::getEmpresa();
         // Login para generar token de Hacienda.
         $responseLogin = LoginMH::login();
         if ($responseLogin['code'] != 200) {

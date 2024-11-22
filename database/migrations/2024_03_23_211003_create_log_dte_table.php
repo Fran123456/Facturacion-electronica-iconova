@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('id_empresa');
             $table->unsignedBigInteger('id_cliente');
-            $table->string('numero_dte');
+            $table->string('numero_dte')->nullable();
             $table->string('codigo_generacion');
             
             $table->string('tipo_documento');

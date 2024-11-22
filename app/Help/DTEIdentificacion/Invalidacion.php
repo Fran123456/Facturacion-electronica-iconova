@@ -48,7 +48,7 @@ class Invalidacion
             "correo" => $correo,
             "codEstable"=>  null,
             "codPuntoVenta" =>  null,
-            "nombreEstablecimiento" => $nombreEmpresa,
+            "nomEstablecimiento" => $nombreEmpresa,
         ];
 
         return $emisor;

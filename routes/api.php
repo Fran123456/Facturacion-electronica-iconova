@@ -49,7 +49,6 @@ Route::middleware('auth:sanctum')->group(function () {
     //! Endpoint de prueba
     Route::get('/prueba/empresa', [PruebasController::class, 'empresa']);
     Route::get('/prueba/usuario', [PruebasController::class, 'usuario']);
-    Route::post('/prueba/invalidar', [InvalidarDteController::class, 'invalidar']);
     
     //^ ENDPOINTS CONSULTAS DE DTE
     Route::prefix('/consultas/dte')->group(function () {
@@ -64,6 +63,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/firmado', [ServicesController::class, 'obtenerFirmaDTE']);
         Route::get('/encriptador', [ServicesController::class, 'encriptador']);
         Route::get('/desencriptador', [ServicesController::class, 'desencriptador']);
+        // ^ Invalidación de dte
+        Route::post('/mh/invalidar', [InvalidarDteController::class, 'invalidar']);
         
         //* ENDPOINTS COMPLETADOS
         Route::post('/mh/enviar/dte/unitario/ccf', [DteCCFController::class, 'enviarDteUnitarioCCF']);
