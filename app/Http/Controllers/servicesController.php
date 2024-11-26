@@ -127,10 +127,9 @@ class ServicesController extends Controller
         ], 200);
     }
 
-    // ENDPOINTS DE PRUEBA
+    //! ENDPOINTS DE PRUEBA
     public function desencriptador(Request $request)
     {
-        // $texto = $request->input("valor");
         $texto = $request->query("valor");
 
         if (!$texto)

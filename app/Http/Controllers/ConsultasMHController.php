@@ -12,13 +12,12 @@ class ConsultasMHController extends Controller
 
         $data = $request->json()->all();
 
+        //^ Se realiza la consulta a la API de MH a través del servicio ConsultaDte
         [$responseData, $statusCode] =  ConsultaDte::consultar(
             $data['nitEmisor'],
             $data['tdte'],
             $data['codigoGeneracion']
         );
-
-        // [$responseData, $statusCode] =  ConsultaDte::consultar();
 
         return response()->json([
             'data' => $responseData,

@@ -57,7 +57,6 @@ class DteCCFController extends Controller
         //Generamos los pagos tributos
         $json['pagoTributos']=CCFDTE::makePagoTributo($json['dteJson']['cuerpoDocumento']);
 
-
         // VARAIBLES DE CONFIGURACION DEL DTE
         $dte = $json['dteJson'];
         $cliente = Help::ValidarCliente($dte['receptor']['nit'],$dte['receptor']);
@@ -78,7 +77,6 @@ class DteCCFController extends Controller
         $emisor = isset($json['emisor']) ? $json['emisor'] : Identificacion::emisor('03', '20', null);
         [$faltan, $receptor] = Receptor::generar($dte['receptor'], $tipoDTE);
 
-
         if ( $faltan )
             return response()->json($receptor, 404);
 
@@ -89,13 +87,11 @@ class DteCCFController extends Controller
         $cuerpoDocumento = CCFDTE::getCuerpoDocumento($dte['cuerpoDocumento']);
 
 
-
         $cuerpoDocumento = CCFDTE::makeCuerpoDocumento($cuerpoDocumento);
         $codigoPago = isset($json['codigo_pago']) ? $json['codigo_pago'] : "01";
         $periodoPago = isset($json['periodo_pago']) ? $json['periodo_pago'] : null;
         $plazoPago = isset($json['plazo_pago']) ? $json['plazo_pago'] : null;
         $resumen = CCFDTE::Resumen($cuerpoDocumento, $dte['receptor']['grancontribuyente'], $json['pagoTributos'], $codigoPago, $periodoPago, $plazoPago);
-
 
         // Variables de Extensión y Apéndice
         $extension = isset($json['extension']) ? $json['extension'] : null;
@@ -116,14 +112,9 @@ class DteCCFController extends Controller
             'apendice' => $apendice
         ];
 
-
-
-        // return response()->json($newDTE, 200);
-
         [$responseData, $statusCode] = DteApiMHService::envidarDTE( $newDTE, $idCliente, $identificacion );
 
-
-
+        //^ Función para correo electrinico
         $correoEmpresa = Crypt::decryptString($empresa->correo_electronico);
 
         $telefono = Crypt::decryptString($empresa->telefono);

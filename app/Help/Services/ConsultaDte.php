@@ -25,8 +25,6 @@ class ConsultaDte
         $responseData = $requestResponse->json();
         $statusCode = $requestResponse->status();
 
-        // return [$jsonRequest, 200];
-
         return [$responseData, $statusCode];
     }
 }

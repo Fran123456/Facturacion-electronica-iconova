@@ -27,7 +27,6 @@ class InvalidarDteController extends Controller
         $documento = $dteRequest['documento'];
         $motivo = $dteRequest['motivo'];
 
-        // $documento['codigoGeneracionR'] = $identificacion['codigoGeneracion'];
         $documento['codigoGeneracionR'] = null;
 
         $dte = compact("identificacion", "emisor", "documento", "motivo");
@@ -38,6 +37,5 @@ class InvalidarDteController extends Controller
             'data' => $responseData,
             'statusCode' => $statusCode
         ], $statusCode);
-
     }
 }

@@ -29,17 +29,7 @@ class ConsultasController extends Controller
         $estado = $request->query('estado');
 
         try {
-            $fechaInicioObj = Carbon::parse($fechaInicio);
-            $fechaFinObj = Carbon::parse($fechaFin);
-    
-    
-            if ($fechaInicio && $fechaFin) {
-                if (!$fechaInicioObj->greaterThanOrEqualTo($fechaFinObj)) {
-                    return response()->json(['error' => 'La fecha de inicio debe ser menor o igual a la fecha de fin'], 400);
-                }
-            }
-    
-            // Inicializar la consulta y cargar la relación 'tipoDocumento' 
+            //^ Inicializar la consulta y cargar la relación 'tipoDocumento' 
             $query = RegistroDTE::with('tipoDocumento');
     
             $query->where('empresa_id', Help::getEmpresa()->id);
@@ -48,18 +38,20 @@ class ConsultasController extends Controller
                 $query->where('tipo_documento', $tipodocumento);
             }
     
+            //* Si se envía fechaInicio o fechaFin se filtra por rango de fechas
             if ($fechaInicio || $fechaFin) {
     
                 $fechaInicio = $fechaInicio ?? date('Y-m-d');
     
                 if (!$fechaFin && $fechaInicio) {
                     $fecha = Carbon::parse($fechaInicio);
+                    //* Se resta un mes a la fecha de inicio si no se envía fecha fin
                     $fechaFin = $fecha->subMonth()->format('Y-m-d');
                 }
-    
-                // return $fechaFin;
+
             }
-    
+
+            //* Se filtra por rango de fechas
             if ($fechaInicio && $fechaFin) {
                 $query->whereBetween('fecha_recibido', [$fechaFin, $fechaInicio]);
             }
@@ -81,17 +73,6 @@ class ConsultasController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
      * Display the specified resource.
      *
      * @param  int  $id
@@ -107,8 +88,10 @@ class ConsultasController extends Controller
                 return response()->json(['error' => 'Registro no encontrado'], 404);
             }
 
+            //* Se crea un resource para devolver el registro
             return new RegistroDTEResource($registro);
         } catch (Exception $e) {
+            //* Si ocurre un error se devuelve un mensaje de error
             return response()->json(
                 [
                     'error' => $e->getMessage()
@@ -126,14 +109,14 @@ class ConsultasController extends Controller
      */
     public function update(ConsultaRequest $request)
     {
-        
+        //* Endpoint para reenviar un DTE no validado por Hacienda
         $json = $request->json()->all();
 
         $id = $json['id'];
         $dte = $json['dte'];
 
         try {
-
+            //* Se obtiene la fecha y hora actual para el reenvío
             $fechaHora = new \DateTime();
 
             $dte['identificacion']['fecEmi'] = $fechaHora->format('Y-m-d');
@@ -150,16 +133,5 @@ class ConsultasController extends Controller
         }
 
 
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
     }
 }

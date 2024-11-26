@@ -41,14 +41,11 @@ class DteCrController extends Controller
         $statusCode = '';
 
         // Variables de Identificación
-        // $identificacion = Identificacion::identidad($tipoDTE, 3);
         $contingencia = isset($json['contingencia']) ? $json['contingencia'] : null;
         $identificacion = Identificacion::identidad($tipoDTE, 1, $contingencia);
 
         // Variables de Emisor y Receptor
         $emisor = $dte['emisor'] ?? Identificacion::emisor($tipoDTE, '20', null);
-        // $receptor = Identificacion::receptorCCF($dte['receptor']);
-        // [$faltan, $receptor] = Receptor::generar($dte['receptor'], $tipoDTE);
         [$faltan, $receptor] = Receptor::generar($dte['receptor'], $tipoDTE);
 
         if ($faltan)
@@ -70,20 +67,11 @@ class DteCrController extends Controller
             "apendice" => $apendice,
         ];
 
-        
         [$responseData, $statusCode] = DteApiMHService::envidarDTE($newDTE, $idCliente, $identificacion);
         
         return response()->json($responseData, $statusCode);
         
         return response()->json($newDTE, 200);
-
-
-        // return response()->json([
-        //     "identificacion" => $identificacion,
-        //     "emisor" => $emisor,
-        //     "receptor" => $receptor,
-        //     "contingencia" => $contingencia
-        // ], 200);
 
     }
 }

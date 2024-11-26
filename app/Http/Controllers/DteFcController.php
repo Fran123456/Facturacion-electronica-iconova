@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Help\DteCodeValidator;
-use App\Help\DTEHelper\CCFDTE;
 use App\Help\DTEHelper\FACTDTE;
 use App\Help\DTEIdentificacion\Identificacion;
 use App\Help\DTEIdentificacion\Receptor;
@@ -19,8 +18,6 @@ class DteFcController extends Controller
 
     public function unitario(Request $request)
     {
-
-
         // Login para generar token de Hacienda.
         $responseLogin = LoginMH::login();
         if ($responseLogin['code'] != 200) {
@@ -44,7 +41,6 @@ class DteFcController extends Controller
         $statusCode = '';
 
         // Variables de Identificación
-        // $identificacion = Identificacion::identidad($tipoDTE, 3);
         $contingencia = isset($json['contingencia']) ? $json['contingencia'] : null;
         $identificacion = Identificacion::identidad($tipoDTE, 1, $contingencia);
 
@@ -52,7 +48,6 @@ class DteFcController extends Controller
         $emisor = $dte['emisor'] ?? Identificacion::emisor($tipoDTE, '20', null);
 
         [$faltan, $receptor] = Receptor::generar($dte['receptor'], $tipoDTE);
-       
 
         if ( $faltan )
             return response()->json($receptor, 404);
@@ -65,19 +60,10 @@ class DteFcController extends Controller
         $plazoPago = isset($json['plazo_pago']) ? $json['plazo_pago'] :  null;
         $resumen = FACTDTE::Resumen($cuerpoDocumento, $cliente['tipoCliente'], $pagoTributos, $codigoPago, $periodoPago, $plazoPago);
 
-
-        // return response()->json([
-        //     "identificacion" => $identificacion,
-        //     "emisor" => $emisor,
-        //     "cuerpoDocumento" => $cuerpoDocumento
-        // ], 200);
-
-
         // Variables de Documento Relacionado y Cuerpo del Documento
         $documentoRelacionado = $json['documentoRelacionado'] ?? null;
         $otrosDocumentos = $json['otrosDocumentos']??null;
         $ventaTercero = $json['ventaTercero'];
-
 
         // Variables de Extensión y Apéndice
         $extension = isset($json['extension']) ? $json['extension'] : null;
@@ -96,9 +82,6 @@ class DteFcController extends Controller
             'extension' => $extension,
             'apendice' => $apendice
         ];
-
-
-           //  return response()->json($newDTE, 200);
 
         [$responseData, $statusCode] = DteApiMHService::envidarDTE($newDTE, $idCliente, $identificacion);
 

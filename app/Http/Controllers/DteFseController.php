@@ -69,8 +69,6 @@ class DteFseController extends Controller
             'apendice'
         );
 
-        // return response()->json($newDTE, 200);
-
         [$responseData, $statusCode] = DteApiMHService::envidarDTE($newDTE, $idCliente, $identificacion);
 
         return response()->json($responseData, $statusCode);

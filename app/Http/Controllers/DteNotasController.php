@@ -68,12 +68,8 @@ class DteNotasController extends Controller
         $newDTE = [];
         $tipoDTE = '05';
 
-
-        // return response()->json(Generator::generateNumControl("01"), 200);
-
         //PASO 3 GENERAR JSON VALIDO PARA  HACIENDA
         $identificacion = Identificacion::identidad('05', 3);
-
 
         $emisor = Identificacion::emisor($tipoDTE, null, null, null);
         [$faltan, $receptor] = Receptor::generar($dte['receptor'], $tipoDTE);
@@ -89,8 +85,6 @@ class DteNotasController extends Controller
         $extension = null;
         $apendice = null;
 
-
-        //  return response()->json($dte['documentoRelacionado'], 200);
         $documentoRelacionado = NOTACREDITODTE::documentosRelacionados($dte['documentoRelacionado']);
         $ventaTercero = $dte['ventaTercero'] ?? null;
         $cuerpoDocumento =  NOTACREDITODTE::cuerpo($dte['cuerpoDocumento']);
@@ -110,16 +104,8 @@ class DteNotasController extends Controller
             "apendice" => $apendice,
         ];
 
-        // return $newDTE;
-
-        // PASO 4 MANDAR A HACIENDA EL NUEVO DTE FORMADO SEGUN EL DTE JSON SCHEMA DE LA DOCUMENTACION
-
-        // return response()->json($newDTE, 200);
-
         [$responseData, $statusCode] = DteApiMHService::envidarDTE($newDTE, $idCliente, $identificacion);
 
         return response()->json($responseData, $statusCode);
-
-
     }
 }

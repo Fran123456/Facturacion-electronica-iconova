@@ -4,16 +4,12 @@ use App\Http\Controllers\ApiController;
 use App\Http\Controllers\ConsultasController;
 use App\Http\Controllers\ConsultasMHController;
 use App\Http\Controllers\ServicesController;
-use App\Http\Controllers\DteSeparadoController;
-use App\Http\Controllers\DteCCF;
 use App\Http\Controllers\DteCCFController;
-use App\Http\Controllers\DteCCFControllerController;
 use App\Http\Controllers\DteCdController;
 use App\Http\Controllers\DteClController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DteNotasController;
-use App\Http\Controllers\DteController;
 use App\Http\Controllers\DteCrController;
 use App\Http\Controllers\DteDclController;
 use App\Http\Controllers\DteFcController;
@@ -57,6 +53,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/reenviar', [ConsultasController::class, 'update']);
     });
     
+    //^ ENDPOINTS DE SERVICIOS DE HACIENDA Y DE LA APLICACIÓN
     Route::prefix('services')->group(function () {
         Route::post('/mh/consulta', [ConsultasMHController::class, 'consultaDte']);
         Route::get('/mh/login', [ServicesController::class, 'loginMH']);
@@ -77,7 +74,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/mh/enviar/dte/unitario/fse', [DteFseController::class, 'unitario']);
         Route::post('/mh/enviar/dte/unitario/nd', [DteNdController::class, 'unitario']);
         
-        
         // TODO: por completar
         Route::post('/mh/enviar/dte/unitario/cd', [DteCdController::class, 'unitario']);
         Route::post('/mh/enviar/dte/unitario/cl', [DteClController::class, 'unitario']);
@@ -91,6 +87,3 @@ Route::get('/encriptador', [ServicesController::class, 'encriptador']);
 Route::post('/signUp', [ApiController::class, 'signUp']);
 Route::get('/users', [ApiController::class, 'users']);
 Route::get('/token', [ApiController::class, 'pruebaToken']);
-Route::get('/generator', [TestController::class, 'numControl']);
-Route::get('/generatorCode', [TestController::class, 'codeGeneration']);
-Route::post('/receptor', [ReceptorController::class, 'receptor']);

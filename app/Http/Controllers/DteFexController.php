@@ -42,10 +42,7 @@ class DteFexController extends Controller
         $tipoDTE = '11';
         $idCliente = $cliente['id'];
 
-
-
         // Variables de Identificación
-        // $identificacion = Identificacion::identidad($tipoDTE, 3);
         $contingencia = isset($json['contingencia']) ? $json['contingencia'] : null;
         $identificacion = Identificacion::identidad($tipoDTE, 1, $contingencia);
 
@@ -55,14 +52,6 @@ class DteFexController extends Controller
 
         if ($faltan)
             return response()->json($receptor, 404);
-
-
-        // return response()->json([
-        //     "identificacion" => $identificacion,
-        //     "emisor" => $emisor,
-        //     "receptor" => $receptor,
-        //     "contingencia" => $contingencia
-        // ], 200);
 
         // Variables de Documento Relacionado y Cuerpo del Documento
         $otrosDocumentos = $dte['otrosDocumentos'];
@@ -94,15 +83,6 @@ class DteFexController extends Controller
             'ventaTercero' => $ventaTercero,
             'apendice' => $apendice
         ];
-        // $newDTE = [
-        //     'identificacion' => $identificacion,
-        //     'emisor' => $emisor,
-        //     'receptor' => $receptor,
-        //     'cuerpoDocumento' => $cuerpoDocumento,
-        //     'resumen' => $resumen,
-        // ];
-
-        // return response()->json($newDTE, 200);
 
         // VARIABLES DE RESPUESTA DEL SERVICIO
         $responseData = '';

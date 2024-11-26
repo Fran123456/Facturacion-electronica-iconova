@@ -43,7 +43,6 @@ class DteNdController extends Controller
         //PASO 3 GENERAR JSON VALIDO PARA  HACIENDA
         $identificacion = Identificacion::identidad($tipoDTE, 3);
 
-
         $emisor = Identificacion::emisor($tipoDTE, null, null, null);
 
         $tipoCliente = $dte['receptor']['granContribuyente'] ?? null;
@@ -56,7 +55,6 @@ class DteNdController extends Controller
 
         $documentoRelacionado = null;
         $ventaTercero = null;
-        // $cuerpoDocumento = CCFDTE::getCuerpoDocumento($dte['cuerpoDocumento']);
 
         $resumen = null;
         $extension = null;
@@ -68,7 +66,6 @@ class DteNdController extends Controller
         $cuerpoDocumento =  NDDTE::cuerpo($dte['cuerpoDocumento']);
         
         $resumen = NDDTE::resumen($dte['cuerpoDocumento'], $tipoCliente);
-        // return response()->json(compact('cuerpoDocumento', 'resumen'), 200);
 
         $extension = $dte['extension'];
         $apendice = $dte['apendice'] ?? null;
@@ -85,11 +82,8 @@ class DteNdController extends Controller
             'apendice'
         );
 
-        // return response()->json($newDTE, 200);
-
         [$responseData, $statusCode] = DteApiMHService::envidarDTE($newDTE, $idCliente, $identificacion);
 
         return response()->json($responseData, $statusCode);
-
     }
 }
