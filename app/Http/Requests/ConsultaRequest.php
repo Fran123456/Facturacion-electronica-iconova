@@ -37,7 +37,7 @@ class ConsultaRequest extends FormRequest
                     function ($attribute, $value, $fail) { //^ Se valida que el registro exista y que no esté activo
                         $record = DB::table('registro_dte')->where('id', $value)->first();
                         if (!$record || $record->estado) {
-                            $fail('The selected id is invalid or the record is active.');
+                            $fail('The selected id is invalid or the dte has been received.');
                         }
                     },
                 ],

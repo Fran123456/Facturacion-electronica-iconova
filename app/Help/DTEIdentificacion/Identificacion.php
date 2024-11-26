@@ -2,19 +2,13 @@
 
 namespace App\Help\DTEIdentificacion;
 
-use App\Models\Config;
 use App\Help\Generator;
 use Illuminate\Support\Facades\Crypt;
 use App\Models\MH\MHActividadEconomica;
-use App\Models\MH\MHTipoDocumento;
-use App\Models\MH\MHPais;
-
 use App\Help\Help;
-use App\Models\Cliente;
 
 class Identificacion
 {
-
     public static function identidad($tipoDoc, $version = 1, $contingencia = null)
     {
         $empresa = Help::getEmpresa();
@@ -38,18 +32,12 @@ class Identificacion
             "tipoMoneda" => "USD"
         ];
 
-        // CCF 03 | CD 15 | CL 08 | CR 07 | DCL 09 | FC 01 | FEX 11 | FSE 14 | NC 05 | NC 06 | NR 04
-
+        //^ CCF 03 | CD 15 | CL 08 | CR 07 | DCL 09 | FC 01 | FEX 11 | FSE 14 | NC 05 | NC 06 | NR 04
         $grupo1 = ["03", "07", "01", "11", "14", "05", "06", "04"];
 
         if (in_array($tipoDoc, $grupo1)) {
             $identificacion["tipoContingencia"] = isset($contingencia["tipoContingencia"]) ? $contingencia["tipoContingencia"] : null;
         }
-
-        // $grupo2 = ["03", "07", "01", "14", "05", "06", "04"];
-        // if(in_array($tipoDoc, $grupo2))
-        // else
-
 
         if ($tipoDoc == "11")
             $identificacion['motivoContigencia'] =  isset($contingencia["motivoContigencia"]) ? $contingencia["motivoContigencia"] : null;
@@ -61,7 +49,6 @@ class Identificacion
 
     public static function emisor($tipoDoc, $tipoEstablecimiento = null, $puntoDeVentaCodigo = null, $recintoFiscal = null, $regimen = null, $tipoItem = 2)
     {
-
         $empresa = Help::getEmpresa();
         $nit = Crypt::decryptString($empresa->nit);
         $nrc = Crypt::decryptString($empresa->nrc);
@@ -70,7 +57,6 @@ class Identificacion
         $correo = Crypt::decryptString($empresa->correo_electronico);
 
         $actividad = MHActividadEconomica::where('codigo', $empresa->codigo_actividad)->first();
-
 
         $emisor = [
             "nit" => $nit,

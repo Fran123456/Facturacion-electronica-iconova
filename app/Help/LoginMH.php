@@ -51,16 +51,11 @@ class LoginMH {
             return array(["error" => "No se pudo conectar con la  API de Ministerio hacienda",'code'=>500])[0];
         }
 
-
-
         $responseData = $requestResponse->json();
         $statusCode = $requestResponse->status();
         $empresa->token_mh = $responseData['body']['token'];
         $empresa->save();
         return array(["error" => "login correcto",'code'=>200])[0];
-
     }
-
-
 }
 

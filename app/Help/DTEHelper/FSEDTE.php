@@ -7,7 +7,6 @@ class FSEDTE {
 
     public static function cuerpo($cuerpo){
 
-
         if ($cuerpo == null)
             return null;
 
@@ -59,14 +58,10 @@ class FSEDTE {
             $reteRenta += $retencionItem;
         }
 
-        // $subTotal = round($subTotal, 2);
-        // $montoTotalOperacion = round($subTotal + $totalImpuestos - $ivaRetenida, 2);
-
         $reteRenta = round($reteRenta, 2);
         $totalPagar = round($totalPagar, 2);
 
         $totalLetras = Generator::generateStringFromNumber($totalPagar);
-
 
         $resumen = compact( 
             'totalCompra', 

@@ -19,12 +19,11 @@ class Receptor
             $cliente = Cliente::where('dui', $dui)->first();
         }
 
-        $correo = $receptorDte['correo']??null;
+        $correo = $receptorDte['correo'] ?? null;
         if($cliente == null){
             $nit = $receptorDte['correo']??null;
             $cliente = Cliente::where('correo', $dui)->first();
         }
-
         
         // SI NO EXISTE USUARIO CON EL NIT INGRESADO, SE CREA EL NUEVO USUARIO
         if ($cliente == null) {
@@ -48,7 +47,7 @@ class Receptor
                 'municipio' => $receptorDte['direccion']['municipio'],
                 'complemento' => isset($receptorDte['direccion']['complemento']) ? $receptorDte['direccion']['complemento'] : 'Sin complemento',
                 'telefono' =>  $receptorDte['telefono'],
-                'correo' => $receptorDte['correo'],
+                'correo' => $correo,
             ]);
         } else {
             // SE VALIDA SI HAY INFORMACION A ACTUALIZAR
@@ -187,17 +186,12 @@ class Receptor
         if (count($faltantes) > 0)
             $faltan = true;
 
-        // $faltantes = ["prueba" => "prueba"];
-
         return [$faltan, $faltantes];
     }
 
     public static function compretarReceptor($receptor, $cliente, $complemento, $tipoDTE)
     {
-        
-
-        // CCF 03 | CD 15 | CL 08 | CR 07 | DCL 09 | FC 01 | FEX 11 | FSE 14 | NC 05 | NC 06 | NR 04
-
+        //^ CCF 03 | CD 15 | CL 08 | CR 07 | DCL 09 | FC 01 | FEX 11 | FSE 14 | NC 05 | NC 06 | NR 04
         $grupo1 = ["03", "08", "07", "09", "05", "06", "04", "01"];
         $grupoNit = ["03", "08", "09", "05", "06"];
         // PARA DTES DE CCF CL CR DCL NC ND NR
@@ -210,7 +204,6 @@ class Receptor
             if (in_array($tipoDTE, $grupoNit))
                 $receptor["nit"] = $cliente->nit;
         }
-        
 
         // PARA CAMPOS NUMDOCUMENTO, TIPODOCUMENTO
         $grupo2 = ["07", "01", "11", "04"];
@@ -224,8 +217,6 @@ class Receptor
         if($tipoDTE == "01"){
             $receptor["numDocumento"] = $complemento["numDocumento"];
         }
-    
-
 
         // Campos para DCL
         if ($tipoDTE == "09") {
@@ -242,17 +233,13 @@ class Receptor
             $receptor["tipoPersona"] = $complemento["tipoPersona"] ;
         }
 
-        
-
         if ($tipoDTE == "04")
             $receptor["bienTitulo"] = $complemento->bienTitulo;
 
         if ( $tipoDTE == "14" ) {
             $receptor["tipoDocumento"] = $complemento["tipoDocumento"];
             $receptor["numDocumento"] = $complemento["numDocumento"];
-
         }
-            
 
         return $receptor;
     }

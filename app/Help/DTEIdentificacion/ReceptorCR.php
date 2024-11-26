@@ -13,8 +13,6 @@ class ReceptorCR {
         $numeroDocumento = $receptor['numeroDocumento'];
         $correo = $receptor['correo'];
 
-        // return compact('tipoDocumento', 'numeroDocumento', 'correo');
-
         if ( $tipoDocumento !== "13" && $tipoDocumento !== "36" )
             return $receptor;
 

@@ -2,8 +2,6 @@
 
 namespace App\Help;
 
-use App\Models\Config;
-
 class DteCodeValidator
 {
 

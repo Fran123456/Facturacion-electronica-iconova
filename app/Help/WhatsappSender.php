@@ -12,10 +12,6 @@ class WhatsappSender
         $numeroDestino = 'whatsapp:+50370234903';
         $mensaje = 'Hola enviado desde laravel. ';
 
-       
-
-        
-
 // Configurar los datos del mensaje
         $datosMensaje = [
             'messaging_product'=>'whatsapp',

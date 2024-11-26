@@ -22,7 +22,6 @@ class NDDTE
     public static function cuerpo($cuerpo)
     {
 
-
         if ($cuerpo == null)
             return null;
 
@@ -128,7 +127,6 @@ class NDDTE
 
         $condicionOperacion = 1;
         $numPagoElectronico = null;
-
 
         $resumen = compact(
             'totalNoSuj',

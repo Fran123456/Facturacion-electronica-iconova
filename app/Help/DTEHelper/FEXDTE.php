@@ -61,7 +61,6 @@ class FEXDTE
             // REDONDENANDO VALORES DEFINIDOS POR LE USUARIO
             $cantidad = intval($item['cantidad']);
 
-
             // CAMPOS CON VALORES PREDEFINIDOS
 
             // CAMPOS CON VALORES DEFINIDOS POR EL USUARIO
@@ -176,7 +175,6 @@ class FEXDTE
             "porcentajeDescuento" => $porcentajeDescuento,
             "seguro" => $seguro,
             "flete" => $flete,
-
 
             "descuento" => $totalDescuentos,
             "codIncoterms" => $inco ? $inco->codigo : null,

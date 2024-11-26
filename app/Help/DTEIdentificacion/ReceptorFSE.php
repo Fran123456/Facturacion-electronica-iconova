@@ -10,8 +10,6 @@ class ReceptorFSE {
         $tipoDocumento = $receptor['tipoDocumento'];
         $numeroDocumento = $receptor['numeroDocumento'];
 
-        // return compact('tipoDocumento', 'numeroDocumento', 'correo');
-
         if ( $tipoDocumento !== "13" && $tipoDocumento !== "36" )
             return $receptor;
 

@@ -23,7 +23,6 @@ class LogDTE extends Model
         'error',
         'estado',
         'empresa_id','codigo_generacion'
-       
     ];
 
     public function cliente(){

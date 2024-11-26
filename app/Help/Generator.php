@@ -2,7 +2,6 @@
 
 namespace App\Help;
 
-use App\Models\Config;
 use App\Help\Help;
 use Ramsey\Uuid\Uuid;
 class Generator
@@ -33,7 +32,6 @@ class Generator
         // SE OBTIENEN LOS DATOS DE LOS DTE GENERADOS POR LAS EMPRESAS
         $empresa = Help::getEmpresa();
 
-
         // SE TOMA EL TOTAL DE DTE GENERADOS DEL TIPO A GENERAR Y SE LE SUMA 1 PARA PODER GENERAR UNO NUEVO
         $correlativos = [
             "03" => "correlativo_ccf",
@@ -57,13 +55,9 @@ class Generator
         if ($registroContadorDTE != null) {
             $contadorDTEs = (int)$registroContadorDTE;
 
-            // $contadorDTEs += 1;
-
             $generated = "DTE-" . $tipoDoc . '-' . $codigoEmpresa;
             $digitos = str_pad($contadorDTEs, 15, "0", STR_PAD_LEFT);
             $generated .= '-' . $digitos;
-
-            // $registroContadorDTE = $contadorDTEs;
 
             $empresa->save();
             return $generated;
@@ -82,7 +76,6 @@ class Generator
         $lengthChars = strlen($characters) - 1;
 
         $loops = count($lengthSections);
-
 
         for ($i = 0; $i < $loops; $i++) {
 

@@ -18,5 +18,4 @@ class Config extends Model
         'valor',
     ];
 
-   
 }

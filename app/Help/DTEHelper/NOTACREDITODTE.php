@@ -2,7 +2,6 @@
 namespace App\Help\DTEHelper;
 
 use App\Help\Generator;
-use App\Models\MH\MHIncoterms;
 use App\Help\Help;
 
 class NOTACREDITODTE
@@ -18,7 +17,6 @@ class NOTACREDITODTE
     }
 
     public static function cuerpo($cuerpo){
-
 
         if ($cuerpo == null)
             return null;

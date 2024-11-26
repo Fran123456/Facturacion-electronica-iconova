@@ -86,13 +86,8 @@ class CCFDTE
             }
 
             // Calcular el monto de pago
-            $montoPago = $subTotal + $impuestoTotalItem - $ivaRetenidoItem;
-
-            // Agregar el pago al array de pagos
-            
+            $montoPago = $subTotal + $impuestoTotalItem - $ivaRetenidoItem;            
         }
-
-       
 
         // Redondear el subtotal
         $subTotal = round($subTotal, 2);
@@ -155,7 +150,6 @@ class CCFDTE
             array_push( $data,$value);
         }
         return $data;
-
     }
 
     // TODO: calculate cuerpoDocumento
@@ -185,6 +179,4 @@ class CCFDTE
         }
         return  $pagosTributos;
     }
-
-
 }

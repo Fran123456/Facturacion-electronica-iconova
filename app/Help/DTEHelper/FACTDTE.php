@@ -7,8 +7,6 @@ use App\help\Help;
 
 class FACTDTE
 {
-
-    // TODO: calculate cuerpoDocumento
     public static function getCuerpoDocumento($items)
     {
         if ($items == null)
@@ -39,128 +37,6 @@ class FACTDTE
 
         return $items;
     }
-    //$condicionPago =  mh_condicion_operacion
-    //codigoPago = mh_forma_pago
-    //$plazoPago = mh_plazo
-    //$periodoPago  =
-    //$formaPago = mh_condicion_operacion
-
-
-    // public static function Resumen($cuerpo, $idTipoCliente, $codigoPago, $plazoPago = null, $periodoPago = null)
-    // {
-    //     $resumen = [];
-
-    //     $descripcionPago = Help::getPayWay($codigoPago);
-
-    //     $totalNoSuj = 0.0;
-    //     $totalExenta = 0.0;
-    //     $subTotal = 0.0;
-    //     $totalDescu = 0.0;
-    //     $totalPagar = 0.0;
-    //     $ivaRetenida = 0.0;
-    //     $totalImpuestos = 0.0;
-
-    //     $totalIva = 0;
-
-    //     $totalNoGravado = 0;
-
-    //     $tributos = [];
-    //     $pagos = [];
-
-    //     foreach ($cuerpo as $key => $value) {
-
-    //         $ventaGravada = round($value['cantidad'] * $value['precioUni'], 2);
-
-
-    //         if ($idTipoCliente == 3 && $ventaGravada >= 100) {
-    //             $ivaRetenida += round(($ventaGravada * 0.01), 2);
-    //         }
-
-    //         $totalNoSuj += $value['ventaNoSuj'];
-    //         $totalExenta += $value['ventaExenta'];
-    //         $totalNoGravado += $value['noGravado'];
-    //         $totalDescu += $value['montoDescu'];
-
-    //         $subTotal += $ventaGravada;
-
-    //         $totalIva += $value['ivaItem'];
-
-    //         if ($value['tributos'] != null)
-    //             foreach ($value['tributos'] as $tributo) {
-    //                 $encontrado = false;
-    //                 $impuesto = round($ventaGravada * 0.115, 2);
-
-    //                 foreach ($tributos as $clave => $valor) {
-    //                     if ($valor['codigo'] == $tributo) {
-    //                         $encontrado = true;
-    //                         $tributos[$clave]['valor'] += $impuesto;
-    //                         break;
-    //                     }
-    //                 }
-
-    //                 if (!$encontrado) {
-    //                     $tributos[] = [
-    //                         'codigo' => $tributo,
-    //                         'descripcion' => Help::getTributo($tributo),
-    //                         'valor' => $impuesto * 1.0
-    //                     ];
-    //                 }
-
-    //                 $totalImpuestos += $impuesto;
-    //             }
-
-    //         $pagos[] = [
-    //             "codigo" => $codigoPago,
-    //             "montoPago" => $ventaGravada,
-    //             "referencia" => $descripcionPago,
-    //             "periodo" => $periodoPago,
-    //             "plazo" => $plazoPago
-    //         ];
-    //     }
-
-    //     // $totalPagar = $subTotal;
-
-    //     $totalPagar = $subTotal + $totalImpuestos - $ivaRetenida - $totalDescu + $totalNoGravado;
-
-    //     $baseImponible = $subTotal; // Este es el monto sujeto a impuestos
-
-    //     $montoTotalOperacion = $baseImponible + $totalImpuestos + $totalNoSuj + $totalExenta - $totalDescu + $totalIva + $totalNoGravado + $totalNoSuj;
-
-    //     $total_en_letras = Generator::generateStringFromNumber($totalPagar);
-
-    //     $resumen = [
-    //         'totalNoSuj' => $totalNoSuj,
-    //         'totalExenta' => $totalExenta,
-    //         'totalDescu' => $totalDescu,
-    //         'totalGravada' => $subTotal,
-    //         'subTotalVentas' => $subTotal,
-    //         'subTotal' => $subTotal,
-    //         'montoTotalOperacion' => $subTotal,
-    //         // 'montoTotalOperacion' => $montoTotalOperacion,
-
-    //         'descuNoSuj' => 0.0,
-    //         'descuExenta' => 0.0,
-    //         'descuGravada' => 0.0,
-    //         'tributos' => $tributos ? $tributos :  null,
-    //         'totalIva' => $totalIva,
-    //         'ivaRete1' => $ivaRetenida,
-    //         'reteRenta' => 0.0,
-    //         // 'totalPagar' => $totalPagar,
-    //         'totalPagar' => $totalPagar,
-    //         // 'totalPagar' => $subTotal,
-
-
-    //         'condicionOperacion' => 1,
-    //         'totalLetras' => 'USD ' . $total_en_letras,
-    //         'saldoFavor' => 0,
-    //         'totalNoGravado' => $totalNoGravado,
-    //         'porcentajeDescuento' => 0.0,
-    //         'numPagoElectronico' => null,
-    //         'pagos' => $pagos,
-    //     ];
-
-    //     return $resumen;
-    // }
 
     public static function Resumen($cuerpo, $idTipoCliente, $pagoTributos,$codigoPago, $plazoPago = null, $periodoPago = null)
     {

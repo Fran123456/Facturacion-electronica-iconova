@@ -12,9 +12,6 @@ use App\Http\Controllers\ServicesController;
 
 class FirmadorElectronico
 {
-
-
-
     public static function firmador($token)
     {
 
@@ -36,14 +33,12 @@ class FirmadorElectronico
         if ($jsonDTE == null)
             return response()->json(["error" => "Enviar un DTE valido por favor."], Response::HTTP_NOT_FOUND);
 
-
         $jsonDocumento = [
             "nit" => $nit,
             "activo" => true,
             "passwordPri" => $passwordPrivate,
             "dteJson" => $jsonDTE
         ];
-
 
         $url = Help::urlFirmador() . "firmardocumento/";
         $response = Http::post($url, $jsonDocumento);

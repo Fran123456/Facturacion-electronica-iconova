@@ -41,7 +41,6 @@ class Empresa extends Model
         'correlativo_nr'
     ];
 
-
     public function empresa()
     {
         return $this->belongsToMany(User::class, "id_usuario")->withDefault();

@@ -92,7 +92,6 @@ class DteApiMHService
         } catch (Exception $e) {
 
             // CREAR LOG DE ERROR DE DTE
-
             LogDTE::create([
                 'empresa_id' => $empresa->id,
                 'id_cliente' => $idCliente,
@@ -149,7 +148,6 @@ class DteApiMHService
         $empresa = Help::getEmpresa();
         $responseData = "";
         $statusCode = 0;
-        $fechaHora = new \DateTime();
 
         $codigoGeneracionDTE = $identificacion['numeroControl'];
         $tipoDTE = $identificacion['tipoDte'];
@@ -159,11 +157,9 @@ class DteApiMHService
         $version = $identificacion['version'];
 
         // CREACION DEL REGISTRO DEL DTE PARA RESPALDO EN LA DB
-
         $registoDTE = RegistroDTE::find( $idDte );
 
         $registoDTE->update([
-            // 'codigo_generacion' => $codigoGeneracionDTE,
             'dte' => json_encode($dte),
             'estado' => true,
         ]);
@@ -219,7 +215,6 @@ class DteApiMHService
         } catch (Exception $e) {
 
             // CREAR LOG DE ERROR DE DTE
-
             LogDTE::create([
                 'empresa_id' => $empresa->id,
                 'id_cliente' => $registoDTE->id_cliente,
