@@ -79,7 +79,6 @@ class DteNotasController extends Controller
 
         $documentoRelacionado = null;
         $ventaTercero = null;
-        $cuerpoDocumento = CCFDTE::getCuerpoDocumento($dte['cuerpoDocumento']);
 
         $resumen = null;
         $extension = null;

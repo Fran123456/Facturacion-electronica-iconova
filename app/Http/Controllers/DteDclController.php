@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Help\DteCodeValidator;
+use App\Help\DTEHelper\DCLDTE;
 use App\Help\DTEIdentificacion\Identificacion;
 use App\Help\DTEIdentificacion\Receptor;
 use App\help\Help;
 use App\Help\LoginMH;
+use App\Help\Services\DteApiMHService;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -38,26 +40,33 @@ class DteDclController extends Controller
         $statusCode = '';
 
         // Variables de Identificación
-        // $identificacion = Identificacion::identidad($tipoDTE, 3);
         $contingencia = isset($json['contingencia']) ? $json['contingencia'] : null;
         $identificacion = Identificacion::identidad($tipoDTE, 3, $contingencia);
 
         // Variables de Emisor y Receptor
-        $emisor = $dte['emisor'] ?? Identificacion::emisor('03', '20', null);
-            // $receptor = Identificacion::receptorCCF($dte['receptor']);
-        // [$faltan, $receptor] = Receptor::generar($dte['receptor'], $tipoDTE);
+        $emisor = $dte['emisor'] ?? Identificacion::emisor($tipoDTE, '20', null);
         [$faltan, $receptor] = Receptor::generar($dte['receptor'], $tipoDTE);
 
         if ( $faltan )
             return response()->json($receptor, 404);
 
+        $cuerpoDocumento = $dte['cuerpoDocumento'];
 
-        // return response()->json([
-        //     "identificacion" => $identificacion,
-        //     "emisor" => $emisor,
-        //     "receptor" => $receptor,
-        //     "contingencia" => $contingencia
-        // ], 200);
+        $extension = $json['extension'] ?? null;
+        $apendice = $json['apendice'] ?? null;
+
+        $newDTE = compact(
+            'identificacion',
+            'emisor',
+            'receptor',
+            'cuerpoDocumento',
+            'extension',
+            'apendice'
+        );
+
+        [$responseData, $statusCode] = DteApiMHService::envidarDTE($newDTE, $idCliente, $identificacion);
+
+        return response()->json($responseData, $statusCode);
 
     }
 }

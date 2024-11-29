@@ -26,7 +26,6 @@ class FEXDTE
             $unidad = '99';
             if (isset($value['uniMedida'])) {
                 $unidad = $value['uniMedida'];
-            } else {
             }
 
             $ar = array(
@@ -48,7 +47,6 @@ class FEXDTE
     }
 
 
-    // TODO: calculate cuerpoDocumento
     public static function getCuerpoDocumento($items)
     {
         if ($items == null)
@@ -161,7 +159,7 @@ class FEXDTE
 
         $inco = null;
         if ( is_null($incoterms) ||  empty ($incoterms) )
-        $inco = MHIncoterms::where('codigo', $incoterms)->first();
+            $inco = MHIncoterms::where('codigo', $incoterms)->first();
 
         $montoTotalOperacion = $totalGravadas + $totalNoGravado + $impuestos;
 

@@ -30,7 +30,6 @@ class NOTACREDITODTE
     }
 
     public static function resumen($cuerpo, $tipoCliente, $pagoTributos){
-        $resumen = [];
 
         // VARIABLES PARA GUARDAR CALCULOS APARTIR DE LOS ITEMS DEL CUERPO DEL DOCUMENTO
         $totalExenta = 0.0;
@@ -56,7 +55,6 @@ class NOTACREDITODTE
 
         foreach ($cuerpo as $key => $value) {
             $ventaGravada = $value['ventaGravada'];
-            $impuestoTotalItem = 0.0;
 
             $totalNoSuj += $value['ventaNoSuj'];
             $totalExenta += $value['ventaExenta'];
@@ -79,7 +77,6 @@ class NOTACREDITODTE
 
                 foreach ($pagoTributo as $keyObjec => $valorObjec) {
                     $totalImpuestos += $valorObjec;
-                    $impuestoTotalItem += $valorObjec;
 
                     // Buscar si el tributo ya existe en el array
                     $clave = array_search($keyObjec, array_column($tributos, 'codigo'));
@@ -107,7 +104,7 @@ class NOTACREDITODTE
         $numero_en_letras = Generator::generateStringFromNumber($montoTotalOperacion);
 
 
-        $resumen = [
+        return [
             'totalNoSuj' => $totalNoSuj,
             'totalExenta' => $totalExenta,
             'totalGravada' => $totalGravada,
@@ -130,7 +127,6 @@ class NOTACREDITODTE
             'condicionOperacion' => 1,
         ];
 
-        return $resumen;
     }
 
     public static function documentosRelacionados($relacionados){

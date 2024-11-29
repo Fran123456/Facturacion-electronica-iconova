@@ -63,13 +63,11 @@ class FACTDTE
         foreach ($cuerpo as $key => $value) {
 
             $ventaGravada = $value['ventaGravada'];
-            $impuestoTotalItem = 0.0;
 
             $totalGravada += $ventaGravada;
 
             $ivaRetenidoItem = 0;
             // Calcular el valor de venta sin descuento
-            $ventaSinDescuento = round(($value['precioUni'] * $value['cantidad']), 2);
 
             // Calcular el IVA retenido si aplica
             // if ($idTipoCliente == 3 && $ventaSinDescuento >= 100) {
@@ -82,9 +80,9 @@ class FACTDTE
             $totalNoGravado += $value['noGravado'];
             $totalDescu += $value['montoDescu'];
 
-            $NoSuj = $value['ventaNoSuj'];
-            $Exenta = $value['ventaExenta'];
-            $NoGravado = $value['noGravado'];
+            // $NoSuj = $value['ventaNoSuj']
+            // $Exenta = $value['ventaExenta'];
+            // $NoGravado = $value['noGravado'];
 
             $subTotal += $ventaGravada - $ivaRetenidoItem;
 
@@ -96,7 +94,6 @@ class FACTDTE
 
                 foreach ($pagoTributo as $keyObjec => $valorObjec) {
                     $totalImpuestos += $valorObjec;
-                    $impuestoTotalItem += $valorObjec;
 
                     // Buscar si el tributo ya existe en el array
                     $clave = array_search($keyObjec, array_column($tributos, 'codigo'));
