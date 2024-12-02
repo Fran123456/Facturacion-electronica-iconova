@@ -41,7 +41,7 @@ class Identificacion
 
         if ($tipoDoc == "11")
             $identificacion['motivoContigencia'] =  isset($contingencia["motivoContigencia"]) ? $contingencia["motivoContigencia"] : null;
-        else
+        elseif ($tipoDoc != "08")
             $identificacion['motivoContin'] = isset($contingencia["motivoContin"]) ? $contingencia["motivoContin"] : null;
 
         return $identificacion;
@@ -84,14 +84,16 @@ class Identificacion
             $emisor["regimen"] =  $regimen ?? null;
         }
 
-        if ($tipoDoc !== '05' && $tipoDoc !== '07' && $tipoDoc !== '06') { //PARA FACTURA DIFERENTE DE EXPORTACION
+        $excepciones1 = ["05", "07", "06", "09"];
+        if (!in_array($tipoDoc, $excepciones1)) { //PARA FACTURA DIFERENTE DE EXPORTACION
             $emisor["codEstableMH"] = $empresa->codigo_establecimiento;
             $emisor["codEstable"] =  null;
             $emisor["codPuntoVenta"] =  null;
             $emisor["codPuntoVentaMH"] =  $puntoDeVentaCodigo ?? $empresa->codigo_establecimiento;
         }
 
-        if ($tipoDoc == '07') {
+        $grupo1 = ["07", "09"];
+        if (in_array($tipoDoc, $grupo1)) {
 
             $emisor["codigoMH"] = $empresa->codigo_establecimiento;
             $emisor["codigo"] =  null;

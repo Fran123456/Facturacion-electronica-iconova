@@ -32,7 +32,7 @@ class DteDclController extends Controller
         // VARAIBLES DE CONFIGURACION DEL DTE
         $dte = $json['dteJson'];
         $cliente = Help::getClienteId($dte['receptor']['nit']);
-        $tipoDTE = '03';
+        $tipoDTE = '09';
         $idCliente = $cliente['id'];
 
         // VARIABLES DE RESPUESTA DEL SERVICIO
@@ -50,7 +50,7 @@ class DteDclController extends Controller
         if ( $faltan )
             return response()->json($receptor, 404);
 
-        $cuerpoDocumento = $dte['cuerpoDocumento'];
+        $cuerpoDocumento = DCLDTE::getCuerpo($dte['cuerpoDocumento']);
 
         $extension = $json['extension'] ?? null;
         $apendice = $json['apendice'] ?? null;
@@ -63,6 +63,8 @@ class DteDclController extends Controller
             'extension',
             'apendice'
         );
+
+        return response()->json($newDTE);
 
         [$responseData, $statusCode] = DteApiMHService::envidarDTE($newDTE, $idCliente, $identificacion);
 

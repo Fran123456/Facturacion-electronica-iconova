@@ -29,11 +29,11 @@ class NRDTE
         $totalDescu = 0.0;
         $montoTotalOperacion = 0.0;
         $subTotal = 0.0;
-        $ivaPerci = 0.0;
         $tributos = [];
         $descuNoSuj = 0.0;
         $descuExenta = 0.0;
         $descuGravada = 0.0;
+        $porcentajeDescuento = 0.0;
 
         // VARIABLES DE PROCESO PARA GUARDAR VALORES A USAR AFUERA DEL CICLO FOREACH
         $totalImpuestos = 0.0;
@@ -56,7 +56,6 @@ class NRDTE
                 $ivaItem = $value['iva'];
 
                 $totalImpuestos += $ivaItem;
-                $ivaPerci += $ivaItem;
 
                 if ($clave !== false) {
                     // Si el tributo ya existe, actualizar su valor
@@ -75,10 +74,9 @@ class NRDTE
 
         $subTotal = floor($subTotal * 100) / 100;
         $subTotalVentas = $subTotal;
-        $montoTotalOperacion = floor(($subTotal + $totalImpuestos + $ivaPerci- $totalDescu) * 100) / 100;
+        $montoTotalOperacion = floor(($subTotal + $totalImpuestos + $totalNoSuj + $totalExenta - $totalDescu) * 100) / 100;
 
         $totalLetras = 'USD ' . Generator::generateStringFromNumber($montoTotalOperacion);
-
 
         return compact(
             'totalNoSuj',

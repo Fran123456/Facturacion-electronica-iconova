@@ -1,17 +1,19 @@
 <?php
 namespace App\Help\DTEHelper;
 
+use App\Help\Generator;
+
 class DCLDTE {
 
-    public static function getCuerpo($items): ?array
+    public static function getCuerpo($item): ?array
     {
-        if ($items == null) return null;
+        if ($item == null) return null;
 
-        foreach ($items as $key => $item) {
-            $item[$key]["numItem"] = $key + 1;
-        }
 
-        return $items;
+        $total = $item['subTotal'];
+        $item['totalLetras'] = 'USD ' . Generator::generateStringFromNumber($total);
+        
+        return $item;
     }
 
 }

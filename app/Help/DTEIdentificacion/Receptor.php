@@ -211,18 +211,19 @@ class Receptor
             $receptor["tipoDocumento"] = $complemento["tipoDocumento"];
             $receptor["numDocumento"] = ($complemento["tipoDocumento"] == "36")
                 ? $cliente->nit
-                : (($complemento["tipoDocumento"] == "13") ? $cliente->dui : $complemento["numDocumento"]);
+                : (($complemento["tipoDocumento"] == "13") ? $cliente->dui 
+                : $complemento["numDocumento"]);
         }
         
-        if($tipoDTE == "01"){
+        if($tipoDTE == "01" || $tipoDTE == "04"){
             $receptor["numDocumento"] = $complemento["numDocumento"];
         }
 
         // Campos para DCL
         if ($tipoDTE == "09") {
-            $receptor["tipoEstablecimiento"] = $complemento["tipoEstablecimiento"];
-            $receptor["codigoMH"] = $complemento["codigoMH"];
-            $receptor["puntoVentaMH"] = $complemento["puntoVentaMH"];
+            $receptor["tipoEstablecimiento"] = $complemento["tipoEstablecimiento"] ?? "01";
+            $receptor["codigoMH"] = $complemento["codigoMH"] ?? null;
+            $receptor["puntoVentaMH"] = $complemento["puntoVentaMH"] ?? null;
         }
 
         // Campos para FEX
@@ -234,7 +235,7 @@ class Receptor
         }
 
         if ($tipoDTE == "04")
-            $receptor["bienTitulo"] = $complemento->bienTitulo;
+            $receptor["bienTitulo"] = $complemento["bienTitulo"];
 
         if ( $tipoDTE == "14" ) {
             $receptor["tipoDocumento"] = $complemento["tipoDocumento"];

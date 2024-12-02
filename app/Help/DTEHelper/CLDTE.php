@@ -45,12 +45,12 @@ class CLDTE
             $subTotal += $ventaGravada;
 
             // Procesar tributos si existen
-            $isIva = $value['iva'] > 0.0;
+            $isIva = $value['ivaItem'] > 0.0;
 
             if ($isIva) {
                 $clave = array_search("20", array_column($tributos, 'codigo'));
 
-                $ivaItem = $value['iva'];
+                $ivaItem = $value['ivaItem'];
 
                 $totalImpuestos += $ivaItem;
                 $ivaPerci += $ivaItem;
@@ -73,7 +73,7 @@ class CLDTE
         $subTotal = floor($subTotal * 100) / 100;
         $subTotalVentas = $subTotal;
         $total = $subTotal;
-        $montoTotalOperacion = floor(($subTotal + $totalImpuestos + $ivaPerci) * 100) / 100;
+        $montoTotalOperacion = floor(($subTotal + $totalImpuestos) * 100) / 100;
 
         $totalLetras = 'USD ' . Generator::generateStringFromNumber($montoTotalOperacion);
 
