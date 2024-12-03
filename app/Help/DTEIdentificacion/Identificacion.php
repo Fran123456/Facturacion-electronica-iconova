@@ -39,9 +39,10 @@ class Identificacion
             $identificacion["tipoContingencia"] = isset($contingencia["tipoContingencia"]) ? $contingencia["tipoContingencia"] : null;
         }
 
+        $grupo2 = ["09", "08", "04"];
         if ($tipoDoc == "11")
             $identificacion['motivoContigencia'] =  isset($contingencia["motivoContigencia"]) ? $contingencia["motivoContigencia"] : null;
-        elseif ($tipoDoc != "08")
+        elseif (!in_array($tipoDoc, $grupo2))
             $identificacion['motivoContin'] = isset($contingencia["motivoContin"]) ? $contingencia["motivoContin"] : null;
 
         return $identificacion;

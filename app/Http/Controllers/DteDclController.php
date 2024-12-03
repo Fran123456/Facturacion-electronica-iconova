@@ -40,8 +40,7 @@ class DteDclController extends Controller
         $statusCode = '';
 
         // Variables de Identificación
-        $contingencia = isset($json['contingencia']) ? $json['contingencia'] : null;
-        $identificacion = Identificacion::identidad($tipoDTE, 3, $contingencia);
+        $identificacion = Identificacion::identidad($tipoDTE, 3);
 
         // Variables de Emisor y Receptor
         $emisor = $dte['emisor'] ?? Identificacion::emisor($tipoDTE, '20', null);

@@ -13,7 +13,8 @@ class NRDTE
         if ($items == null) return null;
 
         foreach ($items as $key => $item) {
-            $item[$key]["numItem"] = $key + 1;
+            $items[$key]["numItem"] = $key + 1;
+            unset($items[$key]['iva']);
         }
 
         return $items;

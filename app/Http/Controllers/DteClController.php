@@ -48,9 +48,9 @@ class DteClController extends Controller
         if ($faltan)
             return response()->json($receptor, 404);
 
-        $cuerpoDocumento = $dte['cuerpoDocumento'];
+        $cuerpoDocumento = CLDTE::getCuerpo($dte['cuerpoDocumento']);
 
-        $resumen = CLDTE::getResumen($cuerpoDocumento);
+        $resumen = CLDTE::getResumen($dte['cuerpoDocumento']);
 
         // Variables de Extensión y Apéndice
         $extension = isset($json['extension']) ? $json['extension'] : null;

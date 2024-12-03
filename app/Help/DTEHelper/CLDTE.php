@@ -7,13 +7,11 @@ use App\help\Help;
 
 class CLDTE
 {
-    public static function getCuerpo($items): ?array
+    public static function getCuerpo($items)
     {
 
-        if ($items == null) return null;
-
         foreach ($items as $key => $item) {
-            $item[$key]["numItem"] = $key + 1;
+            $items[$key]["numItem"] = $key + 1;
         }
 
         return $items;

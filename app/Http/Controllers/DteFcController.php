@@ -47,7 +47,7 @@ class DteFcController extends Controller
         // Variables de Emisor y Receptor
         $emisor = $dte['emisor'] ?? Identificacion::emisor($tipoDTE, '20', null);
 
-        [$faltan, $receptor] = Receptor::generar($dte['receptor'], $tipoDTE);
+        [$faltan, $receptor] = Receptor::generar($dte['receptor'] ?? null, $tipoDTE);
 
         if ( $faltan )
             return response()->json($receptor, 404);

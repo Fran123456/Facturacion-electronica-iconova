@@ -10,6 +10,10 @@ class Receptor
     public static function generar($receptorDte, $tipoDte)
     {
 
+        // @ TIPO DE DTE 01 FACTURA PUEDE NO LLEVAR RECEPTOR
+        if ( $tipoDte == "01" && $receptorDte == null )
+            return [false, null];
+
         $nit = $receptorDte['nit']??null;
         $cliente = Cliente::where('nit', $nit)->first();
 
@@ -157,23 +161,23 @@ class Receptor
             "codActividad"
         ];
 
-        foreach ($base as $key => $item) {
+        foreach ($base as $item) {
             if (!isset($receptor[$item])) {
                 $long = count($faltantes) + 1;
-                $faltantes["campo" . $long] =  "campo " . $item . " es requerido";
+                $faltantes["campo" . $long] =  "campo { $item } es requerido";
             }
         }
 
-        foreach ($direccion as $key => $item) {
+        foreach ($direccion as $item) {
             if (!isset($receptor['direccion'][$item])) {
                 $long = count($faltantes) + 1;
-                $faltantes["campo" . $long] =  "campo " . $item . " en direccion es requerido";
+                $faltantes["campo" . $long] =  "campo { $item } en direccion es requerido";
             }
         }
 
         if (!in_array($tipoDTE, $excepciones)) {
 
-            foreach ($grupo as $key => $item) {
+            foreach ($grupo as $item) {
                 if (!isset($receptor[$item])) {
                     $long = count($faltantes) + 1;
                     $faltantes["campo" . $long] =  "campo " . $item . " es requerido";
@@ -183,7 +187,8 @@ class Receptor
 
         $faltan = false;
 
-        if (count($faltantes) > 0)
+        // if (count($faltantes) > 0)
+        if (!empty($faltantes))
             $faltan = true;
 
         return [$faltan, $faltantes];
@@ -211,7 +216,7 @@ class Receptor
             $receptor["tipoDocumento"] = $complemento["tipoDocumento"];
             $receptor["numDocumento"] = ($complemento["tipoDocumento"] == "36")
                 ? $cliente->nit
-                : (($complemento["tipoDocumento"] == "13") ? $cliente->dui 
+                : (($complemento["tipoDocumento"] == "13") ? $cliente->dui
                 : $complemento["numDocumento"]);
         }
         
