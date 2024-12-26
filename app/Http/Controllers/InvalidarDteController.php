@@ -28,9 +28,10 @@ class InvalidarDteController extends Controller
         $motivo = $dteRequest['motivo'];
 
         $documento['codigoGeneracionR'] = null;
+     
 
         $dte = compact("identificacion", "emisor", "documento", "motivo");
-
+return InvalidarDte::invalidar($dte);
         [$responseData, $statusCode] =  InvalidarDte::invalidar($dte);
 
         return response()->json([

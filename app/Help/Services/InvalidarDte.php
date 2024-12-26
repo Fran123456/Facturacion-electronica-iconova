@@ -22,8 +22,10 @@ class InvalidarDte
         $codigoGeneracion = $dte['documento']['codigoGeneracion'];
         $registroDte = RegistroDTE::where('codigo_generacion', $codigoGeneracion)->first();
 
-        $documento = $dte['documento'];
+        $documento = $dte['documento']; 
+        $dteNum = $documento['numeroControl'];
         $identificacion = $dte['identificacion'];
+   
 
         $tipoDTE = $documento['tipoDte'];
         $fechaEmision = $identificacion['fecAnula'];
@@ -37,7 +39,7 @@ class InvalidarDte
         try {
             $DTESigned = FirmadorElectronico::firmador($dte);
 
-            $ambiente = "00";
+            $ambiente = Help::getEmpresa()?->ambiente;
             $idEnvio = 1;
             $version = 2;
             $documento = $DTESigned['msg'];
@@ -67,6 +69,7 @@ class InvalidarDte
                 'dte' => json_encode($dte),
             ]);
             $registroDte->invalidacion_id = $dteInvalidado->id;
+            $registroDte->save();
 
         } catch (Exception $e) {
             LogDTE::create([
@@ -77,11 +80,10 @@ class InvalidarDte
                 'fecha' => $fechaEmision,
                 'hora' => $horaEmision,
                 'error' => $e->getMessage(),
+                'numero_dte'=> $dteNum,
                 'estado' => false,
             ])->save();
-        } finally {
-            $registroDte->save();
-        }
+        } 
 
         return [$responseData, $statusCode];
     }
