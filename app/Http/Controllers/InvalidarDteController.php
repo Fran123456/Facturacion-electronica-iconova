@@ -31,7 +31,7 @@ class InvalidarDteController extends Controller
      
 
         $dte = compact("identificacion", "emisor", "documento", "motivo");
-return InvalidarDte::invalidar($dte);
+         InvalidarDte::invalidar($dte);
         [$responseData, $statusCode] =  InvalidarDte::invalidar($dte);
 
         return response()->json([

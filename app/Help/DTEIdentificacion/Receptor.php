@@ -96,9 +96,9 @@ class Receptor
     {
         $campos = [
             'tipo_documento' => 'tipo_documento',
-            'nit' => 'nit',
-            'nrc' => 'nrc',
-            'dui' => 'dui',
+           // 'nit' => 'nit',
+           // 'nrc' => 'nrc',
+           // 'dui' => 'dui',
             'nombre' => 'nombre',
             'codigo_actividad' => 'codActividad',
             'descripcion_actividad' => 'descActividad',

@@ -16,7 +16,7 @@ class NOTACREDITODTE
         ];
     }
 
-    public static function cuerpo($cuerpo){
+    /*public static function cuerpo($cuerpo){
 
         if ($cuerpo == null)
             return null;
@@ -26,6 +26,26 @@ class NOTACREDITODTE
             $cuerpo[$key]['numItem'] = $key + 1;
         }
 
+        return $cuerpo;
+    }*/
+    public static function cuerpo($cuerpo){
+        if ($cuerpo == null) {
+            return null;
+        }
+    
+        // Iterar y agregar número de item y campo 'tributos'
+        foreach ($cuerpo as $key => $item) {
+            // Agregar número de item
+            $cuerpo[$key]['numItem'] = $key + 1;
+    
+            // Revisar el valor de 'iva' y asignar 'tributos'
+            if (isset($item['iva']) && $item['iva'] > 0) {
+                $cuerpo[$key]['tributos'] = ["20"];
+            } else {
+                $cuerpo[$key]['tributos'] = null;
+            }
+        }
+    
         return $cuerpo;
     }
 
@@ -66,13 +86,23 @@ class NOTACREDITODTE
             $ventaSinDescuento = round(($value['precioUni'] * $value['cantidad']), 2);
 
             // Calcular el IVA retenido si aplica
-            if ($tipoCliente == 3 && $ventaSinDescuento >= 100) {
+          /*  if ($tipoCliente == 3 && $ventaSinDescuento >= 100) {
                 $ivaRetenidoItem = round($ventaSinDescuento * 0.01, 2);
                 $ivaRetenida += $ivaRetenidoItem;
-            }
+            }*/
+            $ivaRetenida =$ivaRetenida+ $value['ivaRetenida'];
 
+            if($value['iva']>0){
+                $tributos[] = [
+                    'codigo' => "20",
+                    'descripcion' => Help::getTributo("20"),
+                    'valor' => $value['iva']
+                ];
+                $totalImpuestos = $value['iva']+$totalImpuestos;
+            }
+            
             // Procesar tributos si existen
-            if ($pagoTributos != null) {
+            /*if ($pagoTributos != null) {
                 $pagoTributo = $pagoTributos[$key];
 
                 foreach ($pagoTributo as $keyObjec => $valorObjec) {
@@ -94,7 +124,8 @@ class NOTACREDITODTE
                         'valor' => round($valorObjec, 2)
                     ];
                 }
-            }
+            }*/
+            
 
         }
 

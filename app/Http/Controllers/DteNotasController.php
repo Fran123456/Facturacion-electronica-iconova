@@ -53,17 +53,20 @@ class DteNotasController extends Controller
             return response()->json(["error" => "DTE no válido o nulo"], Response::HTTP_BAD_REQUEST);
         }
 
-        if ( ( isset($json['pagoTributos'] ) || $json['pagoTributos']  != null)
+      /*  if ( ( isset($json['pagoTributos'] ) || $json['pagoTributos']  != null)
             && count($json['pagoTributos']) != count($json['dteJson']['cuerpoDocumento']) )
             return request()->json(401, [
                 "msg" => "El campo pagoTributos tiene que tener la misma longitud que cuerpoDocumento"
             ]);
-
+*/
+        
+   
         $dte = $json['dteJson']; //OBTENER EL DTE
 
         $pagoTributos = $json['pagoTributos'] ?? null;
 
-        $cliente = Help::getClienteId($dte['receptor']['nit']);
+        //$cliente = Help::getClienteId($dte['receptor']['nit']??$dte['receptor']['dui']);
+        $cliente =Help::ValidarCliente($dte['receptor']['nit']??$dte['receptor']['dui'], $dte['receptor']);
         $idCliente = $cliente['id'];
         $newDTE = [];
         $tipoDTE = '05';
@@ -87,10 +90,17 @@ class DteNotasController extends Controller
         $documentoRelacionado = NOTACREDITODTE::documentosRelacionados($dte['documentoRelacionado']);
         $ventaTercero = $dte['ventaTercero'] ?? null;
         $cuerpoDocumento =  NOTACREDITODTE::cuerpo($dte['cuerpoDocumento']);
+        
         $resumen = NOTACREDITODTE::resumen($cuerpoDocumento, $cliente['tipoCliente'], $pagoTributos);
         $extension = $dte['extension'];
         $apendice = $dte['apendice'] ?? null;
 
+        foreach ($cuerpoDocumento as $key => $value) {
+            unset($cuerpoDocumento[$key]['ivaRetenida']);
+            unset($cuerpoDocumento[$key]['iva']);
+        }
+        
+      
         $newDTE = [
             "identificacion" => $identificacion,
             "documentoRelacionado" => $documentoRelacionado,
@@ -102,9 +112,10 @@ class DteNotasController extends Controller
             "extension" => $extension,
             "apendice" => $apendice,
         ];
+      
 
         [$responseData, $statusCode] = DteApiMHService::envidarDTE($newDTE, $idCliente, $identificacion);
 
-        return response()->json($responseData, $statusCode);
+       return response()->json($responseData, $statusCode);
     }
 }
