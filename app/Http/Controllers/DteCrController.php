@@ -66,7 +66,7 @@ class DteCrController extends Controller
             "extension" => $extension,
             "apendice" => $apendice,
         ];
-
+        
         [$responseData, $statusCode] = DteApiMHService::envidarDTE($newDTE, $idCliente, $identificacion);
         
         return response()->json($responseData, $statusCode);

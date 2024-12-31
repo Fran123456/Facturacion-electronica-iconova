@@ -239,7 +239,7 @@ class Receptor
             $receptor["tipoPersona"] = $complemento["tipoPersona"] ;
         }
 
-        if ($tipoDTE == "04")
+       if ($tipoDTE == "04")
             $receptor["bienTitulo"] = $complemento["bienTitulo"];
 
         if ( $tipoDTE == "14" ) {
