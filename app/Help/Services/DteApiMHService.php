@@ -128,6 +128,8 @@ class DteApiMHService
         $responseData = "";
         $statusCode = 0;
 
+     
+
         $codigoGeneracionDTE = $identificacion['numeroControl'];
         $tipoDTE = $identificacion['tipoDte'];
         $fechaEmision = $identificacion['fecEmi'];
@@ -327,6 +329,9 @@ class DteApiMHService
             $registoDTE['sello'] = $responseData['selloRecibido'];
             $registoDTE['numero_dte'] = $responseData['codigoGeneracion'];
 
+            
+            //oCursor.responsedata.codigogeneracion
+
             $fechaCompleta = $responseData['fhProcesamiento'];
 
             // Convierte la cadena en un objeto DateTime
@@ -341,6 +346,12 @@ class DteApiMHService
             $registoDTE['observaciones'] = json_encode(self::observaciones($responseData['observaciones']));
 
 
+            // Guardando la firma electronica de MH
+            // add LPSoftware
+
+            //$registoDTE['dte_mh'] = $requestResponse; 
+            $registoDTE['dte_mh'] = $DTESigned;
+          
             if ($statusCode >= 400) {
                 $responseData = self::handleErrorResponse($statusCode, $responseData);
                 throw new Exception("Error $statusCode: " . json_encode($responseData));

@@ -7,11 +7,54 @@ use App\Models\Config;
 use App\Models\Empresa;
 use App\Models\MH\MHFormaPago;
 use App\Models\MH\MHTributo;
+use App\Models\RegistroDTE;
+use App\Models\MH\MH_tipo_documento;
 use Exception;
 use Illuminate\Support\Facades\Auth;
+use app\Models\MH\MHActividadEconomica;
 
 class Help
 {
+
+    public static function pdfActividadEconomicadatos($codigo_act)
+    {
+        $datos_actividad_economica = MHActividadEconomica::where('codigo', $codigo_act)->first();
+
+        if ($datos_actividad_economica->id)
+            return $datos_actividad_economica;
+            //return $datos_dte->sello;
+
+
+
+        return 'CODIGO DE ACTIVIDAD NO EXISTE';
+    }
+
+    public static function pdfDTEdatos($codigo_dte)
+    {
+        $datos_dte = RegistroDTE::where('numero_dte', $codigo_dte)->first();
+
+        if(isset($datos_dte->sello))
+        {
+            return $datos_dte;
+        }
+
+        return 'DTE NO EXISTE O NO HA SIDO SELLADO';
+    }
+
+    public static function getDatosDocumento($codigo_documento)
+    {
+        $datos_documento = MH_tipo_documento::where('codigo', $codigo_documento)->first();
+
+        if ($datos_documento->codigo)
+            return $datos_documento;
+            //return $datos_documento->codigo;
+
+
+
+        return 'TIPO DOCUMENTO NO EXISTE';
+    }
+
+
 
     public static function mhProduccion()
     {

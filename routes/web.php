@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\MainController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -13,6 +13,17 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+
+/*
 Route::get('/', function () {
-    return view('welcome');
+   // return view('welcome');
+   return view('main');
 });
+*/
+
+/* llamado vista desde el controlador */
+Route::get('/Menu', [MainController::class, 'index']);
+
+Route::get('/pdfdte', [App\Http\Controllers\pdfDTEController::class, 'document']);
+
+Route::get('/pdfdte2', [App\Http\Controllers\pdfDTE2Controller::class, 'document']);

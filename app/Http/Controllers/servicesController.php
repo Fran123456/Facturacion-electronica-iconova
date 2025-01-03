@@ -63,6 +63,8 @@ class ServicesController extends Controller
         $responseData = $response->json(); // Obtener los datos de la respuesta en formato JSON
         $statusCode = $response->status(); // Obtener el código de estado de la respuesta
 
+
+      
         if(isset($request['firmanteAutomatico']))
         {
             return array("msg"=>$responseData['body'] , "status"=>$statusCode );
@@ -90,7 +92,8 @@ class ServicesController extends Controller
         $url = Help::mhUrl();
         $nit = Crypt::decryptString($empresa->nit);
         $pwd = Crypt::decryptString($empresa->credenciales_api);
-        return $pwd;
+
+        
 
         $jsonRequest = [
             "user" => $nit,
