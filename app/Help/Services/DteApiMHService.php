@@ -10,10 +10,117 @@ use App\Help\FirmadorElectronico;
 use App\Models\LogDTE;
 use App\Models\RegistroDTE;
 use DateTime;
-
-
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 class DteApiMHService
 {
+
+   
+
+    public static function FirmadorOffline($dte, $idCliente, $identificacion){
+        DB::beginTransaction();
+        $url = Help::mhUrl();
+        $empresa = Help::getEmpresa();
+        $responseData = "";
+        $statusCode = 0;
+
+        $codigoGeneracionDTE = $identificacion['numeroControl'];
+        $tipoDTE = $identificacion['tipoDte'];
+        $fechaEmision = $identificacion['fecEmi'];
+        $horaEmision = $identificacion['horEmi'];
+        $version = $identificacion['version'];
+
+         // CREACION DEL REGISTRO DEL DTE PARA RESPALDO EN LA DB
+         $registoDTE = RegistroDTE::create([
+            'empresa_id' => $empresa->id,
+            'id_cliente' => $idCliente,
+            'codigo_generacion' => $identificacion['codigoGeneracion'] ,
+            "numero_dte"=>$identificacion['numeroControl'],
+            'tipo_documento' => $tipoDTE,
+            'dte' => json_encode($dte),
+            'estado' => false,
+        ]);
+        DB::commit();
+        $responseData = "Error desconocido, se intento guardar de modo offline pero no se pudo firmar correctamente";
+        $statusCode = 400;
+        return [$responseData, $statusCode];
+
+    }
+
+    public static function EnviarOfflineMH($dte, $idCliente, $identificacion){
+        DB::beginTransaction();
+        $url = Help::mhUrl();
+        $empresa = Help::getEmpresa();
+        $responseData = "";
+        $statusCode = 0;
+
+        $codigoGeneracionDTE = $identificacion['numeroControl'];
+        $tipoDTE = $identificacion['tipoDte'];
+        $fechaEmision = $identificacion['fecEmi'];
+        $horaEmision = $identificacion['horEmi'];
+        $version = $identificacion['version'];
+
+         // CREACION DEL REGISTRO DEL DTE PARA RESPALDO EN LA DB
+         $registoDTE = RegistroDTE::create([
+            'empresa_id' => $empresa->id,
+            'id_cliente' => $idCliente,
+            'codigo_generacion' => $identificacion['codigoGeneracion'] ,
+            "numero_dte"=>$identificacion['numeroControl'],
+            'tipo_documento' => $tipoDTE,
+            'dte' => json_encode($dte),
+            'estado' => true,
+        ]);
+
+
+       
+        $registoDTE->estado = false;
+        //Generar un Log por mala conexión a MH
+
+
+        try {
+
+            $DTESigned = FirmadorElectronico::firmador($dte);
+
+            $registoDTE['dte_firmado'] =  $DTESigned ;
+            if ($DTESigned['status'] > 201) {
+                self::FirmadorOffline($dte, $idCliente, $identificacion);
+                return;
+            }
+            $registoDTE->save();
+
+            DB::commit();
+            $responseData = "Se ha guardo pero sin envio exitoso a MH";
+            $statusCode = 400;
+            return [$responseData, $statusCode];
+        } catch (Exception $e) {
+            // CREAR LOG DE ERROR DE DTE
+            LogDTE::create([
+                'empresa_id' => $empresa->id,
+                'id_cliente' => $idCliente,
+                'numero_dte' => $codigoGeneracionDTE,
+                'codigo_generacion'=> $identificacion['codigoGeneracion'],
+                'tipo_documento' => $tipoDTE,
+                'fecha' => $fechaEmision,
+                'hora' => $horaEmision,
+                'error' => $e->getMessage(),
+                'estado' => false,
+            ])->save();
+
+            $registoDTE->estado = false;
+            DB::commit();
+            $responseData = "Error desconocido, se intento guardar de modo offline pero ha generado error";
+            $statusCode = 400;
+            return [$responseData, $statusCode];
+
+        } finally {
+
+            $registoDTE->save();
+            DB::commit();
+        }
+
+    }
+
+
     public static function envidarDTE($dte, $idCliente, $identificacion)
     {
         $url = Help::mhUrl();
@@ -55,7 +162,7 @@ class DteApiMHService
                 'tipoDte' => $tipoDTE,
                 'documento' => $DTESigned['msg'],
                 'codigoGeneracion' => $identificacion['codigoGeneracion'],
-                'nitEmisor' => "06141802161055"
+                'nitEmisor' => Crypt::decryptString($empresa->nit)
             ];
 
             $requestResponse = Http::withHeaders([
@@ -113,6 +220,32 @@ class DteApiMHService
 
         return [$responseData, $statusCode];
     }
+
+    public static function contingencia(){
+        $url = Help::mhUrl();
+        $empresa = Help::getEmpresa();
+        $responseData = "";
+        $statusCode = 0;
+
+        $jsonRequest = [
+            'ambiente' => $empresa->ambiente,
+            'nitEmisor' => Crypt::decryptString($empresa->nit),
+            'documento' => "",
+        
+            
+        ];
+
+        $requestResponse = Http::withHeaders([
+            'Authorization' => $empresa->token_mh,
+            'User-Agent' => 'ApiLaravel/1.0',
+            'Content-Type' => 'application/JSON'
+        ])->post($url . "fesv/recepciondte", $jsonRequest);
+
+        $responseData = $requestResponse->json();
+        $statusCode = $requestResponse->status();
+    }
+
+
 
     private static function handleErrorResponse($statusCode, $responseData)
     {

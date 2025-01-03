@@ -21,6 +21,8 @@ use App\Http\Controllers\InvalidarDteController;
 use App\Http\Controllers\PruebasController;
 use App\Http\Controllers\ReceptorController;
 use App\Http\Controllers\TestController;
+use App\Http\Controllers\ContingenciaController;
+
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
@@ -74,6 +76,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/mh/enviar/dte/unitario/fse', [DteFseController::class, 'unitario']);
         Route::post('/mh/enviar/dte/unitario/nd', [DteNdController::class, 'unitario']);
         Route::post('/mh/enviar/dte/unitario/cl', [DteClController::class, 'unitario']);
+
+       
+        Route::post('/mh/enviar/contingencia', [ ContingenciaController::class, 'sendContingencia']);
         
         // TODO: por completar
         Route::post('/mh/enviar/dte/unitario/cd', [DteCdController::class, 'unitario']); //! No es requerido hacerlo

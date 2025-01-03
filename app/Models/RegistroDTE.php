@@ -26,7 +26,7 @@ class RegistroDTE extends Model
         'estado',
         'empresa_id',
         'response',
-        'dte_firmado'
+        'dte_firmado','anexo'
     ];
 
     public function cliente(){

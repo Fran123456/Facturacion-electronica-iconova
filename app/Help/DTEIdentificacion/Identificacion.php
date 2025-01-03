@@ -9,6 +9,23 @@ use App\Help\Help;
 
 class Identificacion
 {
+
+    public static function identidadContingencia( $version = 3){
+        $empresa = Help::getEmpresa();
+        $fechaHora = new \DateTime();
+        $fecha = $fechaHora->format('Y-m-d');
+        $hora = $fechaHora->format('H:i:s');
+
+        $identificacion = [
+            "version"=> $version,
+            "ambiente"=>$empresa->ambiente,
+            "codigoGeneracion" => Generator::generateCodeGeneration(),
+            "fTransmision"=>$fecha,
+            "hTransmision"=>$hora,
+        ];
+        return $identificacion;
+    }
+
     public static function identidad($tipoDoc, $version = 1, $contingencia = null)
     {
         $empresa = Help::getEmpresa();
@@ -32,7 +49,7 @@ class Identificacion
             "tipoMoneda" => "USD"
         ];
 
-        //^ CCF 03 | CD 15 | CL 08 | CR 07 | DCL 09 | FC 01 | FEX 11 | FSE 14 | NC 05 | NC 06 | NR 04
+        //^ CCF 03 | CD 15 | CL 08 | CR 07 | DCL 09 | FC 01 | FEX 11 | FSE 14 | NC 05 | ND 06 | NR 04
         $grupo1 = ["03", "07", "01", "11", "14", "05", "06", "04"];
 
         if (in_array($tipoDoc, $grupo1)) {

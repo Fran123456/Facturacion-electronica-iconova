@@ -32,6 +32,7 @@ use App\Models\LogDTE;
 use App\Models\RegistroDTE;
 use Carbon\Carbon;
 use Illuminate\Http\Client\ConnectionException;
+use App\Help\DTEHelper\Anexo;
 
 
 // ^ COMPROBANTE CREDITO FISCAL
@@ -41,10 +42,6 @@ class DteCCFController extends Controller
     { 
         $empresa = Help::getEmpresa();
         // Login para generar token de Hacienda.
-        $responseLogin = LoginMH::login();
-        if ($responseLogin['code'] != 200) {
-            return response()->json(DteCodeValidator::code404($responseLogin['error']), 404);
-        }
 
         //obtenemos el json desde el request
         $json = $request->json()->all();
@@ -112,7 +109,18 @@ class DteCCFController extends Controller
             'apendice' => $apendice
         ];
 
-        [$responseData, $statusCode] = DteApiMHService::envidarDTE( $newDTE, $idCliente, $identificacion );
+        $responseLogin = LoginMH::login();
+       
+        
+        if ($responseLogin['code'] != 200) {
+          //  return response()->json(DteCodeValidator::code404($responseLogin['error']), 404);
+             [$responseData, $statusCode] = DteApiMHService::EnviarOfflineMH( $newDTE, $idCliente, $identificacion );
+        }else{
+            
+            [$responseData, $statusCode] = DteApiMHService::envidarDTE( $newDTE, $idCliente, $identificacion );
+        }
+
+        
 
         //^ Función para correo electrinico
         $correoEmpresa = Crypt::decryptString($empresa->correo_electronico);
@@ -121,7 +129,7 @@ class DteCCFController extends Controller
         $nombreEmpresa = Crypt::decryptString($empresa->nombre);
          //return WhatsappSender::send();
         $nombreCliente = $receptor['nombre'];
-
+       
 
         $mailInfo = array(
             'responseData'=>$responseData,
@@ -133,9 +141,14 @@ class DteCCFController extends Controller
             'codigoGeneracion'=> $identificacion['codigoGeneracion'],
         );
 
-       /* Mail::to($receptor['correo'])
-        ->send((new DteMail($nombreCliente, $correoEmpresa, $telefono, $mailInfo))
-        ->from($correoEmpresa, $nombreEmpresa));*/
+        try{
+            Mail::to($receptor['correo'])
+            ->send((new DteMail($nombreCliente, $correoEmpresa, $telefono, $mailInfo))
+            ->from($correoEmpresa, $nombreEmpresa));
+        }catch(Exception $e){
+            Anexo::emailError( $identificacion['codigoGeneracion'], $identificacion['numeroControl']);
+
+        }
 
         return response()->json(
             $mailInfo

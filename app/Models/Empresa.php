@@ -38,7 +38,8 @@ class Empresa extends Model
         'correlativo_fse',
         'correlativo_nota_credito',
         'correlativo_nd',
-        'correlativo_nr'
+        'correlativo_nr',
+        'contingencia_interno'
     ];
 
     public function empresa()
