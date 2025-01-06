@@ -65,6 +65,30 @@ class Identificacion
         return $identificacion;
     }
 
+
+    public static function emisorContingencia($responsable, $dui, $establecimientoTipo="01", $codigoEstablecimiento = null, 
+    $codPuntoVenta = null){
+        $empresa = Help::getEmpresa();
+        $nit = Crypt::decryptString($empresa->nit);
+        $nombreEmpresa = Crypt::decryptString($empresa->nombre);
+        $telefono = Crypt::decryptString($empresa->telefono);
+        $correo = Crypt::decryptString($empresa->correo_electronico);
+
+        $emisor = [
+            "nit" => $nit,
+            "nombre" => $nombreEmpresa,
+            "nombreResponsable"=> $responsable,
+            "tipoDocResponsable"=> "13",
+            "numeroDocResponsable"=> $dui,
+            "tipoEstablecimiento"=> $establecimientoTipo,
+            "codEstableMH"=> $codigoEstablecimiento,
+            "codPuntoVenta"=> $codPuntoVenta,
+            "telefono" => $telefono,
+            "correo" => $correo,
+        ];
+        return $emisor;
+    }
+
     public static function emisor($tipoDoc, $tipoEstablecimiento = null, $puntoDeVentaCodigo = null, $recintoFiscal = null, $regimen = null, $tipoItem = 2)
     {
         $empresa = Help::getEmpresa();

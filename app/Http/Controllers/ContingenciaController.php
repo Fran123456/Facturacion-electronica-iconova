@@ -12,11 +12,12 @@ use App\Models\LogDTE;
 use App\Models\RegistroDTE;
 use App\Help\FirmadorElectronico;
 use  App\Help\DTEIdentificacion\Identificacion;
+use App\Help\Services\DteApiMHService;
 
 class ContingenciaController extends Controller
 {
 
-    public function sendContingencia(){
+    public function sendContingencia(Request $request){
         $responseLogin = LoginMH::login();
         $empresa = Help::getEmpresa();
         
@@ -36,24 +37,63 @@ class ContingenciaController extends Controller
             ])->save();
         }else{
 
-            $registro = RegistroDTE::where('estado',false)->orderBy('id', 'desc')->get();
+            $registro = RegistroDTE::where('estado',false)->where('contingencia'  ,null)->orderBy('id', 'desc')->get();
 
 
             //FIRMARLOS
+            $detallesC = array();
             foreach ($registro as $key => $value) {
                 if($value->dte_firmado == null){
                     $json = json_decode($value->dte, true);
                     $value->dte_firmado = FirmadorElectronico::firmador($json );
                     $value->save();
+
                 }
+
+                array_push($detallesC, [
+                    "noItem"=> $key+1,
+                    "codigoGeneracion" => $value->codigo_generacion,
+                    "tipoDoc"=> $value->tipo_documento
+                ]);
             }
            
             //Codigo para contingencia.
             $identificacion = Identificacion::identidadContingencia(3);
-            $emisor =Identificacion::emisor('03', '20', null) ;
+            $emisor =Identificacion::emisorContingencia($request->responsable,$request->duiResponsable) ;
             $motivo = [
-                "fInicio"
+                "fInicio"=> date('Y-m-d'),
+                "fFin"=> date('Y-m-d'),
+                "hInicio"=>date('H:i:s'),
+                "hFin"=> "23:00:00",
+                "tipoContingencia"=> 1,
+                "motivoContingencia"=> "No disponibilidad de sistema del MH"
             ];
+
+            $dte = [
+                "identificacion"=> $identificacion,
+                "emisor"=> $emisor,
+                "detalleDTE"=>  $detallesC,
+                "motivo"=> $motivo
+            ];
+
+            [$responseData, $statusCode] = DteApiMHService::contingencia(  $dte, $identificacion, 'contingencia', $registro );
+
+           
+            
+            $mailInfo = array(
+                'responseData'=>$responseData,
+                'statusCode'=>$statusCode,
+                'dte'=> $dte,
+                'fecEmi'=> $identificacion['fTransmision'],
+                'horEmi'=> $identificacion['hTransmision'],
+                'codigoGeneracion'=> $identificacion['codigoGeneracion'],
+            );
+    
+           
+    
+            return response()->json(
+                $mailInfo
+                , $statusCode);
             
         }
     }

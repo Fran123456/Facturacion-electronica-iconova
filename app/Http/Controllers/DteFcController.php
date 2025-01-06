@@ -18,11 +18,7 @@ class DteFcController extends Controller
 
     public function unitario(Request $request)
     {
-        // Login para generar token de Hacienda.
-        $responseLogin = LoginMH::login();
-        if ($responseLogin['code'] != 200) {
-            return response()->json(DteCodeValidator::code404($responseLogin['error']), 404);
-        }
+        
 
         $json = $request->json()->all();
 
@@ -83,7 +79,17 @@ class DteFcController extends Controller
             'apendice' => $apendice
         ];
 
-        [$responseData, $statusCode] = DteApiMHService::envidarDTE($newDTE, $idCliente, $identificacion);
+
+
+        $responseLogin = LoginMH::login();
+        
+        if ($responseLogin['code'] != 200) {
+          //  return response()->json(DteCodeValidator::code404($responseLogin['error']), 404);
+             [$responseData, $statusCode] = DteApiMHService::EnviarOfflineMH( $newDTE, $idCliente, $identificacion );
+        }else{
+            
+            [$responseData, $statusCode] = DteApiMHService::envidarDTE( $newDTE, $idCliente, $identificacion );
+        }
 
         return response()->json($responseData, $statusCode);
     }
