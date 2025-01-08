@@ -12,6 +12,7 @@ use App\Models\RegistroDTE;
 use DateTime;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 class DteApiMHService
 {
 
@@ -256,7 +257,7 @@ class DteApiMHService
         $responseData = $requestResponse->json();
         $statusCode = $requestResponse->status();
 
-        if($statusCode>200){
+        if($responseData['estado'] == "RECHAZADO"){
             LogDTE::create([
                 'empresa_id' => $empresa->id,
                 'id_cliente' => null,
@@ -278,26 +279,26 @@ class DteApiMHService
             "numero_dte"=>$identificacion['codigoGeneracion'],
             'tipo_documento' => $tipoDTE,
             'dte' => json_encode($dte),
-            'dte_firmado'=> $DTESigned,
+            'dte_firmado'=>  json_encode($DTESigned) ,
             'estado' => false,
-            'fecha_recibido'=> json_encode($responseData['fechaHora']),
+            'fecha_recibido'=>   Carbon::createFromFormat('d/m/Y H:i:s', $responseData['fechaHora'])->format('Y-m-d H:i:s'),
             'response'=>json_encode($responseData), 
-            'observaciones'=> json_encode($responseData['observaciones']) 
+            'observaciones'=> json_encode($responseData['observaciones']) ,
+            'sello'=> $responseData['selloRecibido']
         ]);
 
          LogDTE::where('tipo_documento', 'contingencia')->where('estado', false)->update(
            [ 'estado'=>true, 'updated_at'=> now()]
          );
 
-         if($statusCode==200){
+         if($responseData['estado'] == "RECIBIDO"){
             foreach ($registros as $key => $value) {
-                $value->contingencia = $responseData['selloRecibido'];
+                $value->contingencia = $responseData['selloRecibido'] ;
                 $value->save();
-
             }
 
-            $registoDTE->estado = true;
-            $registoDTE->save();
+           // $registoDTE->estado = true;
+           // $registoDTE->save();
         }
         
         return [$responseData, $statusCode];
@@ -369,8 +370,8 @@ class DteApiMHService
                 'version' => $version,
                 'tipoDte' => $tipoDTE,
                 'documento' => $DTESigned['msg'],
-                'codigoGeneracion' => "341CA743-70F1-4CFE-88BC7E4AE72E60CB",
-                'nitEmisor' => "06141802161055"
+                'codigoGeneracion' => $dte['identificacion']['codigoGeneracion'],
+                'nitEmisor' => Crypt::decryptString($empresa->nit),
             ];
 
             $requestResponse = Http::withHeaders([

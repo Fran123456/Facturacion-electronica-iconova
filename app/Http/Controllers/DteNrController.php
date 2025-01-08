@@ -31,7 +31,8 @@ class DteNrController extends Controller
 
         // VARAIBLES DE CONFIGURACION DEL DTE
         $dte = $json['dteJson'];
-        $cliente = Help::getClienteId($dte['receptor']['numDocumento']);
+       // $cliente = Help::getClienteId($dte['receptor']['numDocumento']);
+        $cliente = Help::ValidarCliente($dte['receptor']['numDocumento'],$dte['receptor']);
         $tipoDTE = '04';
         $idCliente = $cliente['id'];
 
@@ -42,6 +43,7 @@ class DteNrController extends Controller
         // Variables de Identificación
         $contingencia = isset($json['contingencia']) ? $json['contingencia'] : null;
         $identificacion = Identificacion::identidad($tipoDTE, 3, $contingencia);
+       
 
         // Variables de Emisor y Receptor
         $emisor = $dte['emisor'] ?? Identificacion::emisor($tipoDTE, '20', null);
@@ -72,11 +74,10 @@ class DteNrController extends Controller
             'apendice'
         );
 
-        return response()->json($newDTE);
 
         [$responseData, $statusCode] = DteApiMHService::envidarDTE($newDTE, $idCliente, $identificacion);
 
-        return response()->json($responseData, $statusCode);
+        return response()->json( array($responseData, $newDTE), $statusCode);
 
         
 

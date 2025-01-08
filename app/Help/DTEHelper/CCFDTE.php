@@ -113,7 +113,7 @@ class CCFDTE
             'totalNoSuj' => $totalNoSuj,
             'totalExenta' => $totalExenta,
             'totalDescu' => $totalDescu,
-            'totalGravada' => $ventaGravada,
+            'totalGravada' => round($ventaGravada,2),
             'subTotalVentas' => $subTotal,
             'subTotal' => $subTotal,
             'montoTotalOperacion' => $montoTotal,

@@ -15,7 +15,7 @@ class FACTDTE
         foreach ($items as $key => $item) {
 
             // REDONDENANDO VALORES DEFINIDOS POR LE USUARIO
-            $cantidad = intval($item['cantidad']);
+            $cantidad = $item['cantidad'];
             $precio = round($item['precioUni'], 2);
             $montoDescu = round($item['montoDescu'], 2);
 
@@ -125,7 +125,7 @@ class FACTDTE
         }
 
 
-        $totalPagar = round($subTotal + $totalImpuestos + $totalNoGravado - $ivaRetenida,);
+        $totalPagar = round($subTotal + $totalImpuestos + $totalNoGravado - $ivaRetenida,2);
 
         $total_en_letras = Generator::generateStringFromNumber($totalPagar);
 

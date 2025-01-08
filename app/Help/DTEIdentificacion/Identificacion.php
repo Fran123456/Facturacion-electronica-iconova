@@ -50,7 +50,7 @@ class Identificacion
         ];
 
         //^ CCF 03 | CD 15 | CL 08 | CR 07 | DCL 09 | FC 01 | FEX 11 | FSE 14 | NC 05 | ND 06 | NR 04
-        $grupo1 = ["03", "07", "01", "11", "14", "05", "06", "04"];
+        $grupo1 = ["03", "07", "01", "11", "14", "05", "06"];
 
         if (in_array($tipoDoc, $grupo1)) {
             $identificacion["tipoContingencia"] = isset($contingencia["tipoContingencia"]) ? $contingencia["tipoContingencia"] : null;
@@ -62,6 +62,11 @@ class Identificacion
         elseif (!in_array($tipoDoc, $grupo2))
             $identificacion['motivoContin'] = isset($contingencia["motivoContin"]) ? $contingencia["motivoContin"] : null;
 
+
+            if($tipoDoc=="04"){
+                $identificacion['motivoContin'] = isset($contingencia["motivoContin"]) ? $contingencia["motivoContin"] : null;
+                $identificacion["tipoContingencia"] = isset($contingencia["tipoContingencia"]) ? $contingencia["tipoContingencia"] : null;
+            }
         return $identificacion;
     }
 
