@@ -31,7 +31,7 @@ class Help
 
     public static function pdfDTEdatos($codigo_dte)
     {
-        $datos_dte = RegistroDTE::where('numero_dte', $codigo_dte)->first();
+        $datos_dte = RegistroDTE::where('codigo_generacion', $codigo_dte)->first();
 
         if(isset($datos_dte->sello))
         {
@@ -276,14 +276,14 @@ class Help
                 'nrc'=> $clienteF['nrc']??null,
                 'dui'=> $clienteF['dui']??null,
                 'nombre'=> $clienteF['nombre'],
-                'codigo_actividad'=> $clienteF['codActividad'],
-                'descripcion_actividad'=> $clienteF['descActividad'],
-                'nombre_comercial'=> $clienteF['nombreComercial'],
-                'departamento'=>  $clienteF['direccion']['departamento'],
-                'municipio'=> $clienteF['direccion']['municipio'],
-                'complemento'=> $clienteF['direccion']['complemento'],
-                'telefono'=> $clienteF['telefono'],
-                'correo'=> $clienteF['correo'],
+                'codigo_actividad'=> $clienteF['codActividad']??null,
+                'descripcion_actividad'=> $clienteF['descActividad']??null,
+                'nombre_comercial'=> $clienteF['nombreComercial']??null,
+                'departamento'=>  $clienteF['direccion']['departamento']??null,
+                'municipio'=> $clienteF['direccion']['municipio']??null,
+                'complemento'=> $clienteF['direccion']['complemento']??null,
+                'telefono'=> $clienteF['telefono']??null,
+                'correo'=> $clienteF['correo']??null,
                 'estado'=> 1,
             ]);
         }

@@ -83,8 +83,27 @@ class DteFcController extends Controller
             'apendice' => $apendice
         ];
 
-        [$responseData, $statusCode] = DteApiMHService::envidarDTE($newDTE, $idCliente, $identificacion);
+        // retornando el json para mh
+        //print_r(json_encode($newDTE));
+        //return;
 
-        return response()->json($responseData, $statusCode);
+         [$responseData, $statusCode] = DteApiMHService::envidarDTE($newDTE, $idCliente, $identificacion);
+
+         $mailInfo = array(
+            'responseData'=>$responseData,
+            'statusCode'=>$statusCode,
+            'dte'=> $newDTE,
+            'numeroControl'=>$identificacion['numeroControl'],
+            'fecEmi'=> $identificacion['fecEmi'],
+            'horEmi'=> $identificacion['horEmi'],
+            'codigoGeneracion'=> $identificacion['codigoGeneracion'],
+        );
+
+
+        return response()->json(
+            $mailInfo
+            , $statusCode);
+
+        //return response()->json($responseData, $statusCode);
     }
 }

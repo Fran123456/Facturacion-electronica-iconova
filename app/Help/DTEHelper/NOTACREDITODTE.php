@@ -134,11 +134,37 @@ class NOTACREDITODTE
 
         $numero_en_letras = Generator::generateStringFromNumber($montoTotalOperacion);
 
+        // Agrupar y sumar valores con el mismo código
+        $resultado = [];
+        foreach ($tributos as $tributo) {
+            $codigo = $tributo['codigo'];
+            if (isset($resultado[$codigo])) {
+                $resultado[$codigo]['valor'] += $tributo['valor'];
+            } else {
+                $resultado[$codigo] = $tributo;
+            }
+        }
 
+          // Aplicando redondeo al valor en tributos
+          foreach($resultado as $key=>$t )
+          {
+              $resultado[$key]["valor"] = round($t["valor"],2);
+
+          }
+
+
+
+        $resultado = array_values($resultado);
+
+
+
+        $tributos= $resultado;
+        // Convertir a un array numerado si es necesario
+       
         return [
             'totalNoSuj' => $totalNoSuj,
             'totalExenta' => $totalExenta,
-            'totalGravada' => $totalGravada,
+            'totalGravada' => round($totalGravada,2),
             'totalDescu' => $totalDescu,
             'montoTotalOperacion' => $montoTotalOperacion,
 
@@ -169,15 +195,3 @@ class NOTACREDITODTE
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-

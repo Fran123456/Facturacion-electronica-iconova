@@ -15,12 +15,12 @@ class FACTDTE
         foreach ($items as $key => $item) {
 
             // REDONDENANDO VALORES DEFINIDOS POR LE USUARIO
-            $cantidad = intval($item['cantidad']);
+            $cantidad = $item['cantidad'];
             $precio = round($item['precioUni'], 2);
             $montoDescu = round($item['montoDescu'], 2);
 
             $ventaGravada = round($item['ventaGravada'], 2);
-            $iva = round($item['ivaItem'], 2);
+            $iva = round($item['ivaItem'], 5);
 
             // CAMPOS CON VALORES PREDEFINIDOS
             $items[$key]['tributos'] = null;
@@ -125,7 +125,7 @@ class FACTDTE
         }
 
 
-        $totalPagar = round($subTotal + $totalImpuestos + $totalNoGravado - $ivaRetenida,);
+        $totalPagar = round($subTotal + $totalImpuestos + $totalNoGravado - $ivaRetenida,2);
 
         $total_en_letras = Generator::generateStringFromNumber($totalPagar);
 
@@ -135,11 +135,11 @@ class FACTDTE
             'totalExenta' => $totalExenta,
             'totalNoGravado' => $totalNoGravado,
             'totalDescu' => $totalDescu,
-            'totalGravada' => $totalGravada,
-            'subTotalVentas' => $subTotal,
-            'subTotal' => $subTotal,
-            'montoTotalOperacion' => $subTotal,
-            'totalIva' => $totalIva,
+            'totalGravada' => round($totalGravada,2),
+            'subTotalVentas' => round($subTotal,2),
+            'subTotal' => round($subTotal,2),
+            'montoTotalOperacion' => round($subTotal,2),
+            'totalIva' => round($totalIva,2),
             'pagos' => $pagos,
             'totalPagar' => $totalPagar,
 

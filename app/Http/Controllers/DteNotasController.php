@@ -116,6 +116,25 @@ class DteNotasController extends Controller
 
         [$responseData, $statusCode] = DteApiMHService::envidarDTE($newDTE, $idCliente, $identificacion);
 
-       return response()->json($responseData, $statusCode);
+        
+        $mailInfo = array(
+            'responseData'=>$responseData,
+            'statusCode'=>$statusCode,
+            'dte'=> $newDTE,
+            'numeroControl'=>$identificacion['numeroControl'],
+            'fecEmi'=> $identificacion['fecEmi'],
+            'horEmi'=> $identificacion['horEmi'],
+            'codigoGeneracion'=> $identificacion['codigoGeneracion'],
+        );
+
+
+        return response()->json(
+            $mailInfo
+            , $statusCode);
+
+
+
+
+       //return response()->json($responseData, $statusCode);
     }
 }

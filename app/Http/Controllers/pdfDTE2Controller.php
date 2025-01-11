@@ -409,7 +409,7 @@ class PdfDTE2Controller extends Controller
                    
                     
                     <center>
-                        <barcode code="https://admin.factura.gob.sv/consultaPublica?ambiente='.$cur_ambiente.'&codGen='.$nDTE.'&fechaEmi='.$fecha_emision.'" type="QR" class="barcode" size="0.87" error="M" />
+                        <barcode code="https://admin.factura.gob.sv/consultaPublica?ambiente='.$cur_ambiente.'&codGen='.$cur_codgen.'&fechaEmi='.$fecha_emision.'" type="QR" class="barcode" size="0.87" error="M" />
                     </center>
                 </td>
                 

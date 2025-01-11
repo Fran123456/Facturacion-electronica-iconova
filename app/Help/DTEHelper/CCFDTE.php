@@ -81,6 +81,8 @@ class CCFDTE
                             'valor' => round($valorObjec, 2)
                         ];
                     }
+
+                 
                 }
                 
             }
@@ -100,7 +102,7 @@ class CCFDTE
 
         $pagos[] = [
             "codigo" => $codigoPago,
-            "montoPago" => $totalPagar,
+            "montoPago" => round($totalPagar,2),
             "referencia" => $descripcionPago,
             "periodo" => $periodoPago,
             "plazo" => $plazoPago
@@ -109,14 +111,23 @@ class CCFDTE
         // Generar el total en letras
         $numero_en_letras = Generator::generateStringFromNumber($totalPagar);
 
+           // Aplicando redondeo al valor en tributos
+           foreach($tributos as $key=>$t )
+           {
+               $tributos[$key]["valor"] = round($t["valor"],2);
+
+           }
+
+
+
         $resumen = [
             'totalNoSuj' => $totalNoSuj,
             'totalExenta' => $totalExenta,
             'totalDescu' => $totalDescu,
-            'totalGravada' => $ventaGravada,
+            'totalGravada' => round($ventaGravada,2),
             'subTotalVentas' => $subTotal,
             'subTotal' => $subTotal,
-            'montoTotalOperacion' => $montoTotal,
+            'montoTotalOperacion' => round($montoTotal,2),
 
             'descuNoSuj' => 0.0,
             'descuExenta' => 0.0,
@@ -125,7 +136,7 @@ class CCFDTE
             'ivaPerci1' => 0.0,
             'ivaRete1' => $ivaRetenida,
             'reteRenta' => 0.0,
-            'totalPagar' => $totalPagar,
+            'totalPagar' => round($totalPagar,2),
             'condicionOperacion' => 1,
             'totalLetras' => 'USD ' . $numero_en_letras,
             'saldoFavor' => 0,

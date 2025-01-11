@@ -68,7 +68,7 @@ class NRDTE
                 $tributos[] = [
                     'codigo' => "20",
                     'descripcion' => Help::getTributo("20"),
-                    'valor' => floor($ivaItem * 100) / 100
+                    'valor' => $ivaItem 
                 ];
             }
         }

@@ -109,6 +109,14 @@ class DteCCFController extends Controller
             'apendice' => $apendice
         ];
 
+
+        // retornar el Json a enviar a MH
+        //print_r(json_encode($newDTE));
+        //return;
+
+
+
+
         $responseLogin = LoginMH::login();
        
         
