@@ -12,6 +12,7 @@ use App\Models\RegistroDTE;
 use DateTime;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 class DteApiMHService
 {
 
@@ -106,9 +107,12 @@ class DteApiMHService
                 'estado' => false,
             ])->save();
 
-            $registoDTE->estado = false;
-            DB::commit();
             $responseData = "Error desconocido, se intento guardar de modo offline pero ha generado error";
+            $registoDTE->estado = false;
+            $registoDTE->response  = $responseData;
+            $registoDTE->save();
+            DB::commit();
+            
             $statusCode = 400;
             return [$responseData, $statusCode];
 
@@ -119,7 +123,6 @@ class DteApiMHService
         }
 
     }
-
 
     public static function envidarDTE($dte, $idCliente, $identificacion)
     {
@@ -223,30 +226,84 @@ class DteApiMHService
         return [$responseData, $statusCode];
     }
 
-    public static function contingencia(){
+    public static function contingencia($dte, $identificacion,$tipoDTE, $registros){
         $url = Help::mhUrl();
         $empresa = Help::getEmpresa();
         $responseData = "";
         $statusCode = 0;
 
+        $DTESigned = FirmadorElectronico::firmador($dte);
+        $registoDTE['dte_firmado'] =  $DTESigned ;
+        if ($DTESigned['status'] > 201) {
+                return response()->json(["error" => $DTESigned['error']], $DTESigned['status']);
+        }
+
         $jsonRequest = [
-            'ambiente' => $empresa->ambiente,
-            'nitEmisor' => Crypt::decryptString($empresa->nit),
-            'documento' => "",
-        
             
+            'ambiente' => $empresa->ambiente,
+            'idEnvio' => 1,
+            'version' => 3,
+            'documento' => $DTESigned['msg'],
+            'codigoGeneracion' => $identificacion['codigoGeneracion'],
+            'nitEmisor' => Crypt::decryptString($empresa->nit),
+            'nit' => Crypt::decryptString($empresa->nit),
         ];
 
         $requestResponse = Http::withHeaders([
             'Authorization' => $empresa->token_mh,
             'User-Agent' => 'ApiLaravel/1.0',
             'Content-Type' => 'application/JSON'
-        ])->post($url . "fesv/recepciondte", $jsonRequest);
+        ])->post($url . "fesv/contingencia", $jsonRequest);
 
         $responseData = $requestResponse->json();
         $statusCode = $requestResponse->status();
-    }
 
+        if($responseData['estado'] == "RECHAZADO"){
+            LogDTE::create([
+                'empresa_id' => $empresa->id,
+                'id_cliente' => null,
+                'numero_dte' =>$identificacion['codigoGeneracion'],
+                'codigo_generacion'=> $identificacion['codigoGeneracion'],
+                'tipo_documento' => $tipoDTE,
+                'fecha' => $identificacion['fTransmision'],
+                'hora' => $identificacion['hTransmision'],
+                'error' => json_encode($responseData['observaciones']) ,
+                'estado' => false,
+            ])->save();
+
+        }
+
+        $registoDTE = RegistroDTE::create([
+            'empresa_id' => $empresa->id,
+            'id_cliente' => null,
+            'codigo_generacion' => $identificacion['codigoGeneracion'] ,
+            "numero_dte"=>$identificacion['codigoGeneracion'],
+            'tipo_documento' => $tipoDTE,
+            'dte' => json_encode($dte),
+            'dte_firmado'=>  json_encode($DTESigned) ,
+            'estado' => false,
+            'fecha_recibido'=>   Carbon::createFromFormat('d/m/Y H:i:s', $responseData['fechaHora'])->format('Y-m-d H:i:s'),
+            'response'=>json_encode($responseData), 
+            'observaciones'=> json_encode($responseData['observaciones']) ,
+            'sello'=> $responseData['selloRecibido']
+        ]);
+
+         LogDTE::where('tipo_documento', 'contingencia')->where('estado', false)->update(
+           [ 'estado'=>true, 'updated_at'=> now()]
+         );
+
+         if($responseData['estado'] == "RECIBIDO"){
+            foreach ($registros as $key => $value) {
+                $value->contingencia = $responseData['selloRecibido'] ;
+                $value->save();
+            }
+
+           // $registoDTE->estado = true;
+           // $registoDTE->save();
+        }
+        
+        return [$responseData, $statusCode];
+    }
 
 
     private static function handleErrorResponse($statusCode, $responseData)

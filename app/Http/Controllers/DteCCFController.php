@@ -110,16 +110,8 @@ class DteCCFController extends Controller
         ];
 
 
-        // retornar el Json a enviar a MH
-        //print_r(json_encode($newDTE));
-        //return;
-
-
-
-
         $responseLogin = LoginMH::login();
        
-        
         if ($responseLogin['code'] != 200) {
           //  return response()->json(DteCodeValidator::code404($responseLogin['error']), 404);
              [$responseData, $statusCode] = DteApiMHService::EnviarOfflineMH( $newDTE, $idCliente, $identificacion );
@@ -127,8 +119,6 @@ class DteCCFController extends Controller
             
             [$responseData, $statusCode] = DteApiMHService::envidarDTE( $newDTE, $idCliente, $identificacion );
         }
-
-        
 
         //^ Función para correo electrinico
         $correoEmpresa = Crypt::decryptString($empresa->correo_electronico);

@@ -20,9 +20,9 @@ class DteNdController extends Controller
     {
 
         //PASO 1 , HACER LOGIN EN HACIENDA
-        $responseLogin = LoginMH::login();
+      /*  $responseLogin = LoginMH::login();
         if ($responseLogin['code'] != 200)
-            return response()->json(DteCodeValidator::code404($responseLogin['error']), 404);
+            return response()->json(DteCodeValidator::code404($responseLogin['error']), 404);*/
 
         //PASO 2 OBTENER INFORMACION Y DESFRAGMENTARLA
         $json = json_decode($request->getContent(), true);
@@ -82,7 +82,14 @@ class DteNdController extends Controller
             'apendice'
         );
 
-        [$responseData, $statusCode] = DteApiMHService::envidarDTE($newDTE, $idCliente, $identificacion);
+        $responseLogin = LoginMH::login();
+        if ($responseLogin['code'] != 200) {
+            [$responseData, $statusCode] = DteApiMHService::EnviarOfflineMH( $newDTE, $idCliente, $identificacion );
+        }else{
+            
+            [$responseData, $statusCode] = DteApiMHService::envidarDTE( $newDTE, $idCliente, $identificacion );
+        }
+
 
         return response()->json($responseData, $statusCode);
     }
