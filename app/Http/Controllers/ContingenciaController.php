@@ -12,6 +12,7 @@ use App\Models\RegistroDTE;
 use App\Help\FirmadorElectronico;
 use  App\Help\DTEIdentificacion\Identificacion;
 use App\Help\Services\DteApiMHService;
+use App\Http\Resources\RegistroDTEResource;
 
 class ContingenciaController extends Controller
 {
@@ -36,7 +37,9 @@ class ContingenciaController extends Controller
             ])->save();
         }else{
 
-            $registro = RegistroDTE::where('estado',false)->where('contingencia'  ,null)->orderBy('id', 'desc')->get();
+            $registro = RegistroDTE::where('estado',false)
+            ->whereIn('tipo_documento',['01','03','04','05','06','07','08','09','11','14','15'])
+            ->where('contingencia'  ,null)->orderBy('id', 'desc')->get();
 
 
             //FIRMARLOS
@@ -82,6 +85,60 @@ class ContingenciaController extends Controller
             if(count( $detallesC)>0){
                 [$responseData, $statusCode] = DteApiMHService::contingencia(  $dte, $identificacion, 'contingencia', $registro );
             }
+
+            //vamos a ejecutar los DTE en contingencia pasados y actuales
+            $registro = RegistroDTE::where('estado',false)
+            ->whereIn('tipo_documento',['01','03','04','05','06','07','08','09','11','14','15'])
+            ->where('contingencia', '!=', null)->orderBy('id', 'desc')->get();
+
+
+            $arrayDteProcesadosResponse = array();
+            foreach ($registro as $key => $value) {
+
+               //hacemos el reenvio.
+               $respuesta =  DteApiMHService::resend( $value->dte, $value, null );
+               array_push($arrayDteProcesadosResponse, $respuesta);
+
+                //validando para dar por liquidada la contingencia, se bussca la contingencia
+                //en proceso que es el del dte procesado, 
+
+                if($respuesta['procesadoEnReenvio']){
+
+                   $value->estado = true;
+                   $value->response = json_encode($respuesta['responseData']);
+                   $value->save();
+            
+
+                    $registroSinProcesarContingenciaEnCola = RegistroDTE::where('estado',false)
+                    ->whereIn('tipo_documento',['01','03','04','05','06','07','08','09','11','14','15'])
+                    ->where('contingencia', $value->contingencia)->orderBy('id', 'asc')->get();
+      
+                    if(count($registroSinProcesarContingenciaEnCola) ==0){
+                      $contingenciaEnCola= RegistroDTE::where('sello', $value->contingencia)
+                      ->where('tipo_documento', 'contingencia')->where('estado', false)->first();
+                      if($contingenciaEnCola!= null){
+                          $contingenciaEnCola->estado = true;
+                          $contingenciaEnCola->save();
+                      }
+      
+                      $contingenciaEnColaLog = LogDTE::where('codigo_generacion', $value->contingencia)
+                      ->where('tipo_documento', 'contingencia')->where('estado', false)->get();
+                      if(count($contingenciaEnColaLog)>0){
+                          foreach ($contingenciaEnColaLog as $key => $colaLog) {
+                              $colaLog->estado = true;
+                              $colaLog->save();
+                          }
+                      }
+                    }
+
+
+              
+
+
+              }
+
+            }
+           
            
 
             $mailInfo = array(
@@ -91,6 +148,7 @@ class ContingenciaController extends Controller
                 'fecEmi'=> $identificacion['fTransmision'],
                 'horEmi'=> $identificacion['hTransmision'],
                 'codigoGeneracion'=> $identificacion['codigoGeneracion'],
+                "dteEnviadosEnContingencia"=> $arrayDteProcesadosResponse
             );
     
             return response()->json(
