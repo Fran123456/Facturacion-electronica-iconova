@@ -131,13 +131,13 @@ class DteApiMHService
         $responseData = "";
         $statusCode = 0;
 
-     
-
         $codigoGeneracionDTE = $identificacion['numeroControl'];
         $tipoDTE = $identificacion['tipoDte'];
         $fechaEmision = $identificacion['fecEmi'];
         $horaEmision = $identificacion['horEmi'];
         $version = $identificacion['version'];
+
+        
 
         // CREACION DEL REGISTRO DEL DTE PARA RESPALDO EN LA DB
         $registoDTE = RegistroDTE::create([
@@ -150,10 +150,14 @@ class DteApiMHService
             'estado' => true,
         ]);
 
+        
+
         try {
 
             // FIRMAR DTE
             $DTESigned = FirmadorElectronico::firmador($dte);
+
+            return [  $DTESigned  , 0];
             $registoDTE['dte_firmado'] =  $DTESigned ;
             if ($DTESigned['status'] > 201) {
                 return response()->json(["error" => $DTESigned['error']], $DTESigned['status']);

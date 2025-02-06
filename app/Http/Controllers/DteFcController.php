@@ -82,6 +82,7 @@ class DteFcController extends Controller
             'extension' => $extension,
             'apendice' => $apendice
         ];
+       
 
         // retornando el json para mh
         //print_r(json_encode($newDTE));
@@ -93,6 +94,7 @@ class DteFcController extends Controller
             [$responseData, $statusCode] = DteApiMHService::envidarDTE( $newDTE, $idCliente, $identificacion );
         }
   
+        return $responseData;
 
          $mailInfo = array(
             'responseData'=>$responseData,
