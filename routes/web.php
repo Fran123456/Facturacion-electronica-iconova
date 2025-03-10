@@ -14,12 +14,11 @@ use App\Http\Controllers\MainController;
 */
 
 
-/*
 Route::get('/', function () {
-   // return view('welcome');
+return view('welcome');
    return view('main');
 });
-*/
+
 
 /* llamado vista desde el controlador */
 Route::get('/Menu', [MainController::class, 'index']);
