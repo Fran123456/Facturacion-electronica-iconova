@@ -23,41 +23,36 @@ class MHTransporte extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'codigo' => '2',
+                'codigo' => '3',
                 'valor' => 'Marítimo',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
-                'codigo' => '3',
+                'codigo' => '2',
                 'valor' => 'Aéreo',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'codigo' => '4',
-                'valor' => 'Multimodal, Terrestre-marítimo',
+                'valor' => 'FERREO',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'codigo' => '5',
-                'valor' => 'Multimodal, Terrestre-aéreo',
+                'valor' => 'MULTIMODAL',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'codigo' => '6',
-                'valor' => 'Multimodal, Marítimo- aéreo',
+                'valor' => 'CORREO',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-            [
-                'codigo' => '7',
-                'valor' => 'Multimodal, Terrestre-Marítimo- aéreo',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
+            
         ];
 
         DB::table('mh_transporte')->insert($values);

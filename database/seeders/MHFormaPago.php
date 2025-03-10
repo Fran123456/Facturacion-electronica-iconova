@@ -42,13 +42,7 @@ class MHFormaPago extends Seeder
             ],
             [
                 'codigo' => '05',
-                'valor' => 'Transferencia_ Depósito Bancario',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'codigo' => '06',
-                'valor' => 'Vales o Cupones',
+                'valor' => 'Transferencia-Depósito Bancario',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -61,12 +55,6 @@ class MHFormaPago extends Seeder
             [
                 'codigo' => '09',
                 'valor' => 'Monedero electrónico',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'codigo' => '10',
-                'valor' => 'Certificado o tarjeta de regalo',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],

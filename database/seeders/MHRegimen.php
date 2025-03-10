@@ -237,7 +237,32 @@ class MHRegimen extends Seeder
             [
                 'codigo' => 'EX3.3070.072',
                 'valor' => 'Reexportación Proveniente de Depósito, Decreto 738 Eléctricos e Híbridos'
-            ]
+            ],
+            //^ NUEVOS
+            [
+                'codigo' => 'EX3.3071.000',
+                'valor' => 'Re-Exportación. Prov. de Deposito'
+            ],
+            [
+                'codigo' => 'EX3.3072.000',
+                'valor' => 'Re-Exportación. Prov. de Adm Temp. para Perfeccionamiento Activo'
+            ],
+            [
+                'codigo' => 'EX3.3074.000',
+                'valor' => 'Re-Exportación. Prov. de Regimen de Zona Franca'
+            ],
+            [
+                'codigo' => 'EX3.3075.000',
+                'valor' => 'Re-Exportación. Prov. de Adm. Temporal para Perfeccionamiento Activo con Garantía'
+            ],
+            [
+                'codigo' => 'EX3.3076.000',
+                'valor' => 'Re-Exportación. Prov. de Adm. Temporal ley de Servi. Internacionales'
+            ],
+            [
+                'codigo' => 'EX3.3077.000',
+                'valor' => 'Re-Exportación. Prov. de Centro de Servicio LSI'
+            ],
         ];
 
         DB::table('mh_regimen')->insert($values);

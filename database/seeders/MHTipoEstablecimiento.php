@@ -36,13 +36,7 @@ class MHTipoEstablecimiento extends Seeder
             ],
             [
                 'codigo' => '07',
-                'valor' => 'Predio y/o patio',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'codigo' => '20',
-                'valor' => 'Otro',
+                'valor' => 'Patio',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],

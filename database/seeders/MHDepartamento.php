@@ -17,6 +17,12 @@ class MHDepartamento extends Seeder
     {
         $values = [
             [
+                'codigo' => '00',
+                'valor' => 'Otro',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
                 'codigo' => '01',
                 'valor' => 'Ahuachapán',
                 'created_at' => now(),

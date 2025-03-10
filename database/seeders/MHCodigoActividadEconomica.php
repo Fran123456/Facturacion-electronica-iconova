@@ -5465,6 +5465,13 @@ class MHCodigoActividadEconomica extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            [
+                'codigo' => '10006',
+                'valor' => 'COMERCIANTE',
+                'tipo' => 'COMERCIANTE',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
         ];
 
         DB::table('mh_codigo_actividad_economica')->insert($values);

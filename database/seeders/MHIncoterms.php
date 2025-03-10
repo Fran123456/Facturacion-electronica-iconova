@@ -82,36 +82,6 @@ class MHIncoterms extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-            [
-                'codigo' => '12',
-                'valor' => 'DAT-Entregado en terminal',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'codigo' => '13',
-                'valor' => 'DAF-Entregada en frontera',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'codigo' => '14',
-                'valor' => 'DES-Entregada sobre duque',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'codigo' => '15',
-                'valor' => 'DEQ-Entregada en muelle',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'codigo' => '16',
-                'valor' => 'DDU- Entregada derechos no pagados',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
         ];
 
         DB::table('mh_incoterms')->insert($values);
