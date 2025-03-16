@@ -22,6 +22,9 @@ use App\Http\Controllers\PruebasController;
 use App\Http\Controllers\ReceptorController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\ContingenciaController;
+use App\Http\Controllers\InfoController;
+
+
 
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -42,6 +45,21 @@ Route::post('/login', [ApiController::class, 'login']);
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::middleware('auth:sanctum')->group(function () {
+
+    Route::prefix('/utilidad')->group(function () {
+        Route::get('/empresa', [InfoController::class, 'empresa']);
+        Route::get('/forma-pago', [InfoController::class, 'formaPagoCatalogo']);
+    });
+
+});
+
+
+
+
+
+
 
 Route::middleware('auth:sanctum')->group(function () {
     //! Endpoint de prueba

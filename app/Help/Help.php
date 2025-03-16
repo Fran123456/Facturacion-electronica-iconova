@@ -11,7 +11,11 @@ use App\Models\RegistroDTE;
 use App\Models\MH\MH_tipo_documento;
 use Exception;
 use Illuminate\Support\Facades\Auth;
-use app\Models\MH\MHActividadEconomica;
+use App\Models\MH\MHActividadEconomica;
+use Illuminate\Support\Facades\Crypt;
+use App\Models\MH\MHDepartamento;
+use App\Models\MH\MHMunicipio;
+use App\Models\MH\MHTipoEstablecimiento;
 
 class Help
 {
@@ -89,6 +93,53 @@ class Help
         $usuario = Auth::user();
         $empresa  =  Empresa::find($usuario->empresa_id);
         return $empresa;
+    }
+
+    
+    public static function getEmpresaByCript()
+    {
+        $usuario = Auth::user();
+        $empresa  =  Empresa::find($usuario->empresa_id);
+        $empresaNombreComercial = $empresa->nombre_comercial;
+        $nit = Crypt::decryptString($empresa->nit);
+        $nrc = Crypt::decryptString($empresa->nrc);
+        $nombreEmpresa = Crypt::decryptString($empresa->nombre);
+        $telefono = Crypt::decryptString($empresa->telefono);
+        $correo = Crypt::decryptString($empresa->correo_electronico);
+
+        $departamento = MHDepartamento::where('codigo', $empresa->departamento)->first()?->valor;
+        $municipio = MHMunicipio::where('codigo', $empresa->municipio)->first()?->valor;
+        $direccion = $empresa->direccion;
+        $codigoEsta = $empresa->codigo_establecimiento;
+        $codigoEstablecimientoNombre = MHTipoEstablecimiento::where('codigo', $empresa->codigo_establecimiento)->first()?->valor;
+        $codgoAcividad = $empresa->codigo_actividad;
+        $codigoActividadNombre = MHActividadEconomica::where('codigo', $empresa->codigo_actividad)->first()?->valor;
+
+        return array(
+            'usuario'=> $usuario,
+            'empresa_nombre_comercial'=> $empresaNombreComercial,
+            'nit'=> $nit,
+            'nrc'=> $nrc,
+            'nombre_empresa'=> $nombreEmpresa,
+            'telefono'=> $telefono,
+            'correo'=> $correo,
+            'departamento'=> $departamento,
+            'municipio'=> $municipio,
+            'direccion'=> $direccion,
+            'codigo_estableclimiento'=> $codigoEsta,
+            'codigo_estableclimiento_nombre'=> $codigoEstablecimientoNombre,
+            'codgo_acividad'=> $codgoAcividad,
+            'codigoActividad_nombre'=> $codigoActividadNombre,
+             'ambiente'=> $empresa->ambiente,
+             'correlativo_fex'=> $empresa->correlativo_fex,
+             'correlativo_ccf'=> $empresa->correlativo_ccf, 
+             'correlativo_cl'=> $empresa->correlativo_cl, 
+             'correlativo_cd'=> $empresa->correlativo_cd, 
+             'correlativo_cr'=> $empresa->correlativo_cr,
+             'correlativo_dcl'=> $empresa->correlativo_dcl,
+             'correlativo_fse'=> $empresa->correlativo_fse,    
+        );
+
     }
     
     public static function getUsuario(){
