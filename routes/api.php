@@ -51,6 +51,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('/utilidad')->group(function () {
         Route::get('/empresa', [InfoController::class, 'empresa']);
         Route::get('/forma-pago', [InfoController::class, 'formaPagoCatalogo']);
+        Route::get('/actividad-economica-by-code', [InfoController::class, 'actividadEconomicaByCode']);
+
+        
     });
 
 });
