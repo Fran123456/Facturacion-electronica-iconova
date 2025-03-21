@@ -23,9 +23,10 @@ class InfoController extends Controller
         );
     }
 
-    public function actividadEconomicaByCode(Request $request){
+    public function actividadEconomicaByCode(Request $request, $codigo){
+        $data = MHActividadEconomica::where('codigo', $codigo)->first();
         return response()->json(
-          MHActividadEconomica::where('codigo', $request->codigo)->first()
+            $data
         );
     }
  

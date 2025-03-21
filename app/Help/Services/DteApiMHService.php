@@ -157,7 +157,7 @@ class DteApiMHService
             // FIRMAR DTE
             $DTESigned = FirmadorElectronico::firmador($dte);
 
-            return [  $DTESigned  , 0];
+      
             $registoDTE['dte_firmado'] =  $DTESigned ;
             if ($DTESigned['status'] > 201) {
                 return response()->json(["error" => $DTESigned['error']], $DTESigned['status']);
