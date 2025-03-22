@@ -119,7 +119,7 @@ class DteCCFController extends Controller
              [$responseData, $statusCode] = DteApiMHService::EnviarOfflineMH( $newDTE, $idCliente, $identificacion );
         }else{
             
-            [$responseData, $statusCode] = DteApiMHService::envidarDTE( $newDTE, $idCliente, $identificacion );
+            [$responseData, $statusCode, $id] = DteApiMHService::envidarDTE( $newDTE, $idCliente, $identificacion );
         }
 
         //^ Función para correo electrinico
@@ -139,6 +139,7 @@ class DteCCFController extends Controller
             'fecEmi'=> $identificacion['fecEmi'],
             'horEmi'=> $identificacion['horEmi'],
             'codigoGeneracion'=> $identificacion['codigoGeneracion'],
+            'id'=>$id
         );
 
        /* try{

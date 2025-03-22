@@ -227,7 +227,7 @@ class DteApiMHService
             $registoDTE->save();
         }
 
-        return [$responseData, $statusCode];
+        return [$responseData, $statusCode,  $registoDTE->id];
     }
 
     public static function contingencia($dte, $identificacion,$tipoDTE, $registros){
