@@ -40,6 +40,7 @@ class DteCCFController extends Controller
 {
     public function enviarDteUnitarioCCF(Request $request)
     { 
+        
         $empresa = Help::getEmpresa();
         // Login para generar token de Hacienda.
 
@@ -111,13 +112,14 @@ class DteCCFController extends Controller
 
 
         $responseLogin = LoginMH::login();
+        
        
         if ($responseLogin['code'] != 200) {
           //  return response()->json(DteCodeValidator::code404($responseLogin['error']), 404);
              [$responseData, $statusCode] = DteApiMHService::EnviarOfflineMH( $newDTE, $idCliente, $identificacion );
         }else{
             
-            [$responseData, $statusCode] = DteApiMHService::envidarDTE( $newDTE, $idCliente, $identificacion );
+            [$responseData, $statusCode, $id] = DteApiMHService::envidarDTE( $newDTE, $idCliente, $identificacion );
         }
 
         //^ Función para correo electrinico
@@ -137,16 +139,17 @@ class DteCCFController extends Controller
             'fecEmi'=> $identificacion['fecEmi'],
             'horEmi'=> $identificacion['horEmi'],
             'codigoGeneracion'=> $identificacion['codigoGeneracion'],
+            'id'=>$id
         );
 
-        try{
+       /* try{
             Mail::to($receptor['correo'])
             ->send((new DteMail($nombreCliente, $correoEmpresa, $telefono, $mailInfo))
             ->from($correoEmpresa, $nombreEmpresa));
         }catch(Exception $e){
             Anexo::emailError( $identificacion['codigoGeneracion'], $identificacion['numeroControl']);
 
-        }
+        }*/
 
         return response()->json(
             $mailInfo
