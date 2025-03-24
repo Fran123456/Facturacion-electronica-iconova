@@ -4,6 +4,8 @@
 /public/storage
 /storage/*.key
 /storage/logs/*
+/storage/framework/*
+/storage/app/public/*.pdf
 /vendor
 .env
 .env.backup

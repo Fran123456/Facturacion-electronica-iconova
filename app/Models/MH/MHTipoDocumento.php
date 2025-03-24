@@ -13,7 +13,10 @@ class MHTipoDocumento extends Model
 
     protected $table = 'mh_tipo_documento';
 
-    protected $guarded = [];
+    protected $guarded = [
+        'created_at',
+        'updated_at'
+    ];
 
     public function logDte()
     {
