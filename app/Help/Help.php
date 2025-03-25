@@ -326,7 +326,7 @@ class Help
                 'nit'=> $clienteF['nit']??null,
                 'nrc'=> $clienteF['nrc']??null,
                 'dui'=> $clienteF['dui']??null,
-                'nombre'=> $clienteF['nombre'],
+                'nombre'=> $clienteF['nombre']?? "Sin nombre",
                 'codigo_actividad'=> $clienteF['codActividad']??null,
                 'descripcion_actividad'=> $clienteF['descActividad']??null,
                 'nombre_comercial'=> $clienteF['nombreComercial']??null,

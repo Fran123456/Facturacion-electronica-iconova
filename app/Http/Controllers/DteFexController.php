@@ -38,7 +38,9 @@ class DteFexController extends Controller
 
         // VARAIBLES DE CONFIGURACION DEL DTE
         $dte = $json['dteJson'];
-        $cliente = Help::getClienteId($dte['receptor']['nit']);
+       // $cliente = Help::getClienteId($dte['receptor']['nit']);
+        $cliente = Help::ValidarCliente($dte['receptor']['nit'],$dte['receptor']);
+        
         $tipoDTE = '11';
         $idCliente = $cliente['id'];
 
@@ -71,6 +73,7 @@ class DteFexController extends Controller
         // Variables de Extensión y Apéndice
         $apendice = $dte['apendice'];
 
+   
         // Creación de newDTE
         $newDTE = [
             'identificacion' => $identificacion,
