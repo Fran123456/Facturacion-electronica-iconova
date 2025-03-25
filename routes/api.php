@@ -53,16 +53,18 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/forma-pago', [InfoController::class, 'formaPagoCatalogo']);
         Route::get('/actividad-economica-by-code/{codigo}', [InfoController::class, 'actividadEconomicaByCode']);
 
-        
+        //^ Catalogos
+        Route::get('/paises', [InfoController::class, 'paises']);
+        Route::get('/distritos', [InfoController::class, 'distritos']);
+        Route::get('/departamentos', [InfoController::class, 'departamentos']);
+        Route::get('/tiposPersona', [InfoController::class, 'tiposPersona']);
+        Route::get('/codigosActividad', [InfoController::class, 'codigosActividad']);
+        Route::get('/tiposDocumento', [InfoController::class, 'tiposDocumento']);
+        Route::get('/tiposDocumentoReceptor', [InfoController::class, 'tiposDocumentoReceptor']);
+
     });
-
+    
 });
-
-
-
-
-
-
 
 Route::middleware('auth:sanctum')->group(function () {
     //! Endpoint de prueba
@@ -98,7 +100,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/mh/enviar/dte/unitario/nd', [DteNdController::class, 'unitario']);
         Route::post('/mh/enviar/dte/unitario/cl', [DteClController::class, 'unitario']);
 
-       
         Route::post('/mh/enviar/contingencia', [ ContingenciaController::class, 'sendContingencia']);
         
         // TODO: por completar
