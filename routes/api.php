@@ -61,7 +61,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/codigosActividad', [InfoController::class, 'codigosActividad']);
         Route::get('/tiposDocumento', [InfoController::class, 'tiposDocumento']);
         Route::get('/tiposDocumentoReceptor', [InfoController::class, 'tiposDocumentoReceptor']);
-
+        Route::get('/tipoInvalidacion', [InfoController::class, 'tipoInvalidacion']);
     });
     
 });

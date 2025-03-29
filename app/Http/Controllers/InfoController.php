@@ -10,7 +10,9 @@ use App\Models\MH\MHMunicipio;
 use App\Models\MH\MHPais;
 use App\Models\MH\MHTipoDocumento;
 use App\Models\MH\MHTipoDocumentoReceptor;
+use App\Models\MH\MHTipoInvalidacion;
 use App\Models\MH\MHTipoPersonaModel;
+
 use Illuminate\Http\Request;
 
 class InfoController extends Controller
@@ -74,6 +76,12 @@ class InfoController extends Controller
     public function tiposDocumentoReceptor(Request $request){
         return response()->json(
             MHTipoDocumentoReceptor::select('id', 'codigo', 'valor')->get()
+        );
+    }
+
+    public function tipoInvalidacion(){
+        return response()->json(
+            MHTipoInvalidacion::all()
         );
     }
 

@@ -34,9 +34,15 @@ class InvalidarDteController extends Controller
          InvalidarDte::invalidar($dte);
         [$responseData, $statusCode] =  InvalidarDte::invalidar($dte);
 
+        $anulado = true;
+        if($responseData['estado']=="RECHAZADO"){
+            $anulado = false;
+        }
+
         return response()->json([
-            'data' => $responseData,
-            'statusCode' => $statusCode
+            'responseData' => $responseData,
+            'statusCode' => $statusCode,
+            'anulado'=>$anulado,
         ], $statusCode);
     }
 }
