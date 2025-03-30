@@ -4,6 +4,7 @@ namespace App\Help\Services;
 
 use App\Help\DteCodeValidator;
 use App\Help\FirmadorElectronico;
+use App\Help\Generator;
 use App\help\Help;
 use App\Models\InvalidacionDte;
 use App\Models\LogDTE;
@@ -37,6 +38,7 @@ class InvalidarDte
         $codigoGeneracionDte = $identificacion['codigoGeneracion'];
 
         try {
+            
             $DTESigned = FirmadorElectronico::firmador($dte);
 
             $ambiente = Help::getEmpresa()?->ambiente;
@@ -44,6 +46,8 @@ class InvalidarDte
             $version = 2;
             $documento = $DTESigned['msg'];
 
+
+           
             $jsonRequest = compact("ambiente", "idEnvio", "version", "documento");
 
             $requestResponse = Http::withHeaders([

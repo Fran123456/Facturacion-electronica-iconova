@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Help\DteCodeValidator;
 use App\Help\DTEIdentificacion\Invalidacion;
+use App\Help\Generator;
 use App\Help\LoginMH;
 use App\Help\Services\InvalidarDte;
 use App\Http\Requests\InvalidarRequest;
@@ -27,11 +28,12 @@ class InvalidarDteController extends Controller
         $documento = $dteRequest['documento'];
         $motivo = $dteRequest['motivo'];
 
+      
         $documento['codigoGeneracionR'] = null;
      
 
         $dte = compact("identificacion", "emisor", "documento", "motivo");
-         InvalidarDte::invalidar($dte);
+        
         [$responseData, $statusCode] =  InvalidarDte::invalidar($dte);
 
         $anulado = true;

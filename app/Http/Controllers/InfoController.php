@@ -81,7 +81,7 @@ class InfoController extends Controller
 
     public function tipoInvalidacion(){
         return response()->json(
-            MHTipoInvalidacion::all()
+            MHTipoInvalidacion::whereIn('codigo', [2])->get()
         );
     }
 

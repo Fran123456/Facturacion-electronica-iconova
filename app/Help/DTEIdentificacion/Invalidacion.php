@@ -4,6 +4,7 @@ namespace App\Help\DTEIdentificacion;
 
 use App\Help\Generator;
 use App\help\Help;
+use App\Models\RegistroDTE;
 use Illuminate\Support\Facades\Crypt;
 
 class Invalidacion
@@ -18,10 +19,27 @@ class Invalidacion
         $fecha = $fechaHora->format('Y-m-d');
         $hora = $fechaHora->format('H:i:s');
 
+        $generado = Generator::generateCodeGeneration();
+        $generadoDB = RegistroDTE::where('codigo_generacion', $generado)->first();
+        if($generadoDB){
+            $generado = Generator::generateCodeGeneration();
+
+
+            $generadoDB = RegistroDTE::where('codigo_generacion', $generado)->first();
+            if($generadoDB){
+                $generado = Generator::generateCodeGeneration();
+            }
+
+        }else{
+
+        }
+       
+
+
         $identificacion =  [
             "version" => 2,
             "ambiente" => $empresa->ambiente,
-            "codigoGeneracion" => Generator::generateCodeGeneration(),
+            "codigoGeneracion" => $generado,
             "fecAnula" => $fecha,
             "horAnula" => $hora,
         ];
