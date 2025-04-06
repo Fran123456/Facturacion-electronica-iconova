@@ -58,12 +58,12 @@ class DteFcController extends Controller
         $codigoPago = isset($json['codigo_pago']) ? $json['codigo_pago'] : "01";
         $periodoPago = isset($json['periodo_pago']) ? $json['periodo_pago'] :  null;
         $plazoPago = isset($json['plazo_pago']) ? $json['plazo_pago'] :  null;
-        $resumen = FACTDTE::Resumen($cuerpoDocumento, $cliente['tipoCliente'], $pagoTributos, $codigoPago, $periodoPago, $plazoPago);
+        $resumen = FACTDTE::Resumen($cuerpoDocumento, $dte['receptor']['grancontribuyente'] ?? false, $pagoTributos, $codigoPago, $periodoPago, $plazoPago);
 
         // Variables de Documento Relacionado y Cuerpo del Documento
         $documentoRelacionado = $json['documentoRelacionado'] ?? null;
         $otrosDocumentos = $json['otrosDocumentos']??null;
-        $ventaTercero = $json['ventaTercero'];
+        $ventaTercero = $json['ventaTercero'] ?? null;
 
         // Variables de Extensión y Apéndice
         $extension = isset($json['extension']) ? $json['extension'] : null;
@@ -83,6 +83,11 @@ class DteFcController extends Controller
             'apendice' => $apendice
         ];
        
+        return response()->json($newDTE);
+            
+
+        //return response()->json($responseData, $statusCode);
+    
 
         // retornando el json para mh
         //print_r(json_encode($newDTE));

@@ -70,10 +70,10 @@ class FACTDTE
             // Calcular el valor de venta sin descuento
 
             // Calcular el IVA retenido si aplica
-            // if ($idTipoCliente == 3 && $ventaSinDescuento >= 100) {
-            //     $ivaRetenidoItem = round($ventaSinDescuento * 0.01, 2);
-            //     $ivaRetenida += $ivaRetenidoItem;
-            // }
+            if ($idTipoCliente === true && $ventaGravada >= 100) {
+                $ivaRetenidoItem = round(($ventaGravada - $value['ivaItem'] )* 0.01, 2);
+                $ivaRetenida += $ivaRetenidoItem;
+            }
 
             $totalNoSuj += $value['ventaNoSuj'];
             $totalExenta += $value['ventaExenta'];
@@ -84,7 +84,7 @@ class FACTDTE
             // $Exenta = $value['ventaExenta'];
             // $NoGravado = $value['noGravado'];
 
-            $subTotal += $ventaGravada - $ivaRetenidoItem;
+            $subTotal += $ventaGravada;
 
             $totalIva += $value['ivaItem'];
 
