@@ -83,7 +83,7 @@ class DteFcController extends Controller
             'apendice' => $apendice
         ];
        
-        return response()->json($newDTE);
+        // return response()->json($newDTE);
             
 
         //return response()->json($responseData, $statusCode);
