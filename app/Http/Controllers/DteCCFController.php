@@ -116,7 +116,7 @@ class DteCCFController extends Controller
        
         if ($responseLogin['code'] != 200) {
           //  return response()->json(DteCodeValidator::code404($responseLogin['error']), 404);
-             [$responseData, $statusCode] = DteApiMHService::EnviarOfflineMH( $newDTE, $idCliente, $identificacion );
+             [$responseData, $statusCode, $id] = DteApiMHService::EnviarOfflineMH( $newDTE, $idCliente, $identificacion );
         }else{
             
             [$responseData, $statusCode, $id] = DteApiMHService::envidarDTE( $newDTE, $idCliente, $identificacion );

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\InfoController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MainController;
 /*
@@ -26,3 +27,10 @@ Route::get('/Menu', [MainController::class, 'index']);
 Route::get('/pdfdte', [App\Http\Controllers\pdfDTEController::class, 'document']);
 
 Route::get('/pdfdte2', [App\Http\Controllers\pdfDTE2Controller::class, 'document']);
+
+
+Route::prefix('/utilidad')->group(function () {
+
+   Route::get('/pdf', [InfoController::class, 'pdf']);
+   
+});
