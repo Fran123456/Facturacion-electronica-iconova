@@ -94,12 +94,12 @@ class DteFcController extends Controller
         //return;
         $responseLogin = LoginMH::login();
         if ($responseLogin['code'] != 200) {
-            [$responseData, $statusCode] = DteApiMHService::EnviarOfflineMH( $newDTE, $idCliente, $identificacion );
+            [$responseData, $statusCode, $id] = DteApiMHService::EnviarOfflineMH( $newDTE, $idCliente, $identificacion );
         }else{
-            [$responseData, $statusCode] = DteApiMHService::envidarDTE( $newDTE, $idCliente, $identificacion );
+            [$responseData, $statusCode, $id] = DteApiMHService::envidarDTE( $newDTE, $idCliente, $identificacion );
         }
   
-        return $responseData;
+      
 
          $mailInfo = array(
             'responseData'=>$responseData,
@@ -109,6 +109,7 @@ class DteFcController extends Controller
             'fecEmi'=> $identificacion['fecEmi'],
             'horEmi'=> $identificacion['horEmi'],
             'codigoGeneracion'=> $identificacion['codigoGeneracion'],
+            'id'=>$id
         );
 
 

@@ -3,6 +3,9 @@
 namespace App\Help\DTEIdentificacion;
 
 use App\Models\Cliente;
+use App\Models\MH\MHActividadEconomica;
+use App\Models\MH\MHPais;
+use Database\Seeders\MHCodigoActividadEconomica;
 
 class Receptor
 {
@@ -38,6 +41,8 @@ class Receptor
             if ($faltan)
                 return [$faltan, $faltantes];
 
+            $code = MHActividadEconomica::where('codigo', $receptorDte['codActividad'])->first();
+
             $cliente = Cliente::create([
                 'tipo_documento' => $tipoDte,
                 'nit' => $nit,
@@ -45,7 +50,7 @@ class Receptor
                 'dui' => $receptorDte['dui'],
                 'nombre' => $receptorDte['nombre'],
                 'codigo_actividad' => $receptorDte['codActividad'],
-                'descripcion_actividad' => $receptorDte['descActividad'],
+                'descripcion_actividad' => $code->valor,
                 'nombre_comercial' => $receptorDte['nombreComercial'],
                 'departamento' => $receptorDte['direccion']['departamento'],
                 'municipio' => $receptorDte['direccion']['municipio'],
@@ -233,8 +238,9 @@ class Receptor
 
         // Campos para FEX
         if ($tipoDTE == "11") {
+            $pais = MHPais::where('codigo', $complemento["codPais"])->first();
             $receptor["codPais"] = $complemento["codPais"];
-            $receptor["nombrePais"] = $complemento["nombrePais"];
+            $receptor["nombrePais"] = $pais->valor;
             $receptor["complemento"] = $complemento["complemento"];
             $receptor["tipoPersona"] = $complemento["tipoPersona"] ;
         }

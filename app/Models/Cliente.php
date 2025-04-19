@@ -28,6 +28,7 @@ class Cliente extends Model
         'telefono',
         'correo',
         'estado',
+        'otro_documento'
     ];
 
     public function logDTE(){

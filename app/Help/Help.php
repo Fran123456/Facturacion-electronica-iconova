@@ -15,6 +15,7 @@ use App\Models\MH\MHActividadEconomica;
 use Illuminate\Support\Facades\Crypt;
 use App\Models\MH\MHDepartamento;
 use App\Models\MH\MHMunicipio;
+use App\Models\MH\MHTipoDocumento;
 use App\Models\MH\MHTipoEstablecimiento;
 
 class Help
@@ -47,7 +48,7 @@ class Help
 
     public static function getDatosDocumento($codigo_documento)
     {
-        $datos_documento = MH_tipo_documento::where('codigo', $codigo_documento)->first();
+        $datos_documento = MHTipoDocumento::where('codigo', $codigo_documento)->first();
 
         if ($datos_documento->codigo)
             return $datos_documento;
@@ -343,6 +344,66 @@ class Help
             'tipoCliente' => $cliente->id_tipo_cliente
         ];
     }
+
+
+    public static function ValidarClienteFex($numDocumento, $clienteF)
+    {
+        $cliente = null;
+        $dui = null;
+        $nit = null;
+        if($clienteF['tipoDocumento']== '37'){ //otro doc
+            $cliente = Cliente::where('otro_documento', $clienteF['numDocumento'])->first();
+        }
+
+        if($clienteF['tipoDocumento']== '13'){ //dui
+            $cliente = Cliente::where('otro_documento', $clienteF['numDocumento'])->first();
+            if($cliente == null){
+                $cliente = Cliente::where('dui', $clienteF['numDocumento'])->first();
+            }
+            $dui = $clienteF['numDocumento'];
+        }
+
+        
+        if($clienteF['tipoDocumento']== '36'){ //nit
+            $cliente = Cliente::where('otro_documento', $clienteF['numDocumento'])->first();
+            if($cliente == null){
+                $cliente = Cliente::where('nit', $clienteF['numDocumento'])->first();
+            }
+            $nit = $clienteF['numDocumento'];
+        }
+
+        
+
+       
+
+        if($cliente ==null){
+            $cliente = Cliente::create([
+                'nit'=> $nit??null,
+                'nrc'=> $clienteF['nrc']??null,
+                'dui'=> $dui??null,
+                'otro_documento'=> $clienteF['doc']??null,
+                'tipo_documento'=> $clienteF['tipoDocumento']??null,
+                'nombre'=> $clienteF['nombre']?? "Sin nombre",
+                'codigo_actividad'=> $clienteF['codActividad']??null,
+                'descripcion_actividad'=> $clienteF['descActividad']??null,
+                'nombre_comercial'=> $clienteF['nombreComercial']??null,
+                'departamento'=>  $clienteF['direccion']['departamento']??null,
+                'municipio'=> $clienteF['direccion']['municipio']??null,
+                'complemento'=> $clienteF['direccion']['complemento']??null,
+                'telefono'=> $clienteF['telefono']??null,
+                'correo'=> $clienteF['correo']??null,
+                'estado'=> 1,
+            ]);
+        }
+        return [
+            'id' => $cliente->id,
+            'tipoCliente' => $cliente->id_tipo_cliente
+        ];
+    }
+
+
+
+
 
 
     public static function ValidarClienteByEmail($numDocumento,$correo, $clienteF)

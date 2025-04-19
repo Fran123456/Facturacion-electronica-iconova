@@ -114,7 +114,7 @@ class DteApiMHService
             DB::commit();
             
             $statusCode = 400;
-            return [$responseData, $statusCode];
+            return [$responseData, $statusCode,$registoDTE->id];
 
         } finally {
 

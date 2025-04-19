@@ -39,7 +39,8 @@ class DteFexController extends Controller
         // VARAIBLES DE CONFIGURACION DEL DTE
         $dte = $json['dteJson'];
        // $cliente = Help::getClienteId($dte['receptor']['nit']);
-        $cliente = Help::ValidarCliente($dte['receptor']['nit'],$dte['receptor']);
+      
+        $cliente = Help::ValidarClienteFex( $dte['receptor']['numDocumento'] ,$dte['receptor']);
         
         $tipoDTE = '11';
         $idCliente = $cliente['id'];
@@ -93,12 +94,26 @@ class DteFexController extends Controller
 
         $responseLogin = LoginMH::login();
         if ($responseLogin['code'] != 200) {
-            [$responseData, $statusCode] = DteApiMHService::EnviarOfflineMH( $newDTE, $idCliente, $identificacion );
+            [$responseData, $statusCode, $id] = DteApiMHService::EnviarOfflineMH( $newDTE, $idCliente, $identificacion );
         }else{
             
-            [$responseData, $statusCode] = DteApiMHService::envidarDTE( $newDTE, $idCliente, $identificacion );
+            [$responseData, $statusCode, $id] = DteApiMHService::envidarDTE( $newDTE, $idCliente, $identificacion );
         }
 
-        return response()->json($responseData, $statusCode);
+        $mailInfo = array(
+            'responseData'=>$responseData,
+            'statusCode'=>$statusCode,
+            'dte'=> $newDTE,
+            'numeroControl'=>$identificacion['numeroControl'],
+            'fecEmi'=> $identificacion['fecEmi'],
+            'horEmi'=> $identificacion['horEmi'],
+            'codigoGeneracion'=> $identificacion['codigoGeneracion'],
+            'id'=>$id
+        );
+
+
+        return response()->json(
+            $mailInfo
+            , $statusCode);
     }
 }

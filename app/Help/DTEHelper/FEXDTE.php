@@ -4,6 +4,7 @@ namespace App\Help\DTEHelper;
 
 use App\Models\MH\MHIncoterms;
 use App\Help\Help;
+use App\Help\Generator;
 
 class FEXDTE
 {
@@ -154,8 +155,8 @@ class FEXDTE
                 "plazo" => $plazoPago
             ];
         }
-
-        $totalLetras = Help::numberToString($totalPagar);
+        $totalPagar = (float)$totalPagar;
+        $totalLetras =  Generator::generateStringFromNumber($totalPagar);
 
         $inco = null;
         if ( is_null($incoterms) ||  empty ($incoterms) )

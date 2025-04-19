@@ -12,12 +12,36 @@ use App\Models\MH\MHTipoDocumento;
 use App\Models\MH\MHTipoDocumentoReceptor;
 use App\Models\MH\MHTipoInvalidacion;
 use App\Models\MH\MHTipoPersonaModel;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 use Illuminate\Http\Request;
 
 class InfoController extends Controller
 {
-    //
+
+    public function pdf()
+    {
+        $data = [
+            'cliente' => 'Juan Pérez',
+            'nit_cliente' => '0614-XXXXXX-101-1',
+            'direccion_cliente' => 'San Salvador',
+            'fecha' => now()->format('d/m/Y'),
+            'items' => [
+                ['cantidad' => 2, 'descripcion' => 'Servicio de mantenimiento', 'precio' => 50, 'total' => 100],
+                ['cantidad' => 1, 'descripcion' => 'Instalación de software', 'precio' => 75, 'total' => 75],
+            ],
+            'subtotal' => 175,
+            'iva' => 22.75,
+            'total' => 197.75,
+            'observaciones' => 'Pago recibido en efectivo. Gracias por su preferencia.',
+        ];
+    
+        $pdf =Pdf::loadView('factura.plantilla', $data);
+        return $pdf->stream('factura.pdf'); // o ->download('factura.pdf')
+    }
+
+
+    
     public function empresa(Request $request){
         return response()->json([
             Help::getEmpresaByCript()
