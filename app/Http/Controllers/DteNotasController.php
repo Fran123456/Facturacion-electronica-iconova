@@ -112,6 +112,8 @@ class DteNotasController extends Controller
             "extension" => $extension,
             "apendice" => $apendice,
         ];
+
+        // return $newDTE;
       
 
         $responseLogin = LoginMH::login();

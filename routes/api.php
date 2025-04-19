@@ -56,6 +56,7 @@ Route::middleware('auth:sanctum')->group(function () {
         //^ Catalogos
         Route::get('/paises', [InfoController::class, 'paises']);
         Route::get('/distritos', [InfoController::class, 'distritos']);
+        Route::get('/distrito', [InfoController::class, 'distrito']);
         Route::get('/departamentos', [InfoController::class, 'departamentos']);
         Route::get('/tiposPersona', [InfoController::class, 'tiposPersona']);
         Route::get('/codigosActividad', [InfoController::class, 'codigosActividad']);

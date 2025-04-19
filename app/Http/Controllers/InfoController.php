@@ -48,6 +48,12 @@ class InfoController extends Controller
             MHMunicipio::select('id', 'codigo', 'valor', 'departamento')->get()
         );
     }
+    
+    public function distrito(Request $request){
+        return response()->json(
+            MHMunicipio::select('codigo')->where('id', $request->input('id'))->first()
+        );
+    }
 
     public function departamentos(Request $request){
         return response()->json(
