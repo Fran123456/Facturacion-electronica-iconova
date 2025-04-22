@@ -31,44 +31,44 @@ class ConsultasController extends Controller
         try {
             //^ Inicializar la consulta y cargar la relación 'tipoDocumento' 
             $query = RegistroDTE::with('tipoDocumento');
-    
+
             $query->where('empresa_id', Help::getEmpresa()->id);
-    
+
             if ($tipodocumento) {
                 $query->where('tipo_documento', $tipodocumento);
             }
-    
+
             //* Si se envía fechaInicio o fechaFin se filtra por rango de fechas
             if ($fechaInicio || $fechaFin) {
-    
+
                 $fechaInicio = $fechaInicio ?? date('Y-m-d');
-    
+
                 if (!$fechaFin && $fechaInicio) {
                     $fecha = Carbon::parse($fechaInicio);
                     //* Se resta un mes a la fecha de inicio si no se envía fecha fin
                     $fechaFin = $fecha->subMonth()->format('Y-m-d');
                 }
-
             }
 
             //* Se filtra por rango de fechas
             if ($fechaInicio && $fechaFin) {
                 $query->whereBetween('fecha_recibido', [$fechaFin, $fechaInicio]);
             }
-    
+
             if ($estado) {
                 $query->where('estado', $estado);
             }
-    
-            $registros = $query->get();
-    
-            return RegistroDTEResource::collection($registros);
 
+            $registros = $query->get();
+
+            return RegistroDTEResource::collection($registros);
         } catch (Exception $e) {
             return response()->json(
                 [
                     'error' => $e->getMessage()
-                ], 500);
+                ],
+                500
+            );
         }
     }
 
@@ -95,9 +95,10 @@ class ConsultasController extends Controller
             return response()->json(
                 [
                     'error' => $e->getMessage()
-                ], 500);
+                ],
+                500
+            );
         }
-
     }
 
     /**
@@ -124,14 +125,70 @@ class ConsultasController extends Controller
 
             [$responseData, $statusCode] = DteApiMHService::resend($dte, $id, $dte['identificacion']);
             return response()->json($responseData, $statusCode);
-
         } catch (Exception $e) {
             return response()->json(
                 [
                     'error' => $e->getMessage()
-                ], 500);
+                ],
+                500
+            );
         }
+    }
 
+    public function invalidados(ConsultaRequest $request)
+    {
 
+        $request->validated();
+
+        $tipodocumento = $request->query('tipoDocumento');
+        $fechaInicio = $request->query('fechaInicio');
+        $fechaFin = $request->query('fechaFin');
+        // $estado = $request->query('estado');
+
+        try {
+            //^ Inicializar la consulta y cargar la relación 'tipoDocumento' 
+            $query = RegistroDTE::with([
+                'tipoDocumento',
+                'invalidado:id,created_at'
+            ]);
+
+            $query->whereNotNull('invalidacion_id');
+
+            // $query->where('empresa_id', Help::getEmpresa()->id);
+
+            if ($tipodocumento) {
+                $query->where('tipo_documento', $tipodocumento);
+            }
+
+            //* Si se envía fechaInicio o fechaFin se filtra por rango de fechas
+            if ($fechaInicio || $fechaFin) {
+
+                $fechaInicio = $fechaInicio ?? date('Y-m-d');
+
+                if (!$fechaFin && $fechaInicio) {
+                    $fecha = Carbon::parse($fechaInicio);
+                    //* Se resta un mes a la fecha de inicio si no se envía fecha fin
+                    $fechaFin = $fecha->subMonth()->format('Y-m-d');
+                }
+            }
+
+            //* Se filtra por rango de fechas
+            if ($fechaInicio && $fechaFin) {
+                $query->whereBetween('fecha_recibido', [$fechaFin, $fechaInicio]);
+            }
+
+            $query->where('estado', 1);
+
+            $registros = $query->get();
+
+            return RegistroDTEResource::collection($registros);
+        } catch (Exception $e) {
+            return response()->json(
+                [
+                    'error' => $e->getMessage()
+                ],
+                500
+            );
+        }
     }
 }

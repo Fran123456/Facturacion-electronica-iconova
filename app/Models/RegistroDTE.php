@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Help\Services\InvalidarDte;
 use App\Models\MH\MHTipoDocumento;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -28,7 +29,13 @@ class RegistroDTE extends Model
         'estado',
         'empresa_id',
         'response',
-        'dte_firmado','anexo'
+        'dte_firmado',
+        'anexo',
+        'invalidacion_id'
+    ];
+
+    protected $casts = [
+        'fecha_recibido' => 'datetime', // Reemplaza 'fecha' por el nombre de tu columna
     ];
 
     public function cliente(){
@@ -41,6 +48,10 @@ class RegistroDTE extends Model
 
     public function tipoDocumento(){
         return $this->belongsTo(MHTipoDocumento::class, 'tipo_documento', 'codigo')->withDefault();
+    }
+
+    public function invalidado(){
+        return $this->belongsTo(InvalidacionDte::class, 'invalidacion_id');
     }
 
 

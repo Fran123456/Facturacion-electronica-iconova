@@ -28,9 +28,7 @@ class InvalidarDteController extends Controller
         $documento = $dteRequest['documento'];
         $motivo = $dteRequest['motivo'];
 
-      
         $documento['codigoGeneracionR'] = null;
-     
 
         $dte = compact("identificacion", "emisor", "documento", "motivo");
         
@@ -47,4 +45,6 @@ class InvalidarDteController extends Controller
             'anulado'=>$anulado,
         ], $statusCode);
     }
+
+
 }

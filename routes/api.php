@@ -23,9 +23,7 @@ use App\Http\Controllers\ReceptorController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\ContingenciaController;
 use App\Http\Controllers\InfoController;
-
-
-
+use App\Http\Controllers\PdfDTEController;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
@@ -71,10 +69,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 
-
-
-
-
 Route::middleware('auth:sanctum')->group(function () {
     //! Endpoint de prueba
     Route::get('/prueba/empresa', [PruebasController::class, 'empresa']);
@@ -85,6 +79,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/listar', [ConsultasController::class, 'index']);
         Route::get('/listar/{id}', [ConsultasController::class, 'show']);
         Route::post('/reenviar', [ConsultasController::class, 'update']);
+        Route::get('/listar/invalido', [ConsultasController::class, 'invalidados']);
     });
     
     //^ ENDPOINTS DE SERVICIOS DE HACIENDA Y DE LA APLICACIÓN
@@ -117,6 +112,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/mh/enviar/dte/unitario/nr', [DteNrController::class, 'unitario']);
     });
 });
+
+
+Route::get('/pdf', [PdfDTEController::class, 'test']);
 
 //! ENDPOINTS DE PRUEBA
 Route::get('/encriptador', [ServicesController::class, 'encriptador']);

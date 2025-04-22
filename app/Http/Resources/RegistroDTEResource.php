@@ -22,8 +22,9 @@ class RegistroDTEResource extends JsonResource
             'numero_dte' => $this->numero_dte,
             'sello' => $this->sello,
             'estado' => $this->estado,
-            'fecha_recibido' => $this->fecha_recibido,
+            'fecha_recibido' => $this->fecha_recibido->format('Y/m/d'),
             'observaciones' => $this->observaciones,
+            'fecha_invalidado' => $this->invalidado?->created_at?->format('Y/m/d H:i:s'),
         ];
     }
 }
