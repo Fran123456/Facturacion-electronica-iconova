@@ -124,11 +124,18 @@
         <table width="100%" style="border-collapse: collapse; margin-bottom: 5px;">
             <tr>
                 <!-- Columna izquierda: Logo + datos básicos -->
-                <td width="50%" valign="top" style="padding-right: 10px;">
+                <td width="42%" valign="top" style="padding-right: 5px;">
                     <div
-                        style="background-color: #eee; height: 100px; text-align: center; line-height: 50px; font-weight: bold;">
-                        LOGITO UWU XD
+                        style="background-color: #ffffff; height: 80px; text-align: center; line-height: 50px; font-weight: bold;">
+                       
+                        <img src="logo.jpg" width="100" height="100" alt="">
+                       <div>
+                       
+                       </div>
                     </div>
+                    <p>
+                       <h2><strong> {{$empresa->nombre_comercial}}</strong></h2>
+                    </p>
                     <p><strong>NIT:</strong> {{ $data['emisor']['numDoc'] }}</p>
                     <p><strong>NRC:</strong> {{ $data['emisor']['nrc'] }}</p>
                     <p style="line-height: 14px; !important"><strong>Dirección:</strong>
@@ -139,57 +146,66 @@
                 </td>
 
                 <!-- Columna derecha: Información de factura -->
-                <td width="50%" valign="top" style="padding-left: 10px;">
+                <td width="58%" valign="top" style="padding-left: 10px;">
+                    <br>
                     <div
-                        style="background-color: #d00; color: white; text-align: center; padding: 5px; font-weight: bold;">
+                        style="background-color: rgb(63, 149, 189); color: white; text-align: center; padding: 5px; font-weight: bold;">
                         DOCUMENTO TRIBUTARIO ELECTRÓNICO <br>
-                        {{ $data['respuesta']['tipo'] }}
+                        <h3>{{ $data['respuesta']['tipo'] }}</h3>
                     </div>
                     <div style="background-color: #eee; padding: 8px; font-size: 12px;">
-                        <p style="line-height: 14px; !important"><strong>Código de generación:</strong>
+                        <p  style="font-size: 11px;  !important"><strong>Código de generación:</strong>
                             {{ $data['respuesta']['codigo'] }}</p>
-                        <p style="line-height: 14px; !important"><strong>Sello recepción:</strong> <br>
+                        <p  style="font-size: 11x; !important"><strong>Sello recepción:</strong> 
                             {{ $data['respuesta']['sello'] }}</p>
-                        <p><strong>Número de control:</strong> {{ $data['respuesta']['numControl'] }}</p>
-                        <p><strong>Ambiente:</strong> {{ $data['respuesta']['ambiente'] }}</p>
-                        <p><strong>Versión del JSON:</strong> {{ $data['respuesta']['version'] }}</p>
-                        <p><strong>Fecha de emisión:</strong> {{ $data['respuesta']['fecha'] }}</p>
-                        <p><strong>Hora de emisión:</strong> {{ $data['respuesta']['hora'] }}</p>
+                        <p style="font-size: 11px"><strong>Número de control:</strong> {{ $data['respuesta']['numControl'] }}</p>
+                        <p style="font-size: 11px"><strong>Ambiente:</strong> {{ $data['respuesta']['ambiente'] }}</p>
+                        <p style="font-size: 11px"><strong>Versión del JSON:</strong> {{ $data['respuesta']['version'] }}</p>
+                        <p style="font-size: 11px"> <strong>Fecha de emisión:</strong> {{ $data['respuesta']['fecha'] }}</p>
+                        <p style="font-size: 11px"><strong>Hora de emisión:</strong> {{ $data['respuesta']['hora'] }}</p>
                     </div>
                 </td>
             </tr>
         </table>
 
 
-        <table width="100%" style="border-collapse: collapse; margin-bottom: 10px;">
+        <table width="100%" style="border-collapse: collapse; margin-bottom: 1px;">
             <tr>
                 <!-- Columna izquierda: Datos del receptor -->
-                <td width="50%" valign="top" style="padding-right: 10px;">
+                <td width="70%" valign="top" style="padding-right: 10px;">
                     <div style="background-color: #f5f5f5; padding: 8px; border: 1px solid #ccc;">
                         <p><strong>Nombre:</strong> {{ $data['receptor']['nombre'] }}</p>
                         <p><strong>Dirección:</strong>
                             {{ $data['receptor']['municipio'] . ', ' . $data['receptor']['departamento'] . ', ' . $data['receptor']['complemento'] }}
                         </p>
                         <p><strong>NRC:</strong> {{ $data['receptor']['nrc'] }}</p>
-                    </div>
-                </td>
 
-                <!-- Columna derecha: Información personal -->
-                <td width="50%" valign="top" style="padding-left: 10px;">
-                    <div style="background-color: #f5f5f5; padding: 8px; border: 1px solid #ccc;">
-                        <p><strong>Tipo y N° Documento:</strong>
-                            {{ $data['receptor']['tipoDoc'] . ' - ' . $data['receptor']['numDoc'] }}</p>
+                        <p><strong>Tipo Documento: </strong>{{$data['receptor']['tipoDoc'] }}</p>
+                        <p><strong>Documento:</strong>{{  $data['receptor']['numDoc'] }}</p>
                         <p><strong>Teléfono:</strong> {{ $data['receptor']['telefono'] }}</p>
                         <p><strong>Correo:</strong> {{ $data['receptor']['correo'] }}</p>
                     </div>
+
+                </td>
+
+                <!-- Columna derecha: Información personal -->
+                <td width="30%" valign="top" style="margin-top:-10px;text-align: center;">
+                
+                   
+                        <img src="data:image/png;base64, {!! $qr !!}" alt="QR Code" width="160" height="160"  style="margin-button:10px">
+                      
+                
                 </td>
             </tr>
         </table>
+        <br>
 
 
-        <table width="100%" style="border-collapse: collapse; margin-bottom: 5px;">
+        <table width="100%" style="border-collapse: collapse; margin-bottom: 5px;margin-top:5px">
+            
             <caption style="background-color: #eeeeeeab; font-weight: bold; height: 20px; vertical-align: center;">
                 CUERPO DEL DOCUMENTO</caption>
+
             <thead style="background-color: #eeeeeeab;">
                 <tr>
                     <th class="table-border">Num Item</th>
