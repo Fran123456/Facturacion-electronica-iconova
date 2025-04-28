@@ -13,7 +13,11 @@ use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf as DomPDF;
 use Illuminate\Support\Facades\Crypt;
 
-
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\ErrorCorrectionLevel;
+use Endroid\QrCode\LabelAlignment;
+use Endroid\QrCode\Response\QrCodeResponse;
+use Endroid\QrCode\Writer\PngWriter;
 
 class PdfDTEController extends Controller
 
@@ -216,17 +220,47 @@ class PdfDTEController extends Controller
         $document->Output($documentFileName, \Mpdf\Output\Destination::INLINE);
     }
 
-    public function test(Request $request)
+    public function test(Request $request, $empresaId)
     {
         $dte = RegistroDTE::with([
             'tipoDocumento'
-        ])->find(707);
+        ])->find(7);
+    
+        $empresa =Empresa::find($empresaId);
+        $ambiente = $empresa->ambiente;
+        $gen = $dte->codigo_generacion;
+        $emision = $dte->fecha_recibido;
+        $emision = \Carbon\Carbon::parse($emision)->toDateString();
+        $url = 'https://admin.factura.gob.sv/consultaPublica?ambiente='.$ambiente.'&codGen='.$gen.'&fechaEmi='.$emision;
+        
+      
+        $qrCode = new QrCode($url);
+
+        // Configurar el tamaño y otras opciones
+       // Configurar tamaño y demás
+       $qrCode = new QrCode($url);
+
+       // Opciones
+       $qrCode->setSize(200);
+       $qrCode->setMargin(10);
+    
+       
+       // Usar el writer
+       $writer = new PngWriter();
+       $result = $writer->write($qrCode);
+       
+       // Obtener el contenido como string
+       $qrContent = $result->getString();
+       
+       // Codificar en base64
+       $qr = base64_encode($qrContent);
+
 
         // return (new GeneratePdfDte)->generateStructure($dte);
 
         $data = (new GeneratePdfDte)->generateStructure($dte);
 
-        $pdf = DomPDF::loadView('pdf.plantillaDte', compact('data')); // Carga la vista con los datos
+        $pdf = DomPDF::loadView('pdf.plantillaDte', compact('data','empresa','url','qr')); // Carga la vista con los datos
         $pdf->setPaper('A4', 'portrait');
         return $pdf->stream('dte.pdf'); // Muestra el PDF en el navegador
     }

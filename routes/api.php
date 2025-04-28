@@ -114,7 +114,7 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 
-Route::get('/pdf', [PdfDTEController::class, 'test']);
+Route::get('/pdf/{empresaId}', [PdfDTEController::class, 'test']);
 
 //! ENDPOINTS DE PRUEBA
 Route::get('/encriptador', [ServicesController::class, 'encriptador']);
