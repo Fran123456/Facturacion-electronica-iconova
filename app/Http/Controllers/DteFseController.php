@@ -19,10 +19,6 @@ class DteFseController extends Controller
     {
 
         //* Login para generar token de Hacienda.
-       /* $responseLogin = LoginMH::login();
-        if ($responseLogin['code'] != 200) {
-            return response()->json(DteCodeValidator::code404($responseLogin['error']), 404);
-        }*/
 
         $json = $request->json()->all();
 
@@ -61,44 +57,40 @@ class DteFseController extends Controller
         $apendice = $json['apendice'] ?? null;
 
         $newDTE = compact(
-            'identificacion', 
-            'emisor', 
-            'sujetoExcluido', 
-            'cuerpoDocumento', 
-            'resumen', 
+            'identificacion',
+            'emisor',
+            'sujetoExcluido',
+            'cuerpoDocumento',
+            'resumen',
             'apendice'
         );
 
+        // return $newDTE;
+
         $responseLogin = LoginMH::login();
-       
+
         if ($responseLogin['code'] != 200) {
-            [$responseData, $statusCode] = DteApiMHService::EnviarOfflineMH( $newDTE, $idCliente, $identificacion );
-        }else{
-            
-            [$responseData, $statusCode] = DteApiMHService::envidarDTE( $newDTE, $idCliente, $identificacion );
+            [$responseData, $statusCode, $id] = DteApiMHService::EnviarOfflineMH($newDTE, $idCliente, $identificacion);
+        } else {
+
+            [$responseData, $statusCode, $id] = DteApiMHService::envidarDTE($newDTE, $idCliente, $identificacion);
         }
 
-       
-
-
-         
         $mailInfo = array(
-            'responseData'=>$responseData,
-            'statusCode'=>$statusCode,
-            'dte'=> $newDTE,
-            'numeroControl'=>$identificacion['numeroControl'],
-            'fecEmi'=> $identificacion['fecEmi'],
-            'horEmi'=> $identificacion['horEmi'],
-            'codigoGeneracion'=> $identificacion['codigoGeneracion'],
+            'responseData' => $responseData,
+            'statusCode' => $statusCode,
+            'dte' => $newDTE,
+            'numeroControl' => $identificacion['numeroControl'],
+            'fecEmi' => $identificacion['fecEmi'],
+            'horEmi' => $identificacion['horEmi'],
+            'codigoGeneracion' => $identificacion['codigoGeneracion'],
+            'id'=>$id
         );
 
-
         return response()->json(
-            $mailInfo
-            , $statusCode);
-
-
-
+            $mailInfo,
+            $statusCode
+        );
 
         //return response()->json($responseData, $statusCode);
 

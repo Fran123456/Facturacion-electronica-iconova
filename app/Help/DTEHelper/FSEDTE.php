@@ -1,11 +1,14 @@
 <?php
+
 namespace App\Help\DTEHelper;
 
 use App\Help\Generator;
 
-class FSEDTE { 
+class FSEDTE
+{
 
-    public static function cuerpo($cuerpo){
+    public static function cuerpo($cuerpo)
+    {
 
         if ($cuerpo == null)
             return null;
@@ -18,15 +21,13 @@ class FSEDTE {
         return $cuerpo;
     }
 
-    public static function resumen($cuerpo){
-
-        $resumen = [];
+    public static function resumen($cuerpo)
+    {
 
         // VARIABLES PARA GUARDAR CALCULOS APARTIR DE LOS ITEMS DEL CUERPO DEL DOCUMENTO
         $totalCompra = 0.0;
         $totalDescu = 0.0;
         $totalPagar = 0.0;
-        $montoTotalOperacion = 0.0;
 
         $descu = 0.0;
         $subTotal = 0.0;
@@ -38,8 +39,7 @@ class FSEDTE {
         $observaciones = null;
 
         // VARIABLES DE PROCESO PARA GUARDAR VALORES A USAR AFUERA DEL CICLO FOREACH
-        $numItem = 1;
-        foreach ($cuerpo as $key => $value) {
+        foreach ($cuerpo as $value) {
 
             $compraItem = $value['compra'];
             $cantidadItem = $value['cantidad'];
@@ -63,20 +63,17 @@ class FSEDTE {
 
         $totalLetras = Generator::generateStringFromNumber($totalPagar);
 
-        $resumen = compact( 
-            'totalCompra', 
-            'totalDescu', 
-            'totalPagar', 
+        return compact(
+            'totalCompra',
+            'totalDescu',
+            'totalPagar',
             'totalLetras',
-            'descu', 
-            'subTotal', 
-            'ivaRete1', 
-            'reteRenta', 
-            'pagos', 
-            'observaciones', 
+            'descu',
+            'subTotal',
+            'ivaRete1',
+            'reteRenta',
+            'pagos',
+            'observaciones',
         );
-
-        return $resumen;
     }
-
 }
