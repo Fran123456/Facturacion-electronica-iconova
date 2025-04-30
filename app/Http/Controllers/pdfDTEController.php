@@ -14,9 +14,6 @@ use Barryvdh\DomPDF\Facade\Pdf as DomPDF;
 use Illuminate\Support\Facades\Crypt;
 
 use Endroid\QrCode\QrCode;
-use Endroid\QrCode\ErrorCorrectionLevel;
-use Endroid\QrCode\LabelAlignment;
-use Endroid\QrCode\Response\QrCodeResponse;
 use Endroid\QrCode\Writer\PngWriter;
 
 class PdfDTEController extends Controller
