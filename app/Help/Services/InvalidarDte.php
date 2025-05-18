@@ -72,6 +72,7 @@ class InvalidarDte
                 'sello' => $responseData['selloRecibido'],
                 'dte' => json_encode($dte),
             ]);
+
             $registroDte->invalidacion_id = $dteInvalidado->id;
             $registroDte->save();
 

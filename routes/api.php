@@ -79,7 +79,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/listar', [ConsultasController::class, 'index']);
         Route::get('/listar/{id}', [ConsultasController::class, 'show']);
         Route::post('/reenviar', [ConsultasController::class, 'update']);
-        Route::get('/listar/invalido', [ConsultasController::class, 'invalidados']);
+        Route::get('/listar/invalidos/dte', [ConsultasController::class, 'invalidados']);
     });
     
     //^ ENDPOINTS DE SERVICIOS DE HACIENDA Y DE LA APLICACIÓN

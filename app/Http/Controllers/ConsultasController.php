@@ -135,10 +135,8 @@ class ConsultasController extends Controller
         }
     }
 
-    public function invalidados(ConsultaRequest $request)
+    public function invalidados(Request $request)
     {
-
-        $request->validated();
 
         $tipodocumento = $request->query('tipoDocumento');
         $fechaInicio = $request->query('fechaInicio');
