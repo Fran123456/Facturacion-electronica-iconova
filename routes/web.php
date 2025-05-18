@@ -26,7 +26,9 @@ Route::get('/Menu', [MainController::class, 'index']);
 
 Route::get('/pdfdte', [App\Http\Controllers\pdfDTEController::class, 'document']);
 
-Route::get('/pdfdte2', [App\Http\Controllers\pdfDTE2Controller::class, 'document']);
+//Route::get('/pdfdte2', [App\Http\Controllers\pdfDTE2Controller::class, 'document']);
+
+Route::get('/pdf/{CodigoGeneracion}', [App\Http\Controllers\PdfDTEController::class, 'document']);
 
 
 Route::prefix('/utilidad')->group(function () {

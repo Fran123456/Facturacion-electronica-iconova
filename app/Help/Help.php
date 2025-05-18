@@ -34,17 +34,7 @@ class Help
         return 'CODIGO DE ACTIVIDAD NO EXISTE';
     }
 
-    public static function pdfDTEdatos($codigo_dte)
-    {
-        $datos_dte = RegistroDTE::where('codigo_generacion', $codigo_dte)->first();
-
-        if(isset($datos_dte->sello))
-        {
-            return $datos_dte;
-        }
-
-        return 'DTE NO EXISTE O NO HA SIDO SELLADO';
-    }
+   
 
     public static function getDatosDocumento($codigo_documento)
     {

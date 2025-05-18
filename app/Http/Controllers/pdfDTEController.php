@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Storage;
 use App\help\Help;
 use App\Help\PDF\GeneratePdfDte;
 use App\Models\Empresa;
+use App\Models\MH\MHTipoDocumentoReceptor;
 use App\Models\RegistroDTE;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf as DomPDF;
@@ -15,250 +16,376 @@ use Illuminate\Support\Facades\Crypt;
 
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
+use Illuminate\Support\Facades\DB;
 
 class PdfDTEController extends Controller
 
 {
-    public function document()
-    {
-
-
-        // recupera todos los registros
-        //$empresa = Help::getEmpresa();
-
-        //recupera el registro de la empresa con el id enviado 
-        $empresa  =  Empresa::find(1);
-
-        $nombre_comercial = $empresa->nombre_comercial;
-        $nrc = crypt::decryptString($empresa->nrc);
-        $nit = crypt::decryptString($empresa->nit);
-
-        $email = crypt::decryptString($empresa->correo_electronico);
-        $telefono = crypt::decryptString($empresa->telefono);
-        $direccion = $empresa->direccion;
-
-        $nDTE = (isset($_REQUEST['ndte'])) ? $_REQUEST['ndte'] : 'ABC';
-
-        $cur_datosDTE = Help::pdfDTEdatos($nDTE);
-
-        /*           
-        $cur_sello = $cur_datosDTE['sello'];
-        $cur_codgen = $cur_datosDTE['codigo_generacion'];
-        $cur_tipo_doc = $cur_datosDTE['tipo_documento'];
-        $cur_fecha_emi = $cur_datosDTE['fecha_recibido'];
-        */
-
-        $cur_sello = $cur_datosDTE->sello;
-        $cur_codgen = $cur_datosDTE->codigo_generacion;
-        $cur_tipo_doc = $cur_datosDTE->tipo_documento;
-        $cur_fecha_emi = $cur_datosDTE->fecha_recibido;
-
-        $cur_ambiente = '00';
-
-        $cur_datos_documento = Help::getDatosDocumento($cur_tipo_doc);
-        $cur_descript_doc = strtoupper($cur_datos_documento['valor']);
-
-
-
-        // Setup a filename 
-        $documentFileName = $nDTE . ".pdf";
-
-        // Create the mPDF document
-        $document = new PDF([
-            'mode' => 'utf-8',
-            'format' => 'A4',
-            'margin_header' => '3',
-            'margin_top' => '20',
-            'margin_bottom' => '20',
-            'margin_footer' => '2',
-        ]);
-
-        // Set some header informations for output
-        $header = [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline; filename="' . $documentFileName . '"'
-        ];
-
-
-        $html = '
-<table border="0" width="100%">
-<tbody>
-    <tr>
-        <td width="40%"><img src="../app/assets/tiendanueva_150x150.png">
-       
-          <table>
-            <tbody>
-           
-                <tr>
-                    <td align="left">
-                       <p style="font-weight:bold; font-size:10pt;">' . $nombre_comercial . '</p>
-                        <table>
-                            <tbody>
-                                 <tr>
-                                     <td align="left">
-                                            <tr><td>
-                                                <p><b>NIT:</b></p>
-                                            </td></tr>
-                                            <tr><td>
-                                                <p><b>NRC:</b></p>
-                                            </td></tr>
-                                             <tr><td>
-                                                <p><b>ACTIVIDA ECONOMICA:</b></p>
-                                            </td></tr>
-                                             <tr><td>
-                                                <p><b>DIRECCION:</b></p>
-                                            </td></tr>
-                                             <tr><td>
-                                                <p><b>TELEFONO:</b></p>
-                                            </td></tr>
-                                             <tr><td>
-                                                <p><b>EMAIL:</b></p>
-                                            </td></tr>
-                                     </td>
-                                     <td aling="left">
-                                            <p>' . $nit . '</p>
-                                            <p><b>NRC:</b>' . $nrc . '</p>
-                                            <p><b>Actividad economica:</b></p>
-                                            <p>Compra y venta de productos primer necesidad</p>
-                                            <p><b>Direccion</b></p>
-                                            <p>' . $direccion . '</p>
-                                            <p><b>Numero de telefono</b></p>
-                                            <p>' . $telefono . '</p>
-                                            <p><b>Correo electronico</b></p>
-                                            <p>' . $email . '</p>
-
-                                     </td>
-                                  </tr>
-                            </tbody>
-                        </table> 
-
-                        
-                        
-
-                    </td>
-                </tr>
-            
-            </tbody>
-            </table>
-
-
-
-
-        </td>
-        <td width="60%"  style="border: 1px solid;">
-            
-            <table>
-                <tbody>
-                    <tr>
-                        <td width="100%" style="background-color:#084f08;color:white;">
-                            <center><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>DOCUMENTO TRIBUTARIO ELECTRONICO</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p></center>
-                            <p>' . $cur_descript_doc . '</p>          
-                        </td>
-                   </tr>
-                </tbody>
-            </table>  
-
-            <table>
-            <tbody>
-           
-                <tr>
-                   
-                    <td>
-                    <center><p style="font-size:8px;">Escanea este QR para ir al sitio del Ministerio de Hacienda y validar la información aqui contenida</p></center>
-                    <barcode code="https://admin.factura.gob.sv/consultaPublica?ambiente=' . $cur_ambiente . '&codGen=' . $nDTE . '&fechaEmi=' . $cur_fecha_emi . '" type="QR" class="barcode" size="1.5" error="M" />
-                    </td>
-
-                    <td><center><b><p>Codigo de generacion</p></b></center>
-                    <p style="font-size:10px;">' . $cur_codgen . '</p>
-                    <b><p>Sello de recepcion</p></b></center>
-                    <p style="font-size:10px;">' . $cur_sello . '</p>
-                    <b><p>Numero de control DTE</p></b></center>
-                    <p style="font-size:10px;">' . $nDTE . '</p>
-                    </td>
-                </tr>
-            
-            </tbody>
-            </table>
-           
-        </td>
-        
-    </tr>
-
-  
-</tbody>
-</table>
-';
-
-
-
-        // Write some simple Content
-        /*
-        $document->WriteHTML('<h1 style="color:blue">TheCodingJack</h1>');
-        $document->WriteHTML('<p>Write something, just for fun!</p>');
-        $document->WriteHTML('<p>Excelente...salvador</p>');
-        */
-
-        $document->SetDisplayMode('fullpage');
-
-        $document->list_indent_first_level = 0; // 1 or 0 - whether to indent the first level of a list
-
-        // Load a stylesheet
-        $stylesheet = file_get_contents('../resources/css/fe-gral-pdf.css');
-
-        $document->WriteHTML($stylesheet, 1); // The parameter 1 tells that this is css/style only and no body/html/text
-        $document->WriteHTML($html, 2);
-
-        // Save PDF on your public storage (fe-gral/storage/app/public)
-        Storage::disk('public')->put($documentFileName, $document->Output($documentFileName, "S"));
-
-        // Get file back from storage with the give header informations
-        // return Storage::disk('public')->download($documentFileName, 'Request', $header); //
-
-        $document->Output($documentFileName, \Mpdf\Output\Destination::INLINE);
-    }
 
     public function test(Request $request, $empresaId)
     {
         $dte = RegistroDTE::with([
             'tipoDocumento'
         ])->find(7);
-    
-        $empresa =Empresa::find($empresaId);
+
+        $empresa = Empresa::find($empresaId);
         $ambiente = $empresa->ambiente;
         $gen = $dte->codigo_generacion;
         $emision = $dte->fecha_recibido;
         $emision = \Carbon\Carbon::parse($emision)->toDateString();
-        $url = 'https://admin.factura.gob.sv/consultaPublica?ambiente='.$ambiente.'&codGen='.$gen.'&fechaEmi='.$emision;
-        
-      
-        $qrCode = new QrCode($url);
+        $url = 'https://admin.factura.gob.sv/consultaPublica?ambiente=' . $ambiente . '&codGen=' . $gen . '&fechaEmi=' . $emision;
+
 
         // Configurar el tamaño y otras opciones
-       // Configurar tamaño y demás
-       $qrCode = new QrCode($url);
+        // Configurar tamaño y demás
+        $qrCode = new QrCode($url);
 
-       // Opciones
-       $qrCode->setSize(200);
-       $qrCode->setMargin(10);
-    
-       
-       // Usar el writer
-       $writer = new PngWriter();
-       $result = $writer->write($qrCode);
-       
-       // Obtener el contenido como string
-       $qrContent = $result->getString();
-       
-       // Codificar en base64
-       $qr = base64_encode($qrContent);
+        // Opciones
+        $qrCode->setSize(200);
+        $qrCode->setMargin(10);
+
+
+        // Usar el writer
+        $writer = new PngWriter();
+        $result = $writer->write($qrCode);
+
+        // Obtener el contenido como string
+        $qrContent = $result->getString();
+
+        // Codificar en base64
+        $qr = base64_encode($qrContent);
+        return $qr;
 
 
         // return (new GeneratePdfDte)->generateStructure($dte);
 
         $data = (new GeneratePdfDte)->generateStructure($dte);
 
-        $pdf = DomPDF::loadView('pdf.plantillaDte', compact('data','empresa','url','qr')); // Carga la vista con los datos
+        $pdf = DomPDF::loadView('pdf.plantillaDte', compact('data', 'empresa', 'url', 'qr')); // Carga la vista con los datos
         $pdf->setPaper('A4', 'portrait');
         return $pdf->stream('dte.pdf'); // Muestra el PDF en el navegador
+    }
+
+    public function generarPdf($CodGeneracion)
+    {
+
+        $data = $this->documentData($CodGeneracion);
+        $url = $data['url'];
+        $qr = $data['qr'];
+        $data = $data['data'];
+        $pdf = DomPDF::loadView('plantillaDte', compact('data', 'url', 'qr')); // Carga la vista con los datos
+        return $pdf->setPaper('A4', 'portrait');
+    }
+
+    public function document($CodGeneracion)
+    {
+    
+        $data = $this->documentData($CodGeneracion);
+            
+        $url = $data['url'];
+        $qr = $data['qr'];
+        $data = $data['data'];
+   
+
+
+
+        $pdf = DomPDF::loadView('pdf.plantillaDteNew', compact('data', 'url', 'qr')); // Carga la vista con los datos
+        $pdf->setPaper('A4', 'portrait');
+        return $pdf->stream('dte.pdf'); // Muestra el PDF en el navegador
+    }
+
+
+    public function documentData($CodGeneracion)
+    {
+
+        $registroDTE =  RegistroDTE::where('codigo_generacion', $CodGeneracion)->first();
+
+    
+        $sello = $registroDTE?->sello;
+        $codigo_generacion = $registroDTE->codigo_generacion;
+        $tipo_documento = $registroDTE->tipo_documento;
+        $numero_dte = $registroDTE->numero_dte;
+
+        $JsonDTE = json_decode($registroDTE->dte, true);
+
+        $emisor_activida_economica = $JsonDTE["emisor"]["descActividad"];
+        $emisor_nit = $JsonDTE["emisor"]["nit"];
+        $emisor_nrc = $JsonDTE["emisor"]["nrc"];
+        $emisor_correo = $JsonDTE["emisor"]["correo"];
+        $emisor_direccion = $JsonDTE["emisor"]["direccion"]["complemento"];
+
+        $emisor_municipio = $JsonDTE["emisor"]["direccion"]["municipio"];
+        $emisor_departamento = $JsonDTE["emisor"]["direccion"]["departamento"];
+
+        $emisor_municipio = DB::table('mh_municipio')->where('codigo', $emisor_municipio)->first()?->valor;
+        $emisor_departamento = DB::table('mh_departamento')->where('codigo', $emisor_departamento)->first()?->valor;
+
+
+        $emisor_nombre = $JsonDTE["emisor"]["nombre"];
+        $emisor_nombreComercial = $JsonDTE["emisor"]["nombreComercial"];
+        $emisor_telefono = $JsonDTE["emisor"]["telefono"];
+        // RECEPTOR
+        $receptor_descActividad = $JsonDTE["receptor"]["descActividad"];
+        $receptor_codActividad = $JsonDTE["receptor"]["codActividad"];
+        $receptor_nit = "";
+
+        if ($tipo_documento == "03") { //ccf
+            if ($JsonDTE["receptor"]["nit"] != null) {
+                $receptor_numDocumento = $JsonDTE["receptor"]["nit"];
+                $receptor_tipoDocumento = "NIT";
+            }
+        } else if ($tipo_documento == "01") //factura
+        {
+            $receptor_numDocumento = isset($JsonDTE["receptor"]["numDocumento"]) ? $JsonDTE["receptor"]["numDocumento"] : "";
+            $receptor_tipoDocumento = isset($JsonDTE["receptor"]["tipoDocumento"]) ? $JsonDTE["receptor"]["tipoDocumento"] : "";
+
+            $receptor_tipoDocumento = MHTipoDocumentoReceptor::where('codigo', $receptor_tipoDocumento)->first()?->valor;
+        }
+
+
+        $receptor_municipio = $JsonDTE["receptor"]["direccion"]["municipio"];
+        $receptor_municipio = DB::table('mh_municipio')->where('codigo', $receptor_municipio)->first()?->valor;
+
+        $receptor_departamento = $JsonDTE["receptor"]["direccion"]["departamento"];
+        $receptor_departamento = DB::table('mh_departamento')->where('codigo', $receptor_departamento)->first()?->valor;
+
+        $receptor_nrc = $JsonDTE["receptor"]["nrc"];
+        $receptor_correo = $JsonDTE["receptor"]["correo"];
+
+        $receptor_direccion = "";
+        if (isset($JsonDTE["receptor"]["direccion"]["complemento"])) {
+            $receptor_direccion = $JsonDTE["receptor"]["direccion"]["complemento"];
+        } elseif (isset($JsonDTE["receptor"]["direccion"])) {
+            $receptor_direccion = $JsonDTE["receptor"]["direccion"];
+        }
+
+        $receptor_nrc = $JsonDTE["receptor"]["nrc"];
+        $receptor_correo = $JsonDTE["receptor"]["correo"];
+
+        $receptor_direccion = "";
+        if (isset($JsonDTE["receptor"]["direccion"]["complemento"])) {
+            $receptor_direccion = $JsonDTE["receptor"]["direccion"]["complemento"];
+        } elseif (isset($JsonDTE["receptor"]["direccion"])) {
+            $receptor_direccion = $JsonDTE["receptor"]["direccion"];
+        }
+
+        $receptor_nombre = $JsonDTE["receptor"]["nombre"];
+        $receptor_telefono = $JsonDTE["receptor"]["telefono"];
+
+        $total_subtotal = $JsonDTE["resumen"]["subTotal"];
+        $ivaRete1 = $JsonDTE["resumen"]["ivaRete1"];
+        $totalPagar = $JsonDTE["resumen"]["totalPagar"];
+
+        $total_totalgravado = $JsonDTE["resumen"]["totalGravada"];
+        $total_montototaloperaciones = $JsonDTE["resumen"]["montoTotalOperacion"];
+        $total_ivaretenido = $JsonDTE["resumen"]["ivaRete1"];
+        $total_retencionrenta = $JsonDTE["resumen"]["reteRenta"];
+        $total_descuentonosujetas = $JsonDTE["resumen"]["descuNoSuj"];
+        $total_totalexenta = $JsonDTE["resumen"]["totalExenta"];
+        $total_totalnogravado = $JsonDTE["resumen"]["totalNoGravado"];
+
+        $fecha_emision = $JsonDTE["identificacion"]["fecEmi"];
+        $hora_emision =  $JsonDTE["identificacion"]["horEmi"];
+        $emision = $fecha_emision . " " . $hora_emision;
+
+        $ambiente = $JsonDTE["identificacion"]["ambiente"];
+        $tipoDte = $JsonDTE["identificacion"]["tipoDte"];
+        $versionjson = $JsonDTE["identificacion"]["version"];
+        $cur_datos_documento = Help::getDatosDocumento($tipoDte);
+        $cur_descript_doc = strtoupper($cur_datos_documento['valor']);
+
+        // Setup a filename
+        $documentFileName = $CodGeneracion . ".pdf";
+        $total_totaliva = 0;
+        if ($tipoDte != '01') {
+            // 01=Factura, 03=CCF
+            if (isset($JsonDTE["resumen"]["tributos"]["valor"])) {
+                $total_totaliva = $JsonDTE["resumen"]["tributos"]["valor"];
+            } elseif (isset($JsonDTE["resumen"]["tributos"][0]["valor"])) {
+                $total_totaliva = $JsonDTE["resumen"]["tributos"][0]["valor"];
+            } elseif (isset($JsonDTE["resumen"]["totalIva"])) {
+                $total_totaliva = $JsonDTE["resumen"]["totalIva"];
+            }
+        }
+
+
+        $url = 'https://admin.factura.gob.sv/consultaPublica?ambiente=' . $ambiente . '&codGen=' . $codigo_generacion . '&fechaEmi=' . $fecha_emision;
+
+        $aDetalle = $JsonDTE["cuerpoDocumento"];
+        $Html_detalle = "";
+        $tNoSujeta = 0;
+        $tExenta   = 0;
+        $tGravada  = 0;
+
+        foreach ($aDetalle as $row) {
+
+            $sDesc = str_split($row["descripcion"], 60);
+
+            $cantidad = $row["cantidad"];
+            $preciouni = $row["precioUni"];
+            $ventasNoSuj = $row["ventaNoSuj"];
+            $ventaExenta = $row["ventaExenta"];
+            $ventaGravada = $row["ventaGravada"];
+
+
+            $tNoSujeta = $tNoSujeta + $ventasNoSuj;
+            $tExenta   = $tExenta + $ventaExenta;
+            $tGravada  = $tGravada + $ventaGravada;
+
+
+            $LaDescrip = "";
+            $nRow = 1;
+            foreach ($sDesc as $Fila) {
+                if ($nRow == 1) {
+                    $LaDescrip = $Fila;
+                } else {
+                    $LaDescrip = $LaDescrip . "<br>" . $Fila;
+                }
+                $nRow = $nRow + 1;
+            }
+
+            $total_letras = Help::numberToString($totalPagar);
+
+
+            $l1 = '<tr>';
+            $l2 = '<td style="text-align: center;width: 7%;">' . $cantidad . '</td>';
+            $l3 = '<td style="text-align: left;;width: 55%;">' . $LaDescrip . '</td>';
+            $l4 = '<td style="text-align: right;width: 10%;">' . number_format($preciouni, 2) . '</td>';
+            $l5 = '<td style="text-align: right;width: 10%;">' . number_format($ventasNoSuj, 2) . '</td>';
+            $l6 = '<td style="text-align: right;width: 10%;">' . number_format($ventaExenta, 2) . '</td>';
+            $l7 = '<td style="text-align: right;width: 10%;">' . number_format($ventaGravada, 2) . '</td>';
+
+            $l8 = '</tr>';
+
+
+
+
+            $Html_detalle = $Html_detalle . $l1 . $l2 . $l3 . $l4 . $l5 . $l6 . $l7 . $l8;
+        }
+
+
+        $cfoot = '<tr><td><span>.</span></td></tr><tr style="border-top: solid 1px;">
+                 <td colspan="3"style="text-align: right;">SUMAS</td>
+                 <td style="text-align: right;">' . number_format($tNoSujeta, 2) . '</td>
+                 <td style="text-align: right;">' . number_format($tExenta, 2) . '</td>
+                 <td style="text-align: right;">' . number_format($tGravada, 2) . '</td>
+                 <tr>';
+
+
+        $cfoot2 = '<tr style="border-top: solid 1px;">
+                 <td colspan="4" style="text-align: right;">Suma de operaciones</td>
+                 <td></td>
+                 <td style="text-align: right;">' . number_format($total_totalgravado, 2) . '</td></tr>';
+
+        $cfoot3 = "";
+
+        if ($tipoDte != '01') {
+            $cfoot3 = '<tr><td colspan="4" style="text-align: right;">IVA</td>
+                 <td></td>
+                 <td style="text-align: right;">' . number_format($total_totaliva, 2) . '</td></tr>';
+        }
+
+
+        $cfoot4 = '<tr>
+                 <td colspan="4" style="text-align: right;">Suma de ventas no sujetas</td>
+                 <td></td>
+                 <td style="text-align: right;">' . number_format($total_descuentonosujetas, 2) . '</td></tr>';
+
+        $cfoot5 = '<tr>
+                 <td colspan="4" style="text-align: right;">Suma de ventas exentas</td>
+                 <td></td>
+                 <td style="text-align: right;">' . number_format($total_totalexenta, 2) . '</td></tr>';
+
+
+        $cfoot6 = '<tr>
+                 <td colspan="4" style="text-align: right;">Sub-total</td>
+                 <td></td>
+                 <td style="text-align: right;">' . number_format($total_subtotal, 2) . '</td></tr>';
+
+        $cfoot7 = '<tr>
+                 <td colspan="4" style="text-align: right;">IVA retenido</td>
+                 <td></td>
+                 <td style="text-align: right;">' . number_format($total_ivaretenido, 2) . '</td></tr>';
+
+        $cfoot8 = '<tr style="border-top: solid 1px;background:black;color: white;">
+                 <td colspan="4" style="text-align: right;"><b>total a pagar o saldo a favor</b></td>
+                 <td></td>
+                 <td style="text-align: right;"><b>' . number_format($totalPagar, 2) . '</b></td></tr>';
+
+        $cfoot9 = '<tr style="border-top: solid 1px;">
+                 <td colspan="4" style="text-align: left;"><b>Valor en letras:' . $total_letras . ' USD</b></td>
+                 <td></td><td></td></tr>';
+
+        $Html_detalle = $Html_detalle . $cfoot . $cfoot2 . $cfoot3 . $cfoot4 . $cfoot5 . $cfoot6 . $cfoot7 . $cfoot8 . $cfoot9;
+
+        //-----------------------------------------------
+
+        $data = array(
+            'emisor' => array(
+                'nombre' => $emisor_nombre,
+                'nombreComercial' => $emisor_nombreComercial,
+                'numDoc' => $emisor_nit,
+                'nrc' => $emisor_nrc,
+                'municipio' => $emisor_municipio,
+                'departamento' => $emisor_departamento,
+                'complemento' => $emisor_direccion,
+                'telefono' => $emisor_telefono,
+                'correo' => $emisor_correo
+            ),
+            'respuesta' => array(
+                'tipo' => $tipoDte,
+                'descripcionTipo' => $cur_descript_doc,
+                'codigo' => $codigo_generacion,
+                'sello' => $sello,
+                'numControl' => $numero_dte,
+                'ambiente' => $ambiente,
+                'version' => $versionjson,
+                'fecha' => $fecha_emision,
+                'hora' => $hora_emision
+            ),
+            'receptor' => array(
+                'nombre' => $receptor_nombre,
+                'municipio' => $receptor_municipio,
+                'departamento' => $receptor_departamento,
+                'complemento' => $receptor_direccion,
+                'nrc' => $receptor_nit,
+                'tipoDoc' => $receptor_tipoDocumento,
+                'numDoc' => $receptor_numDocumento,
+                'telefono' => $receptor_telefono,
+                'correo' => $receptor_correo
+            ),
+            'detalleDoc' => $Html_detalle
+        );
+
+
+        //---------------------------------------------------
+        // GENERANDO QR
+        //----------------------------------------------------
+
+        // $qrCode = new QrCodeQrCode($url);
+
+        // Configurar el tamaño y otras opciones
+        // Configurar tamaño y demás
+        $qrCode = new QRCode($url);
+
+        // Opciones
+        $qrCode->setSize(200);
+        $qrCode->setMargin(10);
+
+
+        // Usar el writer
+        $writer = new PngWriter();
+        $result = $writer->write($qrCode);
+
+        // Obtener el contenido como string
+        $qrContent = $result->getString();
+
+        // Codificar en base64
+        $qr = base64_encode($qrContent);
+        return array(
+            "qr" => $qr,
+            "data" => $data,
+            "url" => $url
+        );
     }
 }

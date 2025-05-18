@@ -399,7 +399,7 @@ class DteApiMHService
             $registoDTE['sello'] = $responseData['selloRecibido'];
             $registroDTE['response']= json_encode($responseData);
             if($responseData['selloRecibido'] != null){
-                $registroDTE['activo']= true;
+                $registroDTE['estado']= true;
             }
             
  
@@ -415,7 +415,7 @@ class DteApiMHService
 
             // $registoDTE['descripcion_recibido'] = $responseData['descripcionMsg'];
             $registoDTE['observaciones'] = json_encode($responseData['observaciones']);
-            $registoDTE['response'] = json_encode('observaciones');
+            $registroDTE['response'] = json_encode($responseData); 
             $registoDTE->save();
 
 

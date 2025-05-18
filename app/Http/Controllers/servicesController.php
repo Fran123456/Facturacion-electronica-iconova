@@ -97,7 +97,7 @@ class ServicesController extends Controller
 
         $jsonRequest = [
             "user" => $nit,
-            "pwd" => $pwd,
+            "pwd" => $pwd ,
         ];
 
         $requestResponse = Http::withHeaders([
@@ -109,6 +109,7 @@ class ServicesController extends Controller
 
         $responseData = $requestResponse->json();
         $statusCode = $requestResponse->status();
+     
         $empresa->token_mh = $responseData['body']['token'];
         $empresa->save();
         return response()->json($responseData, $statusCode);
