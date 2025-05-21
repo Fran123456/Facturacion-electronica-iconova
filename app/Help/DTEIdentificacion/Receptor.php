@@ -31,9 +31,11 @@ class Receptor
             $nit = $receptorDte['correo']??null;
             $cliente = Cliente::where('correo', $dui)->first();
         }
-        
+      
         // SI NO EXISTE USUARIO CON EL NIT INGRESADO, SE CREA EL NUEVO USUARIO
+        $code = null;
         if ($cliente == null) {
+      
 
             // SE VALIDA SI FALTA ALGUN VALOR REQUERIDO
             [$faltan, $faltantes] = self::createCliente($receptorDte, $tipoDte);
@@ -42,6 +44,7 @@ class Receptor
                 return [$faltan, $faltantes];
 
             $code = MHActividadEconomica::where('codigo', $receptorDte['codActividad'])->first();
+            
 
             $cliente = Cliente::create([
                 'tipo_documento' => $tipoDte,
@@ -60,14 +63,22 @@ class Receptor
             ]);
         } else {
             // SE VALIDA SI HAY INFORMACION A ACTUALIZAR
-            $update = self::updateCliente($receptorDte);
-            $cliente->update($update);
-        }
+            $code = MHActividadEconomica::where('codigo', $receptorDte['codActividad'])->first();
+            $receptorDte['descripcion_actividad']= $code->valor;
+            if(isset($receptorDte['nrc'])){
+                 $receptorDte['nrc']=  str_replace('-', '', $receptorDte['nrc']);
+            }
 
+            $update = self::updateCliente($receptorDte);
+           
+            $cliente->update($update);
+            
+        }
+        $cliente = Cliente::find($cliente?->id);
         // SE CREAN CAMPOS GENERALES PARA TODOS LOS DTE
         $receptor = [
             "nombre" => $cliente->nombre,
-            "descActividad" => $cliente->descripcion_actividad,
+            "descActividad" =>$cliente->descripcion_actividad,
             "telefono" => $cliente->telefono,
             "correo" => $cliente->correo,
         ];
@@ -106,10 +117,11 @@ class Receptor
            // 'dui' => 'dui',
             'nombre' => 'nombre',
             'codigo_actividad' => 'codActividad',
-            'descripcion_actividad' => 'descActividad',
+            'descripcion_actividad' => 'descripcion_actividad',
             'nombre_comercial' => 'nombreComercial',
             'telefono' => 'telefono',
             'correo' => 'correo',
+            'nrc'=>'nrc'
         ];
 
         $camposDireccion = [
@@ -252,6 +264,8 @@ class Receptor
             $receptor["tipoDocumento"] = $complemento["tipoDocumento"];
             $receptor["numDocumento"] = $complemento["numDocumento"];
         }
+
+        
 
         return $receptor;
     }

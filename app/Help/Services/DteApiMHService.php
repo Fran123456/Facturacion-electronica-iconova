@@ -48,7 +48,7 @@ class DteApiMHService
 
     }
 
-    public static function EnviarOfflineMH($dte, $idCliente, $identificacion){
+    public static function EnviarOfflineMH($dte, $idCliente, $identificacion, $request = null){
         DB::beginTransaction();
         $url = Help::mhUrl();
         $empresa = Help::getEmpresa();
@@ -90,9 +90,45 @@ class DteApiMHService
             $registoDTE->save();
 
             DB::commit();
-            $responseData = "Se ha guardo pero sin envio exitoso a MH";
+            /*
+            "responseData": {
+                "version": 2,
+                "ambiente": "00",
+                "versionApp": 2,
+                "estado": "RECHAZADO",
+                "codigoGeneracion": "CFC2297C-7A40-4C15-A8B3-A5F003268434",
+                "selloRecibido": null,
+                "fhProcesamiento": "19/05/2025 22:22:43",
+                "clasificaMsg": "98",
+                "codigoMsg": "096",
+                "descripcionMsg": "DOCUMENTO NO CUMPLE ESQUEMA JSON",
+                "observaciones": [
+                    "Campo #/receptor/nrc no cumple el formato requerido"
+                ]
+            },
+            */
+            $responseData = array("version"=> 2, "ambiente"=>Help::getEmpresa()->ambiente,
+            'versionApp'=>2, "estado"=>"RECHAZADO", "codigoGeneracion"=>$codigoGeneracionDTE,
+            "selloRecibido"=>null, "fhProcesamiento"=> null,
+            "clasificaMsg"=> "00","descripcionMsg"=>"Se ha guardado el DTE pero no se ha procesado
+            porque no hay conexión con el ministerio de Hacienda",
+            "observaciones"=> "['Mala conexión con el ministerio de hacienda']" );
+           // $responseData = "Se ha guardo pero sin envio exitoso a MH";
             $statusCode = 400;
-            return [$responseData, $statusCode];
+            $registoDTE->response  = json_encode($responseData, JSON_UNESCAPED_UNICODE);
+            LogDTE::create([
+                'empresa_id' => $empresa->id,
+                'id_cliente' => $idCliente,
+                'numero_dte' => $codigoGeneracionDTE,
+                'codigo_generacion'=> $identificacion['codigoGeneracion'],
+                'tipo_documento' => $tipoDTE,
+                'fecha' => null,
+                'hora' => null,
+                'error' => $responseData,
+                'estado' => false,
+            ])->save();
+
+            return [$responseData, $statusCode, $registoDTE->id];
         } catch (Exception $e) {
             // CREAR LOG DE ERROR DE DTE
             LogDTE::create([
@@ -107,9 +143,14 @@ class DteApiMHService
                 'estado' => false,
             ])->save();
 
-            $responseData = "Error desconocido, se intento guardar de modo offline pero ha generado error";
+            $responseData = array("version"=> 2, "ambiente"=>Help::getEmpresa()->ambiente,
+            'versionApp'=>2, "estado"=>"RECHAZADO", "codigoGeneracion"=>$codigoGeneracionDTE,
+            "selloRecibido"=>null, "fhProcesamiento"=> null,
+            "clasificaMsg"=> "00","descripcionMsg"=>"Se ha guardado el DTE pero no se ha procesado
+            porque no hay conexión con el ministerio de Hacienda",
+            "observaciones"=> "['Mala conexión con el ministerio de hacienda']" );
             $registoDTE->estado = false;
-            $registoDTE->response  = $responseData;
+            $registoDTE->response  = json_encode($responseData, JSON_UNESCAPED_UNICODE);
             $registoDTE->save();
             DB::commit();
             
@@ -117,14 +158,16 @@ class DteApiMHService
             return [$responseData, $statusCode,$registoDTE->id];
 
         } finally {
-
+            if($request != null){
+                 $registoDTE->dte_mh = json_encode($request, JSON_UNESCAPED_UNICODE);
+            }
             $registoDTE->save();
             DB::commit();
         }
 
     }
 
-    public static function envidarDTE($dte, $idCliente, $identificacion)
+    public static function envidarDTE($dte, $idCliente, $identificacion, $request = null)
     {
         $url = Help::mhUrl();
         $empresa = Help::getEmpresa();
@@ -222,8 +265,12 @@ class DteApiMHService
 
             $registoDTE->estado = false;
 
+
         } finally {
 
+            if($request != null){
+                 $registoDTE->dte_mh = json_encode($request, JSON_UNESCAPED_UNICODE);
+            }
             $registoDTE->save();
         }
 

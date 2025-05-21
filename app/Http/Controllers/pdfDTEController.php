@@ -73,7 +73,7 @@ class PdfDTEController extends Controller
         $url = $data['url'];
         $qr = $data['qr'];
         $data = $data['data'];
-        $pdf = DomPDF::loadView('plantillaDte', compact('data', 'url', 'qr')); // Carga la vista con los datos
+        $pdf = DomPDF::loadView('pdf.plantillaDteNew', compact('data', 'url', 'qr')); // Carga la vista con los datos
         return $pdf->setPaper('A4', 'portrait');
     }
 

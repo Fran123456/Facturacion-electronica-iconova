@@ -33,7 +33,7 @@ use App\Models\RegistroDTE;
 use Carbon\Carbon;
 use Illuminate\Http\Client\ConnectionException;
 use App\Help\DTEHelper\Anexo;
-
+use App\Help\Services\SendMailFe;
 
 // ^ COMPROBANTE CREDITO FISCAL
 class DteCCFController extends Controller
@@ -46,6 +46,7 @@ class DteCCFController extends Controller
 
         //obtenemos el json desde el request
         $json = $request->json()->all();
+        $requestCrudo = $json;
 
         //Se valida que si venga algo en el body.
         if (!$json) {
@@ -116,11 +117,13 @@ class DteCCFController extends Controller
        
         if ($responseLogin['code'] != 200) {
           //  return response()->json(DteCodeValidator::code404($responseLogin['error']), 404);
-             [$responseData, $statusCode, $id] = DteApiMHService::EnviarOfflineMH( $newDTE, $idCliente, $identificacion );
+             [$responseData, $statusCode, $id] = DteApiMHService::EnviarOfflineMH( $newDTE, $idCliente, $identificacion,
+            $requestCrudo );
         }else{
             
-            [$responseData, $statusCode, $id] = DteApiMHService::envidarDTE( $newDTE, $idCliente, $identificacion );
+            [$responseData, $statusCode, $id] = DteApiMHService::envidarDTE( $newDTE, $idCliente, $identificacion, $requestCrudo );
         }
+       
 
         //^ Función para correo electrinico
         $correoEmpresa = Crypt::decryptString($empresa->correo_electronico);
@@ -131,6 +134,7 @@ class DteCCFController extends Controller
         $nombreCliente = $receptor['nombre'];
        
 
+       
         $mailInfo = array(
             'responseData'=>$responseData,
             'statusCode'=>$statusCode,
@@ -142,15 +146,10 @@ class DteCCFController extends Controller
             'id'=>$id
         );
 
-       /* try{
-            Mail::to($receptor['correo'])
-            ->send((new DteMail($nombreCliente, $correoEmpresa, $telefono, $mailInfo))
-            ->from($correoEmpresa, $nombreEmpresa));
-        }catch(Exception $e){
-            Anexo::emailError( $identificacion['codigoGeneracion'], $identificacion['numeroControl']);
 
-        }*/
+       SendMailFe::sending($id,$nombreCliente, $correoEmpresa,$telefono, $nombreEmpresa, $mailInfo, $identificacion);
 
+        
         return response()->json(
             $mailInfo
             , $statusCode);

@@ -25,6 +25,7 @@ class DteFcController extends Controller
         }*/
 
         $json = $request->json()->all();
+ $requestCrudo = $json;
 
         if (!$json) {
             return response()->json(["error" => "DTE no válido o nulo"], Response::HTTP_BAD_REQUEST);
@@ -93,10 +94,11 @@ class DteFcController extends Controller
         //print_r(json_encode($newDTE));
         //return;
         $responseLogin = LoginMH::login();
+        
         if ($responseLogin['code'] != 200) {
-            [$responseData, $statusCode, $id] = DteApiMHService::EnviarOfflineMH( $newDTE, $idCliente, $identificacion );
+            [$responseData, $statusCode, $id] = DteApiMHService::EnviarOfflineMH( $newDTE, $idCliente, $identificacion, $requestCrudo );
         }else{
-            [$responseData, $statusCode, $id] = DteApiMHService::envidarDTE( $newDTE, $idCliente, $identificacion );
+            [$responseData, $statusCode, $id] = DteApiMHService::envidarDTE( $newDTE, $idCliente, $identificacion , $requestCrudo);
         }
   
       

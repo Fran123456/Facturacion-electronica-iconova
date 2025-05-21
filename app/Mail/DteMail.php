@@ -9,12 +9,15 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
+use App\Http\Controllers\PdfDTEController;
+
 class DteMail extends Mailable
 {
     use Queueable, SerializesModels;
     public $nombreCliente;
     public $correoEmpresa;
     public $telefonoEmpresa;
+     public $mailinfo;
     public $dte;
     /**
      * Create a new message instance.
@@ -58,9 +61,15 @@ class DteMail extends Mailable
     {
 
 
-      $jsonContent = json_encode($this->mailinfo['dte'], JSON_PRETTY_PRINT);
-      $tempPath = tempnam(sys_get_temp_dir(), 'dte_') . '.json';
-      file_put_contents($tempPath, $jsonContent); // Guarda el JSON en el archivo temporal
+        $jsonContent = json_encode($this->mailinfo['dte'], JSON_PRETTY_PRINT);
+        $tempPath = tempnam(sys_get_temp_dir(), 'dte_') . '.json';
+        file_put_contents($tempPath, $jsonContent); // Guarda el JSON en el archivo temporal
+
+        
+        $pdfController = new PdfDTEController();
+        $pdf = $pdfController->generarPdf(
+                $this->mailinfo['codigoGeneracion']
+        );
 
         return $this->view('mail.mail')
                     ->with([
@@ -72,7 +81,10 @@ class DteMail extends Mailable
                     ->attach($tempPath, [
                         'as' => $this->mailinfo['dte']['identificacion']['numeroControl'].'.json',
                         'mime' => 'application/json',
-                    ]);
+                    ])
+                    ->attachData($pdf->output(), $this->mailinfo['dte']['identificacion']['numeroControl'] . '.pdf', [
+                            'mime' => 'application/pdf',
+                        ]);
     }
 
     /**
