@@ -124,17 +124,6 @@ class DteCCFController extends Controller
             [$responseData, $statusCode, $id] = DteApiMHService::envidarDTE( $newDTE, $idCliente, $identificacion, $requestCrudo );
         }
        
-
-        //^ Función para correo electrinico
-        $correoEmpresa = Crypt::decryptString($empresa->correo_electronico);
-
-        $telefono = Crypt::decryptString($empresa->telefono);
-        $nombreEmpresa = Crypt::decryptString($empresa->nombre);
-         //return WhatsappSender::send();
-        $nombreCliente = $receptor['nombre'];
-       
-
-       
         $mailInfo = array(
             'responseData'=>$responseData,
             'statusCode'=>$statusCode,
@@ -147,7 +136,7 @@ class DteCCFController extends Controller
         );
 
 
-       SendMailFe::sending($id,$nombreCliente, $correoEmpresa,$telefono, $nombreEmpresa, $mailInfo, $identificacion);
+       SendMailFe::sending($id,$empresa, $mailInfo, $identificacion, $receptor);
 
         
         return response()->json(

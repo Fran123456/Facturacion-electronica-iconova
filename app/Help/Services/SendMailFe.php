@@ -12,13 +12,19 @@ use App\Models\InvalidacionDte;
 use App\Models\LogDTE;
 use App\Models\RegistroDTE;
 use Exception;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 
 class SendMailFe
 {
-    public static function sending($id,$nombreCliente, $correoEmpresa,$telefono, $nombreEmpresa, $mailInfo, $identificacion){
+    public static function sending($id, $empresa , $mailInfo, $identificacion, $receptor){
+
+        $correoEmpresa = Crypt::decryptString($empresa->correo_electronico);
+        $telefono = Crypt::decryptString($empresa->telefono);
+        $nombreEmpresa = Crypt::decryptString($empresa->nombre);
         $dteActual = RegistroDTE::find($id);
+        $nombreCliente = $receptor['nombre'];
         
         if($dteActual->sello != null){
             try{

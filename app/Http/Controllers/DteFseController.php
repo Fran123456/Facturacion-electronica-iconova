@@ -29,7 +29,8 @@ class DteFseController extends Controller
         //* VARAIBLES DE CONFIGURACION DEL DTE
         $dte = $json['dteJson'];
         $condicionOperacion = $json['condicionOperacion'];
-        $cliente = Help::getClienteId($dte['sujetoExcluido']['numDocumento']);
+      //  $cliente = Help::getClienteId($dte['sujetoExcluido']['numDocumento']);
+        $cliente = Help::ValidarCliente($dte['sujetoExcluido']['numDocumento'],$dte['sujetoExcluido']);
         $tipoDTE = '14';
         $idCliente = $cliente['id'];
 

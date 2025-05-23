@@ -306,7 +306,7 @@ class Help
         ];
     }
 
-
+    //ccf y sujeto excluido
     public static function ValidarCliente($numDocumento, $clienteF)
     {
 
@@ -395,7 +395,7 @@ class Help
 
 
 
-
+    //factura
     public static function ValidarClienteByEmail($numDocumento,$correo, $clienteF)
     {
         $cliente = Cliente::where('nit', $numDocumento)->orWhere('dui', $numDocumento)->first();

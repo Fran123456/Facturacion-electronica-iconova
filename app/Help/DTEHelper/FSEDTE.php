@@ -40,7 +40,8 @@ class FSEDTE
 
         // VARIABLES DE PROCESO PARA GUARDAR VALORES A USAR AFUERA DEL CICLO FOREACH
         foreach ($cuerpo as $value) {
-
+        
+            $renta = isset($value['renta'])? $value['renta']:0;
             $compraItem = $value['compra'];
             $cantidadItem = $value['cantidad'];
             $precioUniItem = $value['precioUni'];
@@ -53,9 +54,10 @@ class FSEDTE
             $totalCompra += $compraItem;
             $totalDescu += $montoDescuItem;
             $descu += $montoDescuItem;
-            $totalPagar += $subTotalItem - $retencionItem;
+            $reteRenta += $renta;
+            $totalPagar += $subTotalItem -  $renta;
 
-            $reteRenta += $retencionItem;
+            
         }
 
         $reteRenta = round($reteRenta, 2);

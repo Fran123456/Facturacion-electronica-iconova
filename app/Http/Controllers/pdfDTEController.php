@@ -81,7 +81,7 @@ class PdfDTEController extends Controller
     {
     
         $data = $this->documentData($CodGeneracion);
-            
+ 
         $url = $data['url'];
         $qr = $data['qr'];
         $data = $data['data'];
@@ -104,6 +104,7 @@ class PdfDTEController extends Controller
         $sello = $registroDTE?->sello;
         $codigo_generacion = $registroDTE->codigo_generacion;
         $tipo_documento = $registroDTE->tipo_documento;
+       
         $numero_dte = $registroDTE->numero_dte;
 
         $JsonDTE = json_decode($registroDTE->dte, true);
@@ -126,9 +127,17 @@ class PdfDTEController extends Controller
         $emisor_telefono = $JsonDTE["emisor"]["telefono"];
         // RECEPTOR
         $receptor_descActividad = $JsonDTE["receptor"]["descActividad"];
-        $receptor_codActividad = $JsonDTE["receptor"]["codActividad"];
-        $receptor_nit = "";
+        
+       if ($tipo_documento == "11") {
+            $receptor_codActividad = null;
+       }else{
+                $receptor_codActividad = $JsonDTE["receptor"]["codActividad"];
+       }
 
+
+        $receptor_nit = "";
+        $receptor_tipoDocumento = null;
+        $receptor_numDocumento = null;
         if ($tipo_documento == "03") { //ccf
             if ($JsonDTE["receptor"]["nit"] != null) {
                 $receptor_numDocumento = $JsonDTE["receptor"]["nit"];
@@ -143,46 +152,65 @@ class PdfDTEController extends Controller
         }
 
 
-        $receptor_municipio = $JsonDTE["receptor"]["direccion"]["municipio"];
-        $receptor_municipio = DB::table('mh_municipio')->where('codigo', $receptor_municipio)->first()?->valor;
+        if ($tipo_documento == "11") {
+            $receptor_municipio = null;
+        }else{
+            $receptor_municipio = $JsonDTE["receptor"]["direccion"]["municipio"];
+            $receptor_municipio = DB::table('mh_municipio')->where('codigo', $receptor_municipio)->first()?->valor;
+        }
 
-        $receptor_departamento = $JsonDTE["receptor"]["direccion"]["departamento"];
-        $receptor_departamento = DB::table('mh_departamento')->where('codigo', $receptor_departamento)->first()?->valor;
 
-        $receptor_nrc = $JsonDTE["receptor"]["nrc"];
+        if ($tipo_documento == "11") {
+            $receptor_departamento = null;
+        }else{
+             $receptor_departamento = $JsonDTE["receptor"]["direccion"]["departamento"];
+             $receptor_departamento = DB::table('mh_departamento')->where('codigo', $receptor_departamento)->first()?->valor;
+        }
+
+        
+        $receptor_nrc = isset($JsonDTE["receptor"]["nrc"])? $JsonDTE["receptor"]["nrc"] : null;
+
+
+
         $receptor_correo = $JsonDTE["receptor"]["correo"];
 
         $receptor_direccion = "";
-        if (isset($JsonDTE["receptor"]["direccion"]["complemento"])) {
-            $receptor_direccion = $JsonDTE["receptor"]["direccion"]["complemento"];
-        } elseif (isset($JsonDTE["receptor"]["direccion"])) {
-            $receptor_direccion = $JsonDTE["receptor"]["direccion"];
+        if ($tipo_documento== "11") {
+            $receptor_direccion = $JsonDTE["receptor"]["complemento"];
+        }else{
+             $receptor_direccion = $JsonDTE["receptor"]["direccion"]["complemento"];
         }
+      
 
-        $receptor_nrc = $JsonDTE["receptor"]["nrc"];
-        $receptor_correo = $JsonDTE["receptor"]["correo"];
+ 
 
-        $receptor_direccion = "";
-        if (isset($JsonDTE["receptor"]["direccion"]["complemento"])) {
-            $receptor_direccion = $JsonDTE["receptor"]["direccion"]["complemento"];
-        } elseif (isset($JsonDTE["receptor"]["direccion"])) {
-            $receptor_direccion = $JsonDTE["receptor"]["direccion"];
-        }
+       
 
         $receptor_nombre = $JsonDTE["receptor"]["nombre"];
         $receptor_telefono = $JsonDTE["receptor"]["telefono"];
 
-        $total_subtotal = $JsonDTE["resumen"]["subTotal"];
-        $ivaRete1 = $JsonDTE["resumen"]["ivaRete1"];
+        if ($tipo_documento == "11") {
+            $total_subtotal  = $JsonDTE["resumen"]["montoTotalOperacion"]; 
+             $ivaRete1 = 0;
+             $total_retencionrenta = 0;
+              $total_ivaretenido = 0;
+        }else{
+            $total_subtotal = $JsonDTE["resumen"]["subTotal"];
+            $ivaRete1 = $JsonDTE["resumen"]["ivaRete1"];
+            $total_retencionrenta = $JsonDTE["resumen"]["reteRenta"];
+             $total_ivaretenido = $JsonDTE["resumen"]["ivaRete1"];
+        }
+
+        
+        
         $totalPagar = $JsonDTE["resumen"]["totalPagar"];
 
         $total_totalgravado = $JsonDTE["resumen"]["totalGravada"];
         $total_montototaloperaciones = $JsonDTE["resumen"]["montoTotalOperacion"];
-        $total_ivaretenido = $JsonDTE["resumen"]["ivaRete1"];
-        $total_retencionrenta = $JsonDTE["resumen"]["reteRenta"];
-        $total_descuentonosujetas = $JsonDTE["resumen"]["descuNoSuj"];
-        $total_totalexenta = $JsonDTE["resumen"]["totalExenta"];
-        $total_totalnogravado = $JsonDTE["resumen"]["totalNoGravado"];
+       
+        $total_descuentonosujetas = isset($JsonDTE["resumen"]["descuNoSuj"])? $JsonDTE["resumen"]["descuNoSuj"]: 0;
+        $total_totalexenta = isset($JsonDTE["resumen"]["totalExenta"])? $JsonDTE["resumen"]["totalExenta"]: 0;
+        $total_totalnogravado =  isset($JsonDTE["resumen"]["totalNoGravado"])? $JsonDTE["resumen"]["totalNoGravado"]: 0;
 
         $fecha_emision = $JsonDTE["identificacion"]["fecEmi"];
         $hora_emision =  $JsonDTE["identificacion"]["horEmi"];
@@ -223,8 +251,8 @@ class PdfDTEController extends Controller
 
             $cantidad = $row["cantidad"];
             $preciouni = $row["precioUni"];
-            $ventasNoSuj = $row["ventaNoSuj"];
-            $ventaExenta = $row["ventaExenta"];
+            $ventasNoSuj = isset($row["ventaNoSuj"])?$row["ventaNoSuj"]:0;
+            $ventaExenta = isset($row["ventaExenta"])? $row["ventaExenta"]:0;
             $ventaGravada = $row["ventaGravada"];
 
 
