@@ -69,12 +69,12 @@ class DteFseController extends Controller
         // return $newDTE;
 
         $responseLogin = LoginMH::login();
-
+        $requestCrudo = $json;
         if ($responseLogin['code'] != 200) {
-            [$responseData, $statusCode, $id] = DteApiMHService::EnviarOfflineMH($newDTE, $idCliente, $identificacion);
+            [$responseData, $statusCode, $id] = DteApiMHService::EnviarOfflineMH($newDTE, $idCliente, $identificacion,$requestCrudo);
         } else {
 
-            [$responseData, $statusCode, $id] = DteApiMHService::envidarDTE($newDTE, $idCliente, $identificacion);
+            [$responseData, $statusCode, $id] = DteApiMHService::envidarDTE($newDTE, $idCliente, $identificacion,$requestCrudo);
         }
 
         $mailInfo = array(

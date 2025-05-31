@@ -81,13 +81,13 @@ class DteNdController extends Controller
             'extension',
             'apendice'
         );
-
+        $requestCrudo = $json;
         $responseLogin = LoginMH::login();
         if ($responseLogin['code'] != 200) {
-            [$responseData, $statusCode] = DteApiMHService::EnviarOfflineMH( $newDTE, $idCliente, $identificacion );
+            [$responseData, $statusCode] = DteApiMHService::EnviarOfflineMH( $newDTE, $idCliente, $identificacion,  $requestCrudo );
         }else{
             
-            [$responseData, $statusCode] = DteApiMHService::envidarDTE( $newDTE, $idCliente, $identificacion );
+            [$responseData, $statusCode] = DteApiMHService::envidarDTE( $newDTE, $idCliente, $identificacion , $requestCrudo);
         }
 
 

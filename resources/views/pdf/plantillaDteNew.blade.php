@@ -199,11 +199,13 @@
                             {{--   $data['receptor']['municipio'] . ', ' . $data['receptor']['departamento'] . ', ' . $data['receptor']['complemento'] --}}
                             {{ $data['receptor']['complemento'] }}
                         </p>
-                        <p><strong>NRC:</strong> {{ $data['receptor']['nrc'] }}</p>
+                        @if ($data['receptor']['nrc'] != null)
+                            <p><strong>NRC:</strong> {{ $data['receptor']['nrc'] }}</p>
+                        @endif
 
                         <p><strong>Tipo Documento: </strong>{{$data['receptor']['tipoDoc'] }}</p>
                         <p><strong>Documento:</strong>{{  $data['receptor']['numDoc'] }}</p>
-                        <p><strong>Teléfono:</strong> {{ $data['receptor']['telefono'] }}</p>
+                        <p><strong>Teléfono:</strong> {{ $data['receptor']['telefono'] ?? "N/A" }}</p>
                         <p><strong>Correo:</strong> {{ $data['receptor']['correo'] }}</p>
                     </div>
 
@@ -224,6 +226,31 @@
             </tr>
         </table>
         <br>
+
+
+        
+        @if ($data['respuesta']['tipo_doc']== "05")
+            <table width="100%" style="border-collapse: collapse; margin-bottom: 5px;margin-top:5px"> 
+            <caption style="background-color: #eeeeeeab; font-weight: bold; height: 20px; vertical-align: center;">
+                DOCUMENTO RELACIONADO</caption>
+
+             <thead style="background-color: #eeeeeeab;">
+                <tr>
+                    <th class="table-border">Fecha</th>
+                    <th class="table-border">Codigo Generación</th>
+                    <th class="table-border">Número de control</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="table-border" style="text-align: center;">{{ \Carbon\Carbon::parse($data['dteRel']['fecha_recibido'])->format('d/m/Y') }}</td>
+                    <td class="table-border" style="text-align: center;">{{$data['dteRel']['codigo_generacion']}}</td>
+                    <td class="table-border" style="text-align: center;">{{$data['dteRel']['numero_dte']}}</td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+        @endif
 
 
         <table width="100%" style="border-collapse: collapse; margin-bottom: 5px;margin-top:5px">

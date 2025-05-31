@@ -47,6 +47,7 @@ class DteCCFController extends Controller
         //obtenemos el json desde el request
         $json = $request->json()->all();
         $requestCrudo = $json;
+       
 
         //Se valida que si venga algo en el body.
         if (!$json) {
@@ -114,7 +115,7 @@ class DteCCFController extends Controller
 
         $responseLogin = LoginMH::login();
         
-       
+
         if ($responseLogin['code'] != 200) {
           //  return response()->json(DteCodeValidator::code404($responseLogin['error']), 404);
              [$responseData, $statusCode, $id] = DteApiMHService::EnviarOfflineMH( $newDTE, $idCliente, $identificacion,
@@ -136,7 +137,7 @@ class DteCCFController extends Controller
         );
 
 
-       SendMailFe::sending($id,$empresa, $mailInfo, $identificacion, $receptor);
+      // SendMailFe::sending($id,$empresa, $mailInfo, $identificacion, $receptor);
 
         
         return response()->json(

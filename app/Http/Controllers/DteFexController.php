@@ -92,13 +92,13 @@ class DteFexController extends Controller
         // VARIABLES DE RESPUESTA DEL SERVICIO
         $responseData = '';
         $statusCode = '';
-
+        $requestCrudo = $json;
         $responseLogin = LoginMH::login();
         if ($responseLogin['code'] != 200) {
-            [$responseData, $statusCode, $id] = DteApiMHService::EnviarOfflineMH( $newDTE, $idCliente, $identificacion );
+            [$responseData, $statusCode, $id] = DteApiMHService::EnviarOfflineMH( $newDTE, $idCliente, $identificacion,$requestCrudo );
         }else{
             
-            [$responseData, $statusCode, $id] = DteApiMHService::envidarDTE( $newDTE, $idCliente, $identificacion );
+            [$responseData, $statusCode, $id] = DteApiMHService::envidarDTE( $newDTE, $idCliente, $identificacion,$requestCrudo );
         }
 
         $mailInfo = array(

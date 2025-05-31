@@ -115,13 +115,13 @@ class DteNotasController extends Controller
 
         // return $newDTE;
       
-
+        $requestCrudo = $json;
         $responseLogin = LoginMH::login();
         if ($responseLogin['code'] != 200) {
-            [$responseData, $statusCode] = DteApiMHService::EnviarOfflineMH( $newDTE, $idCliente, $identificacion );
+            [$responseData, $statusCod,$id] = DteApiMHService::EnviarOfflineMH( $newDTE, $idCliente, $identificacion,$requestCrudo  );
         }else{
             
-            [$responseData, $statusCode] = DteApiMHService::envidarDTE( $newDTE, $idCliente, $identificacion );
+            [$responseData, $statusCode, $id] = DteApiMHService::envidarDTE( $newDTE, $idCliente, $identificacion ,$requestCrudo );
         }
 
         
@@ -133,6 +133,7 @@ class DteNotasController extends Controller
             'fecEmi'=> $identificacion['fecEmi'],
             'horEmi'=> $identificacion['horEmi'],
             'codigoGeneracion'=> $identificacion['codigoGeneracion'],
+            'id'=> $id,
         );
 
 

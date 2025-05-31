@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Storage;
 use App\help\Help;
 use App\Help\PDF\GeneratePdfDte;
 use App\Models\Empresa;
+use App\Models\MH\MHDepartamento;
 use App\Models\MH\MHTipoDocumentoReceptor;
 use App\Models\RegistroDTE;
 use Illuminate\Http\Request;
@@ -17,7 +18,7 @@ use Illuminate\Support\Facades\Crypt;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
 use Illuminate\Support\Facades\DB;
-
+use Carbon\Carbon;
 class PdfDTEController extends Controller
 
 {
@@ -79,17 +80,20 @@ class PdfDTEController extends Controller
 
     public function document($CodGeneracion)
     {
-    
+
         $data = $this->documentData($CodGeneracion);
- 
+
+
+
         $url = $data['url'];
         $qr = $data['qr'];
         $data = $data['data'];
-   
 
 
-
+        //CCF, Exportacion, Factura
         $pdf = DomPDF::loadView('pdf.plantillaDteNew', compact('data', 'url', 'qr')); // Carga la vista con los datos
+
+
         $pdf->setPaper('A4', 'portrait');
         return $pdf->stream('dte.pdf'); // Muestra el PDF en el navegador
     }
@@ -100,45 +104,54 @@ class PdfDTEController extends Controller
 
         $registroDTE =  RegistroDTE::where('codigo_generacion', $CodGeneracion)->first();
 
-    
+
+        //Información del DTE
         $sello = $registroDTE?->sello;
         $codigo_generacion = $registroDTE->codigo_generacion;
         $tipo_documento = $registroDTE->tipo_documento;
-       
         $numero_dte = $registroDTE->numero_dte;
-
         $JsonDTE = json_decode($registroDTE->dte, true);
 
+        //DATA DEL EMISOR
         $emisor_activida_economica = $JsonDTE["emisor"]["descActividad"];
         $emisor_nit = $JsonDTE["emisor"]["nit"];
         $emisor_nrc = $JsonDTE["emisor"]["nrc"];
         $emisor_correo = $JsonDTE["emisor"]["correo"];
         $emisor_direccion = $JsonDTE["emisor"]["direccion"]["complemento"];
-
         $emisor_municipio = $JsonDTE["emisor"]["direccion"]["municipio"];
         $emisor_departamento = $JsonDTE["emisor"]["direccion"]["departamento"];
-
         $emisor_municipio = DB::table('mh_municipio')->where('codigo', $emisor_municipio)->first()?->valor;
         $emisor_departamento = DB::table('mh_departamento')->where('codigo', $emisor_departamento)->first()?->valor;
-
-
         $emisor_nombre = $JsonDTE["emisor"]["nombre"];
-        $emisor_nombreComercial = $JsonDTE["emisor"]["nombreComercial"];
         $emisor_telefono = $JsonDTE["emisor"]["telefono"];
-        // RECEPTOR
-        $receptor_descActividad = $JsonDTE["receptor"]["descActividad"];
-        
-       if ($tipo_documento == "11") {
+
+        if ($tipo_documento == "14") {
+            $emisor_nombreComercial = $JsonDTE["emisor"]["nombre"];
+        } else {
+            $emisor_nombreComercial = $JsonDTE["emisor"]["nombreComercial"];
+        }
+        //DATA DEL EMISOR
+
+
+        //DATOS DEL RECEPTOR (ACTIVIDAD ECONOMICA)
+        if ($tipo_documento == "11") { //Exportacion
             $receptor_codActividad = null;
-       }else{
-                $receptor_codActividad = $JsonDTE["receptor"]["codActividad"];
-       }
+            $receptor_descActividad = null;
+        } else if ($tipo_documento == "14") //sujeto excluido
+        {
+            $receptor_codActividad = null;
+            $receptor_descActividad = null;
+        } else {
+            $receptor_codActividad = $JsonDTE["receptor"]["codActividad"];
+            $receptor_descActividad = $JsonDTE["receptor"]["descActividad"];
+        }
 
 
+        //DATOS DEL RECEPTOR (NUMERO Y TIPO DE DOCUMENTO)
         $receptor_nit = "";
         $receptor_tipoDocumento = null;
         $receptor_numDocumento = null;
-        if ($tipo_documento == "03") { //ccf
+        if ($tipo_documento == "03" || $tipo_documento == "05") { //ccf Y nota de credito
             if ($JsonDTE["receptor"]["nit"] != null) {
                 $receptor_numDocumento = $JsonDTE["receptor"]["nit"];
                 $receptor_tipoDocumento = "NIT";
@@ -147,14 +160,21 @@ class PdfDTEController extends Controller
         {
             $receptor_numDocumento = isset($JsonDTE["receptor"]["numDocumento"]) ? $JsonDTE["receptor"]["numDocumento"] : "";
             $receptor_tipoDocumento = isset($JsonDTE["receptor"]["tipoDocumento"]) ? $JsonDTE["receptor"]["tipoDocumento"] : "";
-
+            $receptor_tipoDocumento = MHTipoDocumentoReceptor::where('codigo', $receptor_tipoDocumento)->first()?->valor;
+        } else if ($tipo_documento == "14") {
+            $receptor_numDocumento = isset($JsonDTE["sujetoExcluido"]["numDocumento"]) ? $JsonDTE["sujetoExcluido"]["numDocumento"] : "";
+            $receptor_tipoDocumento = isset($JsonDTE["sujetoExcluido"]["tipoDocumento"]) ? $JsonDTE["sujetoExcluido"]["tipoDocumento"] : "";
             $receptor_tipoDocumento = MHTipoDocumentoReceptor::where('codigo', $receptor_tipoDocumento)->first()?->valor;
         }
+        //DATOS DEL RECEPTOR (NUMERO Y TIPO DE DOCUMENTO)
 
-
-        if ($tipo_documento == "11") {
+        //DATOS DEL RECEPTOR (MUNICIPIO, DEPARTAMENTO, DIRECCION)
+        if ($tipo_documento == "11") { //Exportacion
             $receptor_municipio = null;
-        }else{
+        } else if ($tipo_documento == "14") { //sujeto excluido
+            $receptor_municipio = $JsonDTE["sujetoExcluido"]["direccion"]["municipio"];
+            $receptor_municipio = DB::table('mh_municipio')->where('codigo', $receptor_municipio)->first()?->valor;
+        } else { //otros
             $receptor_municipio = $JsonDTE["receptor"]["direccion"]["municipio"];
             $receptor_municipio = DB::table('mh_municipio')->where('codigo', $receptor_municipio)->first()?->valor;
         }
@@ -162,55 +182,85 @@ class PdfDTEController extends Controller
 
         if ($tipo_documento == "11") {
             $receptor_departamento = null;
-        }else{
-             $receptor_departamento = $JsonDTE["receptor"]["direccion"]["departamento"];
-             $receptor_departamento = DB::table('mh_departamento')->where('codigo', $receptor_departamento)->first()?->valor;
+        } else if ($tipo_documento == "14") {
+            $receptor_departamento = $JsonDTE["sujetoExcluido"]["direccion"]["departamento"];
+            $receptor_departamento = DB::table('mh_departamento')->where('codigo', $receptor_departamento)->first()?->valor;
+        } else {
+            $receptor_departamento = $JsonDTE["receptor"]["direccion"]["departamento"];
+            $receptor_departamento = DB::table('mh_departamento')->where('codigo', $receptor_departamento)->first()?->valor;
         }
-
-        
-        $receptor_nrc = isset($JsonDTE["receptor"]["nrc"])? $JsonDTE["receptor"]["nrc"] : null;
-
-
-
-        $receptor_correo = $JsonDTE["receptor"]["correo"];
 
         $receptor_direccion = "";
-        if ($tipo_documento== "11") {
-            $receptor_direccion = $JsonDTE["receptor"]["complemento"];
-        }else{
-             $receptor_direccion = $JsonDTE["receptor"]["direccion"]["complemento"];
-        }
-      
-
- 
-
-       
-
-        $receptor_nombre = $JsonDTE["receptor"]["nombre"];
-        $receptor_telefono = $JsonDTE["receptor"]["telefono"];
-
         if ($tipo_documento == "11") {
-            $total_subtotal  = $JsonDTE["resumen"]["montoTotalOperacion"]; 
-             $ivaRete1 = 0;
-             $total_retencionrenta = 0;
-              $total_ivaretenido = 0;
-        }else{
+            $receptor_direccion = $JsonDTE["receptor"]["complemento"];
+        } else if ($tipo_documento == "14") {
+
+            $receptor_direccion = $JsonDTE["sujetoExcluido"]["direccion"]['complemento'];
+        } else {
+            $receptor_direccion = $JsonDTE["receptor"]["direccion"]["complemento"];
+        }
+        //DATOS DEL RECEPTOR (MUNICIPIO, DEPARTAMENTO, DIRECCION)
+
+        //DATOS DEL RECEPTOR (NRC)
+        $receptor_nrc = isset($JsonDTE["receptor"]["nrc"]) ? $JsonDTE["receptor"]["nrc"] : null;
+        //DATOS DEL RECEPTOR (NRC)
+
+
+
+        //DATOS DEL RECEPTOR (NOMBRE , TELEFONO, CORREO)
+        if ($tipo_documento == "14") {
+            $receptor_nombre = $JsonDTE["sujetoExcluido"]["nombre"];
+            $receptor_telefono = $JsonDTE["sujetoExcluido"]["telefono"];
+            $receptor_correo = $JsonDTE["sujetoExcluido"]["correo"];
+        } else {
+            $receptor_nombre = $JsonDTE["receptor"]["nombre"];
+            $receptor_telefono = $JsonDTE["receptor"]["telefono"];
+            $receptor_correo = $JsonDTE["receptor"]["correo"];
+        }
+        //DATOS DEL RECEPTOR (NOMBRE , TELEFONO, CORREO)
+
+        //DATOS DEL RECEPTOR (OPERACIONES NUMERICAS)
+        $renta = 0;
+        if ($tipo_documento == "11") {
+            $total_subtotal  = $JsonDTE["resumen"]["montoTotalOperacion"];
+            $ivaRete1 = 0;
+            $total_retencionrenta = 0;
+            $total_ivaretenido = 0;
+            $total_totalgravado = $JsonDTE["resumen"]["totalGravada"];
+            $total_montototaloperaciones = $JsonDTE["resumen"]["montoTotalOperacion"];
+            $totalPagar = $JsonDTE["resumen"]["totalPagar"];
+        } else if ($tipo_documento == "14") {
+            $total_subtotal  = $JsonDTE["resumen"]["totalPagar"];
+            $ivaRete1 = 0;
+            $total_retencionrenta = 0;
+            $total_ivaretenido = 0;
+            $total_totalgravado = $JsonDTE["resumen"]["totalCompra"];
+            $total_montototaloperaciones = $JsonDTE["resumen"]["totalPagar"];
+            $renta = $JsonDTE["resumen"]["reteRenta"];
+            $totalPagar = $JsonDTE["resumen"]["totalPagar"];
+        } else if ($tipo_documento == "05") {
             $total_subtotal = $JsonDTE["resumen"]["subTotal"];
             $ivaRete1 = $JsonDTE["resumen"]["ivaRete1"];
             $total_retencionrenta = $JsonDTE["resumen"]["reteRenta"];
-             $total_ivaretenido = $JsonDTE["resumen"]["ivaRete1"];
+            $total_ivaretenido = $JsonDTE["resumen"]["ivaRete1"];
+            $total_totalgravado = $JsonDTE["resumen"]["totalGravada"];
+            $total_montototaloperaciones = $JsonDTE["resumen"]["montoTotalOperacion"];
+            $totalPagar = $JsonDTE["resumen"]["montoTotalOperacion"];
+        } else {
+            $total_subtotal = $JsonDTE["resumen"]["subTotal"];
+            $ivaRete1 = $JsonDTE["resumen"]["ivaRete1"];
+            $total_retencionrenta = $JsonDTE["resumen"]["reteRenta"];
+            $total_ivaretenido = $JsonDTE["resumen"]["ivaRete1"];
+            $total_totalgravado = $JsonDTE["resumen"]["totalGravada"];
+            $total_montototaloperaciones = $JsonDTE["resumen"]["montoTotalOperacion"];
+            $totalPagar = $JsonDTE["resumen"]["totalPagar"];
         }
 
-        
-        
-        $totalPagar = $JsonDTE["resumen"]["totalPagar"];
 
-        $total_totalgravado = $JsonDTE["resumen"]["totalGravada"];
-        $total_montototaloperaciones = $JsonDTE["resumen"]["montoTotalOperacion"];
-       
-        $total_descuentonosujetas = isset($JsonDTE["resumen"]["descuNoSuj"])? $JsonDTE["resumen"]["descuNoSuj"]: 0;
-        $total_totalexenta = isset($JsonDTE["resumen"]["totalExenta"])? $JsonDTE["resumen"]["totalExenta"]: 0;
-        $total_totalnogravado =  isset($JsonDTE["resumen"]["totalNoGravado"])? $JsonDTE["resumen"]["totalNoGravado"]: 0;
+
+        $total_descuentonosujetas = isset($JsonDTE["resumen"]["descuNoSuj"]) ? $JsonDTE["resumen"]["descuNoSuj"] : 0;
+        $total_totalexenta = isset($JsonDTE["resumen"]["totalExenta"]) ? $JsonDTE["resumen"]["totalExenta"] : 0;
+        $total_totalnogravado =  isset($JsonDTE["resumen"]["totalNoGravado"]) ? $JsonDTE["resumen"]["totalNoGravado"] : 0;
 
         $fecha_emision = $JsonDTE["identificacion"]["fecEmi"];
         $hora_emision =  $JsonDTE["identificacion"]["horEmi"];
@@ -221,6 +271,16 @@ class PdfDTEController extends Controller
         $versionjson = $JsonDTE["identificacion"]["version"];
         $cur_datos_documento = Help::getDatosDocumento($tipoDte);
         $cur_descript_doc = strtoupper($cur_datos_documento['valor']);
+
+        //DOCUMENTO RELACIONADO
+        $dteRel = null;
+        if($tipo_documento == "05")
+        {
+            $dteRel = RegistroDTE::where('codigo_generacion', $JsonDTE['documentoRelacionado'][0]['numeroDocumento'])?->first();
+           
+        // $dteRel->fecha_recibido = Carbon::createFromFormat('d/m/Y',$dteRel->fecha_recibido );
+
+        }
 
         // Setup a filename
         $documentFileName = $CodGeneracion . ".pdf";
@@ -251,9 +311,15 @@ class PdfDTEController extends Controller
 
             $cantidad = $row["cantidad"];
             $preciouni = $row["precioUni"];
-            $ventasNoSuj = isset($row["ventaNoSuj"])?$row["ventaNoSuj"]:0;
-            $ventaExenta = isset($row["ventaExenta"])? $row["ventaExenta"]:0;
-            $ventaGravada = $row["ventaGravada"];
+            $ventasNoSuj = isset($row["ventaNoSuj"]) ? $row["ventaNoSuj"] : 0;
+            $ventaExenta = isset($row["ventaExenta"]) ? $row["ventaExenta"] : 0;
+
+            if ($tipo_documento == "14") {
+                $ventaGravada = $row["compra"];
+            } else {
+                $ventaGravada = $row["ventaGravada"];
+            }
+
 
 
             $tNoSujeta = $tNoSujeta + $ventasNoSuj;
@@ -312,6 +378,12 @@ class PdfDTEController extends Controller
                  <td></td>
                  <td style="text-align: right;">' . number_format($total_totaliva, 2) . '</td></tr>';
         }
+        $footRenta = null;
+        if ($tipoDte ==  '14') {
+            $footRenta = '<tr><td colspan="4" style="text-align: right;">Renta</td>
+                 <td></td>
+                 <td style="text-align: right;">' . number_format($renta, 2) . '</td></tr>';
+        }
 
 
         $cfoot4 = '<tr>
@@ -344,7 +416,7 @@ class PdfDTEController extends Controller
                  <td colspan="4" style="text-align: left;"><b>Valor en letras:' . $total_letras . ' USD</b></td>
                  <td></td><td></td></tr>';
 
-        $Html_detalle = $Html_detalle . $cfoot . $cfoot2 . $cfoot3 . $cfoot4 . $cfoot5 . $cfoot6 . $cfoot7 . $cfoot8 . $cfoot9;
+        $Html_detalle = $Html_detalle . $cfoot . $cfoot2 . $cfoot3 . $footRenta . $cfoot4 . $cfoot5 . $cfoot6 . $cfoot7 . $cfoot8 . $cfoot9;
 
         //-----------------------------------------------
 
@@ -369,7 +441,8 @@ class PdfDTEController extends Controller
                 'ambiente' => $ambiente,
                 'version' => $versionjson,
                 'fecha' => $fecha_emision,
-                'hora' => $hora_emision
+                'hora' => $hora_emision,
+                'tipo_doc' => $tipo_documento
             ),
             'receptor' => array(
                 'nombre' => $receptor_nombre,
@@ -382,7 +455,8 @@ class PdfDTEController extends Controller
                 'telefono' => $receptor_telefono,
                 'correo' => $receptor_correo
             ),
-            'detalleDoc' => $Html_detalle
+            'detalleDoc' => $Html_detalle,
+            'dteRel'=>$dteRel
         );
 
 
@@ -410,6 +484,7 @@ class PdfDTEController extends Controller
 
         // Codificar en base64
         $qr = base64_encode($qrContent);
+
         return array(
             "qr" => $qr,
             "data" => $data,

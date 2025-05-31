@@ -188,9 +188,12 @@ class DteApiMHService
             'id_cliente' => $idCliente,
             'codigo_generacion' => $identificacion['codigoGeneracion'] ,
             "numero_dte"=>$identificacion['numeroControl'],
+            "codigo_control"=>$identificacion['numeroControl'],
             'tipo_documento' => $tipoDTE,
             'dte' => json_encode($dte),
             'estado' => true,
+            'dte_mh'=>  json_encode($request, JSON_UNESCAPED_UNICODE),
+            'id_interno'=> isset($request['id_interno'])? $request['id_interno']: null
         ]);
 
         
