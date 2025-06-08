@@ -114,6 +114,8 @@ class DteCCFController extends Controller
 
 
         $responseLogin = LoginMH::login();
+       
+       
         
 
         if ($responseLogin['code'] != 200) {
@@ -137,7 +139,7 @@ class DteCCFController extends Controller
         );
 
 
-      // SendMailFe::sending($id,$empresa, $mailInfo, $identificacion, $receptor);
+       SendMailFe::sending($id,$empresa, $mailInfo, $identificacion, $receptor);
 
         
         return response()->json(

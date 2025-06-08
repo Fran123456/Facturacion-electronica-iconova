@@ -9,6 +9,7 @@ use App\Help\DTEIdentificacion\Receptor;
 use App\help\Help;
 use App\Help\LoginMH;
 use App\Help\Services\DteApiMHService;
+use App\Help\Services\SendMailFe;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -87,6 +88,9 @@ class DteFseController extends Controller
             'codigoGeneracion' => $identificacion['codigoGeneracion'],
             'id'=>$id
         );
+
+        $empresa = Help::getEmpresa();
+        SendMailFe::sending($id,$empresa, $mailInfo, $identificacion, $sujetoExcluido);
 
         return response()->json(
             $mailInfo,

@@ -28,6 +28,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Help\WhatsappSender;
 use App\Help\DTEIdentificacion\Identificacion;
 use App\Help\DTEIdentificacion\Receptor;
+use App\Help\Services\SendMailFe;
 use DateTime;
 use App\Models\LogDTE;
 use App\Models\RegistroDTE;
@@ -125,6 +126,7 @@ class DteNotasController extends Controller
         }
 
         
+
         $mailInfo = array(
             'responseData'=>$responseData,
             'statusCode'=>$statusCode,
@@ -135,7 +137,8 @@ class DteNotasController extends Controller
             'codigoGeneracion'=> $identificacion['codigoGeneracion'],
             'id'=> $id,
         );
-
+        $empresa = Help::getEmpresa();
+        SendMailFe::sending($id,$empresa, $mailInfo, $identificacion, $receptor);
 
         return response()->json(
             $mailInfo
