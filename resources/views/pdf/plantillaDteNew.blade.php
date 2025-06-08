@@ -117,7 +117,10 @@
     </style>
 </head>
 
+
+
 <body>
+
     <div class="container">
 
         <!-- Encabezado -->
@@ -128,7 +131,7 @@
                     <div
                         style="background-color: #ffffff; height: 80px; text-align: center; line-height: 50px; font-weight: bold;">
 
-                        <img class="mt-2" src="logo.jpg" width="120" height="110" alt="">
+                        <img class="mt-2" src="apopsa.jpg" width="120" height="110" alt="">
                        <div>
 
                        </div>
@@ -368,6 +371,27 @@
         </div> --}}
 
     </div>
+
+@if ($data['respuesta']['anulado']  )
+    
+    
+
+    <div style="
+    position: fixed;
+    top: 35%;
+    left: 5%;
+    width: 100%;
+    font-size: 80px;
+    color: rgba(12, 12, 12, 0.4);
+    transform: rotate(-30deg);
+    z-index: -1;
+    text-align: center;
+    pointer-events: none;
+">
+    DOCUMENTO NO VÁLIDO
+</div>
+
+@endif
 </body>
 
 </html>

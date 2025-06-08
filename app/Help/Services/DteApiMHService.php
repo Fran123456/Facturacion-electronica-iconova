@@ -202,6 +202,7 @@ class DteApiMHService
 
             // FIRMAR DTE
             $DTESigned = FirmadorElectronico::firmador($dte);
+            
 
       
             $registoDTE['dte_firmado'] =  $DTESigned ;
