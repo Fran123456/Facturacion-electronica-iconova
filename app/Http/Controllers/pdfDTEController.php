@@ -55,7 +55,7 @@ class PdfDTEController extends Controller
 
         // Codificar en base64
         $qr = base64_encode($qrContent);
-        return $qr;
+       
 
 
         // return (new GeneratePdfDte)->generateStructure($dte);
@@ -71,6 +71,7 @@ class PdfDTEController extends Controller
     {
 
         $data = $this->documentData($CodGeneracion);
+       
         $url = $data['url'];
         $qr = $data['qr'];
         $data = $data['data'];
@@ -82,7 +83,6 @@ class PdfDTEController extends Controller
     {
 
         $data = $this->documentData($CodGeneracion);
-
 
 
         $url = $data['url'];
@@ -106,6 +106,7 @@ class PdfDTEController extends Controller
 
 
         //Información del DTE
+        $anulado = $registroDTE?->sello;
         $sello = $registroDTE?->sello;
         $codigo_generacion = $registroDTE->codigo_generacion;
         $tipo_documento = $registroDTE->tipo_documento;
@@ -442,8 +443,10 @@ class PdfDTEController extends Controller
                 'version' => $versionjson,
                 'fecha' => $fecha_emision,
                 'hora' => $hora_emision,
-                'tipo_doc' => $tipo_documento
+                'tipo_doc' => $tipo_documento,
+                'anulado'=> $registroDTE->anulado
             ),
+
             'receptor' => array(
                 'nombre' => $receptor_nombre,
                 'municipio' => $receptor_municipio,

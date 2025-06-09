@@ -116,7 +116,7 @@ class DteFcController extends Controller
         );
       
         $empresa = Help::getEmpresa();
-       // SendMailFe::sending($id,$empresa, $mailInfo, $identificacion, $receptor);
+        SendMailFe::sending($id,$empresa, $mailInfo, $identificacion, $receptor);
 
 
         return response()->json(
