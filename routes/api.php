@@ -23,7 +23,7 @@ use App\Http\Controllers\ReceptorController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\ContingenciaController;
 use App\Http\Controllers\InfoController;
-use App\Http\Controllers\PdfDTEController;
+use App\Http\Controllers\PdfController;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
@@ -114,7 +114,7 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 
-Route::get('/pdf/{empresaId}', [PdfDTEController::class, 'test']);
+Route::get('/pdf/{empresaId}', [PdfController::class, 'test']);
 
 //! ENDPOINTS DE PRUEBA
 Route::get('/encriptador', [ServicesController::class, 'encriptador']);

@@ -9,7 +9,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-use App\Http\Controllers\PdfDTEController;
+use App\Http\Controllers\PdfController;
 
 class DteMail extends Mailable
 {
@@ -66,7 +66,7 @@ class DteMail extends Mailable
         file_put_contents($tempPath, $jsonContent); // Guarda el JSON en el archivo temporal
 
         
-        $pdfController = new PdfDTEController();
+        $pdfController = new PdfController();
         $pdf = $pdfController->generarPdf(
                 $this->mailinfo['codigoGeneracion']
         );

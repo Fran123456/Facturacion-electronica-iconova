@@ -19,8 +19,8 @@ use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-class PdfDTEController extends Controller
-
+class PdfController extends Controller
+      
 {
 
     public function test(Request $request, $empresaId)

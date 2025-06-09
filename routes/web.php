@@ -24,11 +24,11 @@ return view('welcome');
 /* llamado vista desde el controlador */
 Route::get('/Menu', [MainController::class, 'index']);
 
-Route::get('/pdfdte', [App\Http\Controllers\pdfDTEController::class, 'document']);
+Route::get('/pdfdte', [App\Http\Controllers\pdfController::class, 'document']);
 
 //Route::get('/pdfdte2', [App\Http\Controllers\pdfDTE2Controller::class, 'document']);
 
-Route::get('/pdf/{CodigoGeneracion}', [App\Http\Controllers\PdfDTEController::class, 'document']);
+Route::get('/pdf/{CodigoGeneracion}', [App\Http\Controllers\PdfController::class, 'document']);
 
 
 Route::prefix('/utilidad')->group(function () {
