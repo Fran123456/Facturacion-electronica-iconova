@@ -29,8 +29,8 @@ class DteFseController extends Controller
         //* VARAIBLES DE CONFIGURACION DEL DTE
         $dte = $json['dteJson'];
         $condicionOperacion = $json['condicionOperacion'];
-      //  $cliente = Help::getClienteId($dte['sujetoExcluido']['numDocumento']);
-        $cliente = Help::ValidarCliente($dte['sujetoExcluido']['numDocumento'],$dte['sujetoExcluido']);
+        //  $cliente = Help::getClienteId($dte['sujetoExcluido']['numDocumento']);
+        $cliente = Help::ValidarCliente($dte['sujetoExcluido']['numDocumento'], $dte['sujetoExcluido']);
         $tipoDTE = '14';
         $idCliente = $cliente['id'];
 
@@ -53,6 +53,14 @@ class DteFseController extends Controller
         $cuerpoDocumento = $dte['cuerpoDocumento'] ?? null;
         $cuerpoDocumento = FSEDTE::cuerpo($cuerpoDocumento);
         $resumen = FSEDTE::resumen($cuerpoDocumento);
+
+        $cuerpoDocumento = array_map(function ($item) {
+            if (isset($item['renta'])) {
+                unset($item['renta']);
+            }
+            return $item;
+        }, $cuerpoDocumento);
+
         $resumen['condicionOperacion'] = $condicionOperacion;
 
         $apendice = $json['apendice'] ?? null;
@@ -71,10 +79,10 @@ class DteFseController extends Controller
         $responseLogin = LoginMH::login();
         $requestCrudo = $json;
         if ($responseLogin['code'] != 200) {
-            [$responseData, $statusCode, $id] = DteApiMHService::EnviarOfflineMH($newDTE, $idCliente, $identificacion,$requestCrudo);
+            [$responseData, $statusCode, $id] = DteApiMHService::EnviarOfflineMH($newDTE, $idCliente, $identificacion, $requestCrudo);
         } else {
 
-            [$responseData, $statusCode, $id] = DteApiMHService::envidarDTE($newDTE, $idCliente, $identificacion,$requestCrudo);
+            [$responseData, $statusCode, $id] = DteApiMHService::envidarDTE($newDTE, $idCliente, $identificacion, $requestCrudo);
         }
 
         $mailInfo = array(
@@ -85,7 +93,7 @@ class DteFseController extends Controller
             'fecEmi' => $identificacion['fecEmi'],
             'horEmi' => $identificacion['horEmi'],
             'codigoGeneracion' => $identificacion['codigoGeneracion'],
-            'id'=>$id
+            'id' => $id
         );
 
         return response()->json(
