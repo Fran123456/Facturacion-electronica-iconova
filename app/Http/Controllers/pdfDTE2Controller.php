@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 
 use \Mpdf\Mpdf as PDF; 
 use Illuminate\Support\Facades\Storage;
-use App\help\Help;
+use App\Help\Help;
 use App\Models\Empresa;
 use Illuminate\Support\Facades\Crypt;
 

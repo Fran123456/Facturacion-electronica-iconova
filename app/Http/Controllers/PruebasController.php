@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\help\Help;
+use App\Help\Help;
 use Illuminate\Http\Request;
 
 class PruebasController extends Controller

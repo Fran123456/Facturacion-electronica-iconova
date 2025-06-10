@@ -2,7 +2,7 @@
 
 namespace App\Help\Services;
 
-use App\help\Help;
+use App\Help\Help;
 use Illuminate\Support\Facades\Http;
 
 class ConsultaDte

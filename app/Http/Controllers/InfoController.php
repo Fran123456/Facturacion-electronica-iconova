@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\help\Help;
+use App\Help\Help;
 use App\Models\MH\MHActividadEconomica;
 use App\Models\MH\MHDepartamento;
 use App\Models\MH\MHFormaPago;
