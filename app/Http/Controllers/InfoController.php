@@ -12,7 +12,7 @@ use App\Models\MH\MHTipoDocumento;
 use App\Models\MH\MHTipoDocumentoReceptor;
 use App\Models\MH\MHTipoInvalidacion;
 use App\Models\MH\MHTipoPersonaModel;
-use Barryvdh\DomPDF\Facade\Pdf;
+use Barryvdh\DomPDF\Facade\Pdf as Pdf;
 
 use Illuminate\Http\Request;
 
@@ -36,7 +36,7 @@ class InfoController extends Controller
             'observaciones' => 'Pago recibido en efectivo. Gracias por su preferencia.',
         ];
     
-        $pdf =\Pdf::loadView('factura.plantilla', $data);
+        $pdf =Pdf::loadView('factura.plantilla', $data);
         return $pdf->stream('factura.pdf'); // o ->download('factura.pdf')
     }
 
