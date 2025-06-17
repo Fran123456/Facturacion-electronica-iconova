@@ -391,8 +391,11 @@ class DteApiMHService
     }
 
     public static function resend( $dte, $registro, $identificacion = null ){
+        
         $jsonData = $dte;
-        $data = json_decode($jsonData);
+        //$data = json_decode($jsonData);
+        $data = $jsonData;
+       
       
       
         $numeroControl = $data->identificacion->numeroControl;
@@ -507,5 +510,124 @@ class DteApiMHService
         
     
         
+    }
+
+
+
+    public static function resendWithDocumentoEdit( $dte, $registro, $identificacion = null ){
+        $jsonData = $dte;
+        $data = $jsonData;
+        $data = json_decode(json_encode($dte)); // convierte array a objeto stdClass
+      
+        $numeroControl = $data->identificacion->numeroControl;
+        $tipoDte = $data->identificacion->tipoDte;
+        $fecEmi = $data->identificacion->fecEmi;
+        $horEmi = $data->identificacion->horEmi;
+        $version = $data->identificacion->version;
+        $codigoGen = $data->identificacion->codigoGeneracion;
+
+        $url = Help::mhUrl();
+        $empresa = Help::getEmpresa();
+        $responseData = "";
+        $statusCode = 0;
+
+        $codigoGeneracionDTE = $identificacion['numeroControl']??$numeroControl;
+        $tipoDTE = $identificacion['tipoDte']??$tipoDte ;
+        $fechaEmision = $identificacion['fecEmi']??$fecEmi ;
+        $horaEmision = $identificacion['horEmi']??$horEmi;
+        $version = $identificacion['version']??$version;
+        $codigoGeneracion = $identificacion['codigoGeneracion']??$codigoGen;
+        
+
+
+        // CREACION DEL REGISTRO DEL DTE PARA RESPALDO EN LA DB
+        $registoDTE = $registro;
+       
+        try {
+
+            // FIRMAR DTE
+            $DTESigned = FirmadorElectronico::firmador($data);
+            if ($DTESigned['status'] > 201) {
+                return response()->json(["error" => $DTESigned['error']], $DTESigned['status']);
+            }
+            
+            $jsonRequest = [
+                'ambiente' => $empresa->ambiente,
+                'idEnvio' => 1,
+                'version' => $version,
+                'tipoDte' => $tipoDTE,
+                'documento' => $DTESigned['msg'],
+                'codigoGeneracion' => $codigoGeneracion,
+                'nitEmisor' => Crypt::decryptString($empresa->nit)
+            ];
+            
+            $requestResponse = Http::withHeaders([
+                'Authorization' => $empresa->token_mh,
+                'User-Agent' => 'ApiLaravel/1.0',
+                'Content-Type' => 'application/JSON'
+            ])->post($url . "fesv/recepciondte", $jsonRequest);
+            
+            
+            $responseData = $requestResponse->json();
+            $statusCode = $requestResponse->status();
+           
+            $registoDTE = RegistroDTE::find($registoDTE);
+            $registoDTE['sello'] = $responseData['selloRecibido'];
+        
+            $registroDTE['response']= json_encode($responseData);
+            if($responseData['selloRecibido'] != null){
+                $registroDTE['estado']= true;
+            }
+            
+ 
+            $fechaCompleta = $responseData['fhProcesamiento'];
+
+            // Convierte la cadena en un objeto DateTime
+            $dateTime = DateTime::createFromFormat('d/m/Y H:i:s', $fechaCompleta);
+
+            // Obtiene solo la parte de la fecha
+            $fechaSolo = $dateTime->format('Y-m-d');
+            // Asigna la fecha a tu variable $registoDTE['fecha_recibido']
+            $registoDTE['fecha_recibido'] = $fechaSolo;
+
+            // $registoDTE['descripcion_recibido'] = $responseData['descripcionMsg'];
+            $registoDTE['observaciones'] = json_encode($responseData['observaciones']);
+            $registroDTE['response'] = json_encode($responseData); 
+            $registoDTE->save();
+
+
+            //desabilitar el log ya que han sido procesados
+            $dtesLogAProcesar = LogDTE::where('codigo_generacion',$codigoGeneracion)->where('numero_dte', $codigoGeneracionDTE)
+            ->where('tipo_documento', $tipoDTE)->where('estado', false)->get();
+            foreach ($dtesLogAProcesar as $key => $value) {
+                $value->estado = true;
+                $value->updated_at = now();
+                $value->save();
+            }
+            
+            return array($responseData,  $statusCode, true);
+        
+            if ($statusCode >= 400) {
+                $responseData = self::handleErrorResponse($statusCode, $responseData);
+                throw new Exception("Error $statusCode: " . json_encode($responseData));
+            }
+        } catch (Exception $e) {
+
+            // CREAR LOG DE ERROR DE DTE
+            LogDTE::create([
+                'empresa_id' => $empresa->id,
+                'id_cliente' => $registoDTE->id_cliente,
+                'numero_dte' => $codigoGeneracionDTE,
+                'tipo_documento' => $tipoDTE,
+                'fecha' => $fechaEmision,
+                'hora' => $horaEmision,
+                'error' => $e->getMessage(),
+                'estado' => false,
+            ])->save();
+
+            $registoDTE->estado = false;
+            $registoDTE->save();
+            return [$responseData, $statusCode, false];
+        } 
     }
 }

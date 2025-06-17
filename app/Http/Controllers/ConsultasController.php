@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Help\Generator;
 use App\Help\Help;
 use App\Help\Services\DteApiMHService;
 use App\Http\Requests\ConsultaRequest;
@@ -111,7 +112,7 @@ class ConsultasController extends Controller
     public function update(ConsultaRequest $request)
     {
         //* Endpoint para reenviar un DTE no validado por Hacienda
-        $json = $request->json()->all();
+       /* $json = $request->json()->all();
 
         $id = $json['id'];
         $dte = $json['dte'];
@@ -123,6 +124,7 @@ class ConsultasController extends Controller
             $dte['identificacion']['fecEmi'] = $fechaHora->format('Y-m-d');
             $dte['identificacion']['horEmi'] = $fechaHora->format('H:i:s');
 
+   
             [$responseData, $statusCode] = DteApiMHService::resend($dte, $id, $dte['identificacion']);
             return response()->json($responseData, $statusCode);
         } catch (Exception $e) {
@@ -133,6 +135,40 @@ class ConsultasController extends Controller
                 500
             );
         }
+        */
+
+        //* Endpoint para reenviar un DTE no validado por Hacienda
+        $json = $request->json()->all();
+
+        $id = $json['id'];
+        $dte = $json['dte'];
+
+        if($dte['identificacion']['numeroControl'] == null||$dte['identificacion']['numeroControl'] == "" ){
+            $dte['identificacion']['numeroControl'] =  Generator::generateNumControl( $dte['identificacion']['tipoDte']);
+        }
+        
+
+        try {
+            //* Se obtiene la fecha y hora actual para el reenvío
+            $fechaHora = new \DateTime();
+
+            $dte['identificacion']['fecEmi'] = $fechaHora->format('Y-m-d');
+            $dte['identificacion']['horEmi'] = $fechaHora->format('H:i:s');
+          
+
+            [$responseData, $statusCode] = DteApiMHService::resendWithDocumentoEdit($dte, $id, $dte['identificacion']);
+            $d = array("responseData"=>$responseData,'numero_control'=> $dte['identificacion']['numeroControl'], "statusCode"=>$statusCode);
+            return response()->json($d,200) ;
+        } catch (Exception $e) {
+            return response()->json(
+                [
+                    'error' => $e->getMessage()
+                ],
+                500
+            );
+        }
+
+
     }
 
     public function invalidados(Request $request)
@@ -180,6 +216,41 @@ class ConsultasController extends Controller
             $registros = $query->get();
 
             return RegistroDTEResource::collection($registros);
+        } catch (Exception $e) {
+            return response()->json(
+                [
+                    'error' => $e->getMessage()
+                ],
+                500
+            );
+        }
+    }
+
+
+    public function reenvioConDteIncluido(ConsultaRequest $request)
+    {
+        //* Endpoint para reenviar un DTE no validado por Hacienda
+        $json = $request->json()->all();
+
+        $id = $json['id'];
+        $dte = $json['dte'];
+
+        if($dte['identificacion']['numeroControl'] == null||$dte['identificacion']['numeroControl'] == "" ){
+            $dte['identificacion']['numeroControl'] =  Generator::generateNumControl( $dte['identificacion']['tipoDte']);
+        }
+        
+
+        try {
+            //* Se obtiene la fecha y hora actual para el reenvío
+            $fechaHora = new \DateTime();
+
+            $dte['identificacion']['fecEmi'] = $fechaHora->format('Y-m-d');
+            $dte['identificacion']['horEmi'] = $fechaHora->format('H:i:s');
+          
+
+            [$responseData, $statusCode] = DteApiMHService::resendWithDocumentoEdit($dte, $id, $dte['identificacion']);
+            $d = array("responseData"=>$responseData,'numero_control'=> $dte['identificacion']['numeroControl'], "statusCode"=>$statusCode);
+            return response()->json($d,200) ;
         } catch (Exception $e) {
             return response()->json(
                 [
