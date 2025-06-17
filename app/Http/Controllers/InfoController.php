@@ -36,7 +36,7 @@ class InfoController extends Controller
             'observaciones' => 'Pago recibido en efectivo. Gracias por su preferencia.',
         ];
     
-        $pdf =Pdf::loadView('factura.plantilla', $data);
+        $pdf =\Pdf::loadView('factura.plantilla', $data);
         return $pdf->stream('factura.pdf'); // o ->download('factura.pdf')
     }
 
