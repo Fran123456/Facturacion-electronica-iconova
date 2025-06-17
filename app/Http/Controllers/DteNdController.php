@@ -7,7 +7,7 @@ use App\Help\DTEHelper\CCFDTE;
 use App\Help\DTEHelper\NDDTE;
 use App\Help\DTEIdentificacion\Identificacion;
 use App\Help\DTEIdentificacion\Receptor;
-use App\help\Help;
+use App\Help\Help;
 use App\Help\LoginMH;
 use App\Help\Services\DteApiMHService;
 use Illuminate\Http\Request;

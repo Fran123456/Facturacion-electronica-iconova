@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Help\DteCodeValidator;
 use App\Help\DTEIdentificacion\Identificacion;
 use App\Help\DTEIdentificacion\Receptor;
-use App\help\Help;
+use App\Help\Help;
 use App\Help\LoginMH;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;

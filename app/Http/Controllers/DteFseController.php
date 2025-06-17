@@ -6,7 +6,7 @@ use App\Help\DteCodeValidator;
 use App\Help\DTEHelper\FSEDTE;
 use App\Help\DTEIdentificacion\Identificacion;
 use App\Help\DTEIdentificacion\Receptor;
-use App\help\Help;
+use App\Help\Help;
 use App\Help\LoginMH;
 use App\Help\Services\DteApiMHService;
 use App\Help\Services\SendMailFe;

@@ -3,7 +3,7 @@
 namespace App\Help\DTEIdentificacion;
 
 use App\Help\Generator;
-use App\help\Help;
+use App\Help\Help;
 use App\Models\RegistroDTE;
 use Illuminate\Support\Facades\Crypt;
 

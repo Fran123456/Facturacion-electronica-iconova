@@ -4,7 +4,7 @@ namespace App\Help\Services;
 
 use Illuminate\Support\Facades\Http;
 use Exception;
-use App\help\Help;
+use App\Help\Help;
 use App\Help\DteCodeValidator;
 use App\Help\FirmadorElectronico;
 use App\Models\LogDTE;

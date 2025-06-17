@@ -6,7 +6,7 @@ use App\Help\DteCodeValidator;
 use App\Help\DTEHelper\Anexo;
 use App\Help\FirmadorElectronico;
 use App\Help\Generator;
-use App\help\Help;
+use App\Help\Help;
 use App\Mail\DteMail;
 use App\Models\InvalidacionDte;
 use App\Models\LogDTE;

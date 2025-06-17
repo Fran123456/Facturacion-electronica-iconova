@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\help\Help;
+use App\Help\Help;
 use App\Help\Services\DteApiMHService;
 use App\Http\Requests\ConsultaRequest;
 use App\Http\Resources\RegistroDTEResource;
