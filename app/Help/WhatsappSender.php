@@ -22,7 +22,8 @@ class WhatsappSender
         ];
 
 // Realizar la solicitud POST a la API de WhatsApp Business de Facebook
-        $response = Http::withToken($token)->post("https://graph.facebook.com/v18.0/251363918066309/messages", $datosMensaje);
+        $response = Http::timeout(160)
+            ->connectTimeout(10)->withToken($token)->post("https://graph.facebook.com/v18.0/251363918066309/messages", $datosMensaje);
 
 // Verificar si la solicitud fue exitosa y retornar la respuesta
         return$response;

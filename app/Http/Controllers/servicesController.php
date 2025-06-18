@@ -100,7 +100,8 @@ class ServicesController extends Controller
             "pwd" => $pwd ,
         ];
 
-        $requestResponse = Http::withHeaders([
+        $requestResponse = Http::timeout(160)
+            ->connectTimeout(10)->withHeaders([
             'Content-Type' => 'application/x-www-form-urlencoded',
             'User-Agent' => 'ApiLaravel/1.0',
             "Accept" => "application/json"

@@ -12,7 +12,7 @@ use App\Models\MH\MHTipoDocumento;
 use App\Models\MH\MHTipoDocumentoReceptor;
 use App\Models\MH\MHTipoInvalidacion;
 use App\Models\MH\MHTipoPersonaModel;
-use Barryvdh\DomPDF\Facade\Pdf as Pdf;
+use PDF;
 
 use Illuminate\Http\Request;
 

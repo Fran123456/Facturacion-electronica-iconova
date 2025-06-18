@@ -50,7 +50,8 @@ class InvalidarDte
            
             $jsonRequest = compact("ambiente", "idEnvio", "version", "documento");
 
-            $requestResponse = Http::withHeaders([
+            $requestResponse = Http::timeout(160)
+            ->connectTimeout(10)->withHeaders([
                 'Authorization' => $empresa->token_mh,
                 'User-Agent' => 'ApiLaravel/1.0',
                 'Content-Type' => 'application/JSON'
