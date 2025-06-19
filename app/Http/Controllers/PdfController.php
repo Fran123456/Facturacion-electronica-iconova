@@ -143,8 +143,8 @@ class PdfController extends Controller
             $receptor_codActividad = null;
             $receptor_descActividad = null;
         } else {
-            $receptor_codActividad = $JsonDTE["receptor"]["codActividad"];
-            $receptor_descActividad = $JsonDTE["receptor"]["descActividad"];
+            $receptor_codActividad = isset($JsonDTE["receptor"]["codActividad"])?$JsonDTE["receptor"]["codActividad"]: null;
+            $receptor_descActividad = isset($JsonDTE["receptor"]["descActividad"])? $JsonDTE["receptor"]["descActividad"]: "Sin registro";
         }
 
 
@@ -176,7 +176,7 @@ class PdfController extends Controller
             $receptor_municipio = $JsonDTE["sujetoExcluido"]["direccion"]["municipio"];
             $receptor_municipio = DB::table('mh_municipio')->where('codigo', $receptor_municipio)->first()?->valor;
         } else { //otros
-            $receptor_municipio = $JsonDTE["receptor"]["direccion"]["municipio"];
+            $receptor_municipio = isset($JsonDTE["receptor"]["direccion"]["municipio"])? $JsonDTE["receptor"]["direccion"]["municipio"]: null;
             $receptor_municipio = DB::table('mh_municipio')->where('codigo', $receptor_municipio)->first()?->valor;
         }
 
@@ -187,7 +187,7 @@ class PdfController extends Controller
             $receptor_departamento = $JsonDTE["sujetoExcluido"]["direccion"]["departamento"];
             $receptor_departamento = DB::table('mh_departamento')->where('codigo', $receptor_departamento)->first()?->valor;
         } else {
-            $receptor_departamento = $JsonDTE["receptor"]["direccion"]["departamento"];
+            $receptor_departamento = isset($JsonDTE["receptor"]["direccion"]["departamento"])? $JsonDTE["receptor"]["direccion"]["departamento"]: null;
             $receptor_departamento = DB::table('mh_departamento')->where('codigo', $receptor_departamento)->first()?->valor;
         }
 
@@ -198,7 +198,7 @@ class PdfController extends Controller
 
             $receptor_direccion = $JsonDTE["sujetoExcluido"]["direccion"]['complemento'];
         } else {
-            $receptor_direccion = $JsonDTE["receptor"]["direccion"]["complemento"];
+            $receptor_direccion = isset($JsonDTE["receptor"]["direccion"]["complemento"])??null;
         }
         //DATOS DEL RECEPTOR (MUNICIPIO, DEPARTAMENTO, DIRECCION)
 
@@ -214,9 +214,9 @@ class PdfController extends Controller
             $receptor_telefono = $JsonDTE["sujetoExcluido"]["telefono"];
             $receptor_correo = $JsonDTE["sujetoExcluido"]["correo"];
         } else {
-            $receptor_nombre = $JsonDTE["receptor"]["nombre"];
-            $receptor_telefono = $JsonDTE["receptor"]["telefono"];
-            $receptor_correo = $JsonDTE["receptor"]["correo"];
+            $receptor_nombre = $JsonDTE["receptor"]["nombre"]??null;
+            $receptor_telefono = $JsonDTE["receptor"]["telefono"]??null;
+            $receptor_correo = $JsonDTE["receptor"]["correo"]??null;
         }
         //DATOS DEL RECEPTOR (NOMBRE , TELEFONO, CORREO)
 

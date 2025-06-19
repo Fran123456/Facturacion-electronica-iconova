@@ -189,7 +189,8 @@
         <table width="100%" style="border-collapse: collapse; margin-bottom: 1px;">
             <tr>
                 <td>
-                    Informacion del receptor
+                    <br>
+                    <strong> Informacion del receptor</strong>
                 </td>
             </tr>
 
@@ -197,19 +198,46 @@
                 <!-- Columna izquierda: Datos del receptor -->
                 <td width="70%" valign="top" style="padding-right: 10px;">
                     <div style="background-color: #f5f5f5; padding: 8px; border: 1px solid #ccc;">
-                        <p><strong>Nombre:</strong> {{ $data['receptor']['nombre'] }}</p>
-                        <p style="line-height: 1.5;"><strong>Dirección:</strong>
+                        <p ><strong>Nombre:</strong>
+                            @if ($data['receptor']['nombre'] == null ||  $data['receptor']['nombre']  == "" )
+                                Sin registro
+                             @else 
+                             {{ $data['receptor']['nombre']  }}
+                            @endif
+                        </p>
+
+
+                        <p ><strong>Dirección:</strong>
                             {{--   $data['receptor']['municipio'] . ', ' . $data['receptor']['departamento'] . ', ' . $data['receptor']['complemento'] --}}
-                            {{ $data['receptor']['complemento'] }}
+                            @if ($data['receptor']['complemento'] == null ||  $data['receptor']['complemento'] == "" )
+                                Sin registro
+                             @else 
+                             {{ $data['receptor']['complemento'] }}
+                            @endif
                         </p>
                         @if ($data['receptor']['nrc'] != null)
-                            <p><strong>NRC:</strong> {{ $data['receptor']['nrc'] }}</p>
+                            <p><strong>NRC:</strong> {{ $data['receptor']['nrc'] ?? "Sin registro" }}</p>
                         @endif
 
-                        <p><strong>Tipo Documento: </strong>{{$data['receptor']['tipoDoc'] }}</p>
-                        <p><strong>Documento:</strong>{{  $data['receptor']['numDoc'] }}</p>
-                        <p><strong>Teléfono:</strong> {{ $data['receptor']['telefono'] ?? "N/A" }}</p>
-                        <p><strong>Correo:</strong> {{ $data['receptor']['correo'] }}</p>
+                        <p><strong>Tipo Documento: </strong>
+                          
+                             @if ($data['receptor']['tipoDoc']  == null ||  $data['receptor']['tipoDoc']  == "" )
+                                Sin registro
+                             @else 
+                             {{ $data['receptor']['tipoDoc']  }}
+                            @endif
+                        </p>
+
+                        <p><strong>Documento:</strong>
+                           
+                          @if ($data['receptor']['numDoc'] == null ||  $data['receptor']['numDoc']  == "" )
+                                Sin registro
+                             @else 
+                             {{ $data['receptor']['numDoc']  }}
+                            @endif
+                        </p>
+                        <p><strong>Teléfono:</strong> {{ $data['receptor']['telefono'] ?? "Sin registro" }}</p>
+                        <p><strong>Correo:</strong> {{ $data['receptor']['correo'] ?? "Sin registro" }}</p>
                     </div>
 
                 </td>
