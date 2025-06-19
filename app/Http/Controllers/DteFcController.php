@@ -34,9 +34,17 @@ class DteFcController extends Controller
 
         // VARAIBLES DE CONFIGURACION DEL DTE
         $dte = $json['dteJson'];
-        $cliente = Help::ValidarClienteByEmail($dte['receptor']['numDocumento'],$dte['receptor']['correo'], $dte['receptor']);
+
+        $cliente = null;
+        if($dte['receptor']!=null){
+            $cliente = Help::ValidarClienteByEmail($dte['receptor']['numDocumento'],$dte['receptor']['correo'], $dte['receptor']);
+                $idCliente = $cliente['id'];
+        }else{
+                 $idCliente = 1;
+        }
+       
         $tipoDTE = "01";
-        $idCliente = $cliente['id'];
+   
 
         // VARIABLES DE RESPUESTA DEL SERVICIO
         $responseData = '';

@@ -64,7 +64,7 @@ class Receptor
         } else {
             // SE VALIDA SI HAY INFORMACION A ACTUALIZAR
             $code = MHActividadEconomica::where('codigo', $receptorDte['codActividad'])->first();
-            $receptorDte['descripcion_actividad']= $code->valor;
+            $receptorDte['descripcion_actividad']= $code?->valor;
             if(isset($receptorDte['nrc'])){
                  $receptorDte['nrc']=  str_replace('-', '', $receptorDte['nrc']);
             }

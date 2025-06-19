@@ -24,13 +24,19 @@ class SendMailFe
         $telefono = Crypt::decryptString($empresa->telefono);
         $nombreEmpresa = Crypt::decryptString($empresa->nombre);
         $dteActual = RegistroDTE::find($id);
-        $nombreCliente = $receptor['nombre'];
+        $nombreCliente = $receptor['nombre']??null;
         
         if($dteActual->sello != null){
             try{
-              Mail::to("francisco.navas.iconova@gmail.com")
-            ->send((new DteMail($nombreCliente, $correoEmpresa, $telefono, $mailInfo))
-            ->from($correoEmpresa, $nombreEmpresa));
+
+                if($dteActual->id_cliente != 1){
+                      Mail::to("francisco.navas.iconova@gmail.com")
+                        ->send((new DteMail($nombreCliente, $correoEmpresa, $telefono, $mailInfo))
+                        ->from($correoEmpresa, $nombreEmpresa));
+                }
+            
+
+
             }catch(Exception $e){
                 Anexo::emailError( $identificacion['codigoGeneracion'], $identificacion['numeroControl'], (string) $e);
 
