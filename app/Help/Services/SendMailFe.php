@@ -28,7 +28,7 @@ class SendMailFe
         
         if($dteActual->sello != null){
             try{
-              Mail::to("francisco.navas.iconova@gmail.com")
+              Mail::to("franciscocimco@gmail.com")
             ->send((new DteMail($nombreCliente, $correoEmpresa, $telefono, $mailInfo))
             ->from($correoEmpresa, $nombreEmpresa));
             }catch(Exception $e){

@@ -131,22 +131,25 @@
                     <div
                         style="background-color: #ffffff; height: 80px; text-align: center; line-height: 50px; font-weight: bold;">
 
-                        <img class="mt-2" src="apopsa.jpg" width="120" height="110" alt="">
+                        <img class="mt-2" src="apopsa.jpg" width="170" height="120" alt="">
                        <div>
 
                        </div>
                     </div>
+                    <br>
                     <p>
                        <h2><strong> {{ $data['emisor']['nombre']}}</strong></h2>
                     </p>
-                    <p><strong>NIT:</strong> {{ $data['emisor']['numDoc'] }}</p>
-                    <p><strong>NRC:</strong> {{ $data['emisor']['nrc'] }}</p>
-                    <p style="line-height: 1.5; !important"><strong>Dirección:</strong>
+                    <p><strong>NIT:</strong> {{ $data['emisor']['numDoc'] }}   <strong>NRC:</strong> {{ $data['emisor']['nrc'] }}</p>
+                    
+                    
+                    <p><strong>Teléfono:</strong> {{ $data['emisor']['telefono'] }} <strong>Correo:</strong> {{ $data['emisor']['correo'] }}</p>
+                   
+                      <p><strong>Actividad Economica:</strong> {{ $data['emisor']['actividad'] }}</p>
+                      <p style="line-height: 1.1; !important"><strong>Dirección:</strong>
                         {{--  $data['emisor']['municipio'] . ', ' . $data['emisor']['departamento'] . ', ' . $data['emisor']['complemento'] --}}
                         {{ $data['emisor']['complemento'] }}
                     </p>
-                    <p><strong>Teléfono:</strong> {{ $data['emisor']['telefono'] }}</p>
-                    <p><strong>Correo:</strong> {{ $data['emisor']['correo'] }}</p>
                 </td>
 
                 <!-- Columna derecha: Información de factura -->
@@ -177,9 +180,9 @@
                             {{ $data['respuesta']['sello'] }}</p>
                         <p style="font-size: 11px"><strong>Número de control:</strong> {{ $data['respuesta']['numControl'] }}</p>
                         <p style="font-size: 11px"><strong>Ambiente:</strong> {{ $data['respuesta']['ambiente'] }}</p>
-                        <p style="font-size: 11px"><strong>Versión del JSON:</strong> {{ $data['respuesta']['version'] }}</p>
                         <p style="font-size: 11px"> <strong>Fecha de emisión:</strong> {{ $data['respuesta']['fecha'] }}</p>
                         <p style="font-size: 11px"><strong>Hora de emisión:</strong> {{ $data['respuesta']['hora'] }}</p>
+                        <p style="font-size: 11px"><strong>Modelo de facturación:</strong> Previo / Transmisión normal</p>
                     </div>
                 </td>
             </tr>
@@ -189,16 +192,16 @@
         <table width="100%" style="border-collapse: collapse; margin-bottom: 1px;">
             <tr>
                 <td>
-                    Informacion del receptor
+                    <strong>Información del receptor</strong>
                 </td>
             </tr>
 
             <tr>
                 <!-- Columna izquierda: Datos del receptor -->
-                <td width="70%" valign="top" style="padding-right: 10px;">
+                <td width="90%" valign="top" style="padding-right: 10px;">
                     <div style="background-color: #f5f5f5; padding: 8px; border: 1px solid #ccc;">
                         <p><strong>Nombre:</strong> {{ $data['receptor']['nombre'] }}</p>
-                        <p style="line-height: 1.5;"><strong>Dirección:</strong>
+                        <p style="line-height: 1.0;"><strong>Dirección:</strong>
                             {{--   $data['receptor']['municipio'] . ', ' . $data['receptor']['departamento'] . ', ' . $data['receptor']['complemento'] --}}
                             {{ $data['receptor']['complemento'] }}
                         </p>
@@ -206,16 +209,18 @@
                             <p><strong>NRC:</strong> {{ $data['receptor']['nrc'] }}</p>
                         @endif
 
-                        <p><strong>Tipo Documento: </strong>{{$data['receptor']['tipoDoc'] }}</p>
-                        <p><strong>Documento:</strong>{{  $data['receptor']['numDoc'] }}</p>
-                        <p><strong>Teléfono:</strong> {{ $data['receptor']['telefono'] ?? "N/A" }}</p>
+
+                        <p><strong>Tipo Documento: </strong>{{$data['receptor']['tipoDoc'] }}  <strong>Documento:</strong>{{  $data['receptor']['numDoc'] }}</p>
+                       
+                        <p><strong>Teléfono:</strong> {{ $data['receptor']['telefono'] ?? "Sin registro" }}</p>
                         <p><strong>Correo:</strong> {{ $data['receptor']['correo'] }}</p>
+                        <p><strong>Actividad economica:</strong> {{ $data['receptor']['actividad'] }}</p>
                     </div>
 
                 </td>
 
                 <!-- Columna derecha: Información personal -->
-                <td width="30%" valign="top" style="margin-top:-10px;text-align: center;">
+                <td width="10%" valign="top" style="margin-top:-5px;text-align: center;">
 
 
 
@@ -272,7 +277,12 @@
                     <th class="table-border" style="width: 10%;">Ventas no sujetas</th>
 
                     <th class="table-border" style="width: 10%;">Ventas exentas</th>
-                    <th class="table-border" style="width: 10%;">Ventas gravadas</th>
+
+                    @if ($data['respuesta']['tipo'] == "11")
+                        <th class="table-border" style="width: 10%;">Ventas afectas</th>
+                    @else
+                    <th class="table-border" style="width: 10%;">Ventas gravadas  </th>
+                    @endif
                 </tr>
             </thead>
             <tbody>

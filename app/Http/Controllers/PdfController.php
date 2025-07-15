@@ -75,6 +75,7 @@ class PdfController extends Controller
         $url = $data['url'];
         $qr = $data['qr'];
         $data = $data['data'];
+        
         $pdf = DomPDF::loadView('pdf.plantillaDteNew', compact('data', 'url', 'qr')); // Carga la vista con los datos
         return $pdf->setPaper('A4', 'portrait');
     }
@@ -162,11 +163,24 @@ class PdfController extends Controller
             $receptor_numDocumento = isset($JsonDTE["receptor"]["numDocumento"]) ? $JsonDTE["receptor"]["numDocumento"] : "";
             $receptor_tipoDocumento = isset($JsonDTE["receptor"]["tipoDocumento"]) ? $JsonDTE["receptor"]["tipoDocumento"] : "";
             $receptor_tipoDocumento = MHTipoDocumentoReceptor::where('codigo', $receptor_tipoDocumento)->first()?->valor;
+
+       
         } else if ($tipo_documento == "14") {
             $receptor_numDocumento = isset($JsonDTE["sujetoExcluido"]["numDocumento"]) ? $JsonDTE["sujetoExcluido"]["numDocumento"] : "";
             $receptor_tipoDocumento = isset($JsonDTE["sujetoExcluido"]["tipoDocumento"]) ? $JsonDTE["sujetoExcluido"]["tipoDocumento"] : "";
             $receptor_tipoDocumento = MHTipoDocumentoReceptor::where('codigo', $receptor_tipoDocumento)->first()?->valor;
         }
+        if ($tipo_documento == "11") { //Exportacion
+             $receptor_numDocumento = isset($JsonDTE["receptor"]["numDocumento"]) ? $JsonDTE["receptor"]["numDocumento"] : "";
+             $receptor_tipoDocumento = isset($JsonDTE["receptor"]["tipoDocumento"]) ? $JsonDTE["receptor"]["tipoDocumento"] : "";
+             $receptor_tipoDocumento = MHTipoDocumentoReceptor::where('codigo', $receptor_tipoDocumento)->first()?->valor;
+        }
+
+        $receptorActividad =  isset($JsonDTE["receptor"]["descActividad"]) ? $JsonDTE["receptor"]["descActividad"] : "Sin Registro";
+   
+
+
+
         //DATOS DEL RECEPTOR (NUMERO Y TIPO DE DOCUMENTO)
 
         //DATOS DEL RECEPTOR (MUNICIPIO, DEPARTAMENTO, DIRECCION)
@@ -193,7 +207,7 @@ class PdfController extends Controller
 
         $receptor_direccion = "";
         if ($tipo_documento == "11") {
-            $receptor_direccion = $JsonDTE["receptor"]["complemento"];
+            $receptor_direccion = $JsonDTE["receptor"]["complemento"] ?? "Sin dirección";
         } else if ($tipo_documento == "14") {
 
             $receptor_direccion = $JsonDTE["sujetoExcluido"]["direccion"]['complemento'];
@@ -431,7 +445,8 @@ class PdfController extends Controller
                 'departamento' => $emisor_departamento,
                 'complemento' => $emisor_direccion,
                 'telefono' => $emisor_telefono,
-                'correo' => $emisor_correo
+                'correo' => $emisor_correo,
+                 'actividad'=> $emisor_activida_economica
             ),
             'respuesta' => array(
                 'tipo' => $tipoDte,
@@ -444,7 +459,8 @@ class PdfController extends Controller
                 'fecha' => $fecha_emision,
                 'hora' => $hora_emision,
                 'tipo_doc' => $tipo_documento,
-                'anulado'=> $registroDTE->anulado
+                'anulado'=> $registroDTE->anulado,
+               
             ),
 
             'receptor' => array(
@@ -456,7 +472,8 @@ class PdfController extends Controller
                 'tipoDoc' => $receptor_tipoDocumento,
                 'numDoc' => $receptor_numDocumento,
                 'telefono' => $receptor_telefono,
-                'correo' => $receptor_correo
+                'correo' => $receptor_correo,
+                "actividad"=> $receptorActividad
             ),
             'detalleDoc' => $Html_detalle,
             'dteRel'=>$dteRel

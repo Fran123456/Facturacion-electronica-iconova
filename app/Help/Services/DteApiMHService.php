@@ -544,12 +544,14 @@ class DteApiMHService
         $registoDTE = $registro;
        
         try {
+       
 
             // FIRMAR DTE
             $DTESigned = FirmadorElectronico::firmador($data);
             if ($DTESigned['status'] > 201) {
                 return response()->json(["error" => $DTESigned['error']], $DTESigned['status']);
             }
+            
             
             $jsonRequest = [
                 'ambiente' => $empresa->ambiente,
@@ -560,7 +562,7 @@ class DteApiMHService
                 'codigoGeneracion' => $codigoGeneracion,
                 'nitEmisor' => Crypt::decryptString($empresa->nit)
             ];
-            
+        
             $requestResponse = Http::withHeaders([
                 'Authorization' => $empresa->token_mh,
                 'User-Agent' => 'ApiLaravel/1.0',
@@ -571,10 +573,14 @@ class DteApiMHService
             $responseData = $requestResponse->json();
             $statusCode = $requestResponse->status();
            
+            
+           
             $registoDTE = RegistroDTE::find($registoDTE);
+            
             $registoDTE['sello'] = $responseData['selloRecibido'];
-        
+       
             $registroDTE['response']= json_encode($responseData);
+           
             if($responseData['selloRecibido'] != null){
                 $registroDTE['estado']= true;
             }
@@ -627,6 +633,7 @@ class DteApiMHService
 
             $registoDTE->estado = false;
             $registoDTE->save();
+            
             return [$responseData, $statusCode, false];
         } 
     }
