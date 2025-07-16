@@ -25,7 +25,7 @@ class FACTDTE
             // CAMPOS CON VALORES PREDEFINIDOS
             $items[$key]['tributos'] = null;
             $items[$key]['ventaNoSuj'] = 0;
-            $items[$key]['ventaExenta'] = 0;
+            $items[$key]['ventaExenta'] = round($item['ventaExenta'], 2);
 
             // CAMPOS CON VALORES DEFINIDOS POR EL USUARIO
             $items[$key]['cantidad'] = $cantidad;
@@ -70,10 +70,10 @@ class FACTDTE
             // Calcular el valor de venta sin descuento
 
             // Calcular el IVA retenido si aplica
-            if ($idTipoCliente === true && $ventaGravada >= 100) {
+            /*if ($idTipoCliente === true && $ventaGravada >= 100) {
                 $ivaRetenidoItem = round(($ventaGravada - $value['ivaItem'] )* 0.01, 2);
                 $ivaRetenida += $ivaRetenidoItem;
-            }
+            }*/
 
             $totalNoSuj += $value['ventaNoSuj'];
             $totalExenta += $value['ventaExenta'];
@@ -84,7 +84,8 @@ class FACTDTE
             // $Exenta = $value['ventaExenta'];
             // $NoGravado = $value['noGravado'];
 
-            $subTotal += $ventaGravada;
+            $subTotal += $ventaGravada + $value['ventaExenta'];
+           
 
             $totalIva += $value['ivaItem'];
 
@@ -113,20 +114,21 @@ class FACTDTE
                 }
             }
 
-            $montoPago = $ventaGravada - $ivaRetenidoItem;
+            $montoPago = $ventaGravada - $ivaRetenidoItem + $totalExenta;
 
             $pagos[] = [
                 "codigo" => $codigoPago,
-                "montoPago" => $montoPago,
+                "montoPago" => round($montoPago,2),
                 "referencia" => $descripcionPago,
                 "periodo" => $periodoPago,
                 "plazo" => $plazoPago
             ];
         }
+   
 
 
         $totalPagar = round($subTotal + $totalImpuestos + $totalNoGravado - $ivaRetenida,2);
-
+     
         $total_en_letras = Generator::generateStringFromNumber($totalPagar);
 
         $resumen = [

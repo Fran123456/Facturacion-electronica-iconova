@@ -410,7 +410,7 @@ class Help
                 'dui'=> $clienteF['dui']??null,
                 'nombre'=> $clienteF['nombre'],
                 'codigo_actividad'=> $clienteF['codActividad'],
-                'descripcion_actividad'=> $clienteF['descActividad'],
+                'descripcion_actividad'=> $clienteF['descActividad'] ?? MHActividadEconomica::where('codigo', $clienteF['codActividad'])->first()?->valor,
                 'nombre_comercial'=> $clienteF['nombreComercial'],
                 'departamento'=>  $clienteF['direccion']['departamento'],
                 'municipio'=> $clienteF['direccion']['municipio'],
