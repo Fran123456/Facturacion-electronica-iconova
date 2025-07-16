@@ -55,6 +55,7 @@ class DteFcController extends Controller
             return response()->json($receptor, 404);
 
         $cuerpoDocumento = FACTDTE::getCuerpoDocumento($dte['cuerpoDocumento']);
+        
 
         $pagoTributos = isset($json['pagoTributos']) ? $json['pagoTributos'] : null;
         $codigoPago = isset($json['codigo_pago']) ? $json['codigo_pago'] : "01";
