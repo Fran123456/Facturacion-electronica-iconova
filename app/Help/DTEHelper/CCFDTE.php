@@ -134,7 +134,7 @@ class CCFDTE
             'descuGravada' => 0.0,
             'tributos' => $tributos ?? null,
             'ivaPerci1' => 0.0,
-            'ivaRete1' => $ivaRetenida,
+            'ivaRete1' => round($ivaRetenida,2),
             'reteRenta' => 0.0,
             'totalPagar' => round($totalPagar,2),
             'condicionOperacion' => 1,
