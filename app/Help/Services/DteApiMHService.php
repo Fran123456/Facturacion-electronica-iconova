@@ -571,6 +571,7 @@ class DteApiMHService
             
             
             $responseData = $requestResponse->json();
+            
             $statusCode = $requestResponse->status();
            
             

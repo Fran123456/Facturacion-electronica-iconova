@@ -26,7 +26,7 @@ class DteFcController extends Controller
         }*/
 
         $json = $request->json()->all();
- $requestCrudo = $json;
+        $requestCrudo = $json;
 
         if (!$json) {
             return response()->json(["error" => "DTE no válido o nulo"], Response::HTTP_BAD_REQUEST);
