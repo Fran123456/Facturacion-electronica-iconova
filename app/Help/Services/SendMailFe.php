@@ -8,6 +8,7 @@ use App\Help\FirmadorElectronico;
 use App\Help\Generator;
 use App\Help\Help;
 use App\Mail\DteMail;
+use App\Mail\DteReenvioMail;
 use App\Models\InvalidacionDte;
 use App\Models\LogDTE;
 use App\Models\RegistroDTE;
@@ -33,6 +34,28 @@ class SendMailFe
             ->from($correoEmpresa, $nombreEmpresa));
             }catch(Exception $e){
                 Anexo::emailError( $identificacion['codigoGeneracion'], $identificacion['numeroControl'], (string) $e);
+
+            }
+        }
+    }
+
+
+     public static function sendingInvalidacion($id, $empresa , $mailInfo, $identificacion, $receptor){
+
+        $correoEmpresa = Crypt::decryptString($empresa->correo_electronico);
+        $telefono = Crypt::decryptString($empresa->telefono);
+        $nombreEmpresa = Crypt::decryptString($empresa->nombre);
+        $dteActual = RegistroDTE::find($id);
+        $nombreCliente = $receptor['nombre'];
+        
+        if($dteActual->sello != null){
+            try{
+              Mail::to("apopsasv2021@gmail.com")
+            ->send((new DteReenvioMail($nombreCliente, $correoEmpresa, $telefono, $mailInfo))
+            ->from($correoEmpresa, $nombreEmpresa));
+            }catch(Exception $e){
+                Anexo::emailError( $identificacion['codigoGeneracion'], $identificacion['numeroControl'], (string) $e);
+                return $e;
 
             }
         }
