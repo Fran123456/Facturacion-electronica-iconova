@@ -194,7 +194,7 @@ class Help
         return $retorno;
     }
 
-    public static function numberToString($numero)
+     public static function numberToString($numero)
     {
         $conversion = array(
             0 => 'cero',
@@ -279,6 +279,7 @@ class Help
             }
         }
     }
+
 
     public static function getPayWay($way)
     {

@@ -435,6 +435,7 @@ class PdfController extends Controller
 
         //-----------------------------------------------
 
+       
         $data = array(
             'emisor' => array(
                 'nombre' => $emisor_nombre,
@@ -468,7 +469,7 @@ class PdfController extends Controller
                 'municipio' => $receptor_municipio,
                 'departamento' => $receptor_departamento,
                 'complemento' => $receptor_direccion,
-                'nrc' => $receptor_nit,
+                'nrc' => $receptor_nrc,
                 'tipoDoc' => $receptor_tipoDocumento,
                 'numDoc' => $receptor_numDocumento,
                 'telefono' => $receptor_telefono,

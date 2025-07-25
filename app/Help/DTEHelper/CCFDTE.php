@@ -13,6 +13,8 @@ class CCFDTE
     {
         $resumen = [];
 
+        $retenido= round($retenido,2);
+
         // Obtener la descripción del método de pago
         $descripcionPago = Help::getPayWay($codigoPago);
 

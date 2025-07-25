@@ -85,6 +85,7 @@ class DteCCFController extends Controller
         $otrosDocumentos = isset($json['otrosDocumentos']) ? $json['otrosDocumentos'] : null;
         $ventaTercero = isset($json['ventaTercero']) ? $json['ventaTercero'] : null;
         $cuerpoDocumento = CCFDTE::getCuerpoDocumento($dte['cuerpoDocumento']);
+        
         $retenido = $json['dteJson']['retenido']??0;
        
 
