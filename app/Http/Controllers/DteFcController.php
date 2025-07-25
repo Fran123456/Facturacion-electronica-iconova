@@ -12,7 +12,8 @@ use App\Help\Services\DteApiMHService;
 use App\Help\Services\SendMailFe;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-
+use App\Models\Cliente;
+use App\Models\RegistroDTE;
 // ^ FACTURA
 class DteFcController extends Controller
 {
@@ -26,7 +27,7 @@ class DteFcController extends Controller
         }*/
 
         $json = $request->json()->all();
- $requestCrudo = $json;
+        $requestCrudo = $json;
 
         if (!$json) {
             return response()->json(["error" => "DTE no válido o nulo"], Response::HTTP_BAD_REQUEST);
@@ -59,6 +60,8 @@ class DteFcController extends Controller
 
         [$faltan, $receptor] = Receptor::generar($dte['receptor'] ?? null, $tipoDTE);
 
+        
+
         if ( $faltan )
             return response()->json($receptor, 404);
 
@@ -68,7 +71,9 @@ class DteFcController extends Controller
         $codigoPago = isset($json['codigo_pago']) ? $json['codigo_pago'] : "01";
         $periodoPago = isset($json['periodo_pago']) ? $json['periodo_pago'] :  null;
         $plazoPago = isset($json['plazo_pago']) ? $json['plazo_pago'] :  null;
-        $resumen = FACTDTE::Resumen($cuerpoDocumento, $dte['receptor']['grancontribuyente'] ?? false, $pagoTributos, $codigoPago, $periodoPago, $plazoPago);
+        $operacion = isset($json['operacion']) ? $json['operacion'] :  1;
+        $resumen = FACTDTE::Resumen($cuerpoDocumento, $dte['receptor']['grancontribuyente'] ?? false,
+        $pagoTributos, $codigoPago, $periodoPago, $plazoPago, $operacion);
 
         // Variables de Documento Relacionado y Cuerpo del Documento
         $documentoRelacionado = $json['documentoRelacionado'] ?? null;
@@ -103,14 +108,25 @@ class DteFcController extends Controller
         //print_r(json_encode($newDTE));
         //return;
         $responseLogin = LoginMH::login();
+       
+        
+      
         
         if ($responseLogin['code'] != 200) {
             [$responseData, $statusCode, $id] = DteApiMHService::EnviarOfflineMH( $newDTE, $idCliente, $identificacion, $requestCrudo );
         }else{
             [$responseData, $statusCode, $id] = DteApiMHService::envidarDTE( $newDTE, $idCliente, $identificacion , $requestCrudo);
         }
-  
-      
+
+        //$json['dteJson']
+        //*logica para agregar comentario y json productos*/
+        $registro = RegistroDTE::find($id);
+        $registro->comentario = isset($json['comentario']) ? $json['comentario'] : null;
+        $registro->json_productos = isset($json['productos']) ? json_encode($json['productos'], JSON_PRETTY_PRINT) : null;
+        $registro->save();
+
+        
+
 
          $mailInfo = array(
             'responseData'=>$responseData,
@@ -125,6 +141,10 @@ class DteFcController extends Controller
       
         $empresa = Help::getEmpresa();
         SendMailFe::sending($id,$empresa, $mailInfo, $identificacion, $receptor);
+
+        $c = Cliente::find(1);
+        $c->nombre = "generico";
+        $c->save();
 
 
         return response()->json(

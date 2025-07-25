@@ -32,6 +32,7 @@ class LoginMH {
             return array(["error" => "La empresa existe pero se encuentra desactivada",'code'=>Response::HTTP_NOT_FOUND])[0];
 
         $url = Help::mhUrl();
+        
         $nit = Crypt::decryptString($empresa->nit);
         $pwd = Crypt::decryptString($empresa->credenciales_api);
 
@@ -39,6 +40,7 @@ class LoginMH {
             "user" => $nit,
             "pwd" => $pwd,
         ];
+        
 
         try {
             $requestResponse = Http::timeout(160)
@@ -52,6 +54,7 @@ class LoginMH {
         } catch (Exception $e) {
             return array(["error" => "No se pudo conectar con la  API de Ministerio hacienda",'code'=>500])[0];
         }
+        
 
         $responseData = $requestResponse->json();
         $statusCode = $requestResponse->status();

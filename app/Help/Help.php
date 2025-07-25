@@ -398,9 +398,20 @@ class Help
     //factura
     public static function ValidarClienteByEmail($numDocumento,$correo, $clienteF)
     {
-        $cliente = Cliente::where('nit', $numDocumento)->orWhere('dui', $numDocumento)->first();
+        $cliente = Cliente::where('nit', $numDocumento)->orWhere('dui', $numDocumento)
+        ->orWhere('nombre', $clienteF['nombre'])->first();
+
+        if($cliente?->id == 1){
+            $cliente = null;
+        }
+
+
         if($cliente == null){
-            $cliente = Cliente::where('correo', $correo)->first();
+            $cliente = Cliente::where('correo', $correo)->where('nombre','!=', 'generico')->first();
+
+            if($cliente?->id == 1){
+               $cliente = null;
+            }
         }
         
         if($cliente ==null){
@@ -408,7 +419,7 @@ class Help
                 'nit'=> $clienteF['nit']??null,
                 'nrc'=> $clienteF['nrc']??null,
                 'dui'=> $clienteF['dui']??null,
-                'nombre'=> $clienteF['nombre'] ?? "generico",
+                'nombre'=> $clienteF['nombre'] ?? "Desconocido",
                 'codigo_actividad'=> $clienteF['codActividad'],
                 'descripcion_actividad'=> $clienteF['descActividad'],
                 'nombre_comercial'=> $clienteF['nombreComercial'],
@@ -420,6 +431,10 @@ class Help
                 'estado'=> 1,
             ]);
         }
+
+        $c = Cliente::find(1);
+        $c->nombre = "generico";
+        $c->save();
         return [
             'id' => $cliente->id,
             'tipoCliente' => $cliente->id_tipo_cliente

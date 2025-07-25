@@ -196,15 +196,13 @@ class DteApiMHService
             'id_interno'=> isset($request['id_interno'])? $request['id_interno']: null
         ]);
 
-        
-
+       
+ 
         try {
 
             // FIRMAR DTE
-            $DTESigned = FirmadorElectronico::firmador($dte);
-            
+             $DTESigned = FirmadorElectronico::firmador($dte);
 
-      
             $registoDTE['dte_firmado'] =  $DTESigned ;
             if ($DTESigned['status'] > 201) {
                 return response()->json(["error" => $DTESigned['error']], $DTESigned['status']);
@@ -397,6 +395,9 @@ class DteApiMHService
         $jsonData = $dte;
         //$data = json_decode($jsonData);
         $data = $jsonData;
+        if(!isset($data->identificacion->numeroControl)){
+            $data = json_decode($jsonData);
+        }
        
       
       
@@ -580,7 +581,8 @@ class DteApiMHService
         
             $registroDTE['response']= json_encode($responseData);
             if($responseData['selloRecibido'] != null){
-                $registroDTE['estado']= true;
+                $registoDTE['estado']= true;
+                $registoDTE->save();
             }
             
  

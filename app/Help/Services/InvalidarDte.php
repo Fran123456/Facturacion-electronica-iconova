@@ -36,6 +36,7 @@ class InvalidarDte
         $statusCode = null;
 
         $codigoGeneracionDte = $identificacion['codigoGeneracion'];
+        $dteInvalidado= null;
 
         try {
             
@@ -72,6 +73,7 @@ class InvalidarDte
                 'dte_firmado' => $documento,
                 'sello' => $responseData['selloRecibido'],
                 'dte' => json_encode($dte),
+                'registro_dte_id'=> $registroDte->id,
             ]);
 
             $registroDte->invalidacion_id = $dteInvalidado->id;
@@ -90,8 +92,11 @@ class InvalidarDte
                 'estado' => false,
             ])->save();
         } 
+        $dtejson = json_encode($dte);
+        $id = $dteInvalidado?->id;
 
-        return [$responseData, $statusCode];
+        return [$responseData, $statusCode, $dtejson, $id];
+
     }
 
     private static function handleErrorResponse($statusCode, $responseData)

@@ -49,7 +49,7 @@ class Receptor
             $cliente = Cliente::create([
                 'tipo_documento' => $tipoDte,
                 'nit' => $nit,
-                'nrc' => $receptorDte['nrc'],
+                'nrc' => $receptorDte['nrc']??null,
                 'dui' => $receptorDte['dui'],
                 'nombre' => $receptorDte['nombre'],
                 'codigo_actividad' => $receptorDte['codActividad'],
@@ -220,6 +220,10 @@ class Receptor
         if (in_array($tipoDTE, $grupo1)) {
 
             $receptor["nrc"] = $cliente->nrc;
+
+            if($receptor["nrc"] == ""){
+                $receptor["nrc"] = null;
+            }
             $receptor["codActividad"] = $cliente->codigo_actividad;
 
             // Solo se agrega el nit si es necesario es dte CCF 03 | CL 08 | DCL 09 | NC 05 | NC 06
@@ -265,7 +269,23 @@ class Receptor
             $receptor["numDocumento"] = $complemento["numDocumento"];
         }
 
-        
+       
+
+         if($tipoDTE== "01"){
+
+            if($receptor["tipoDocumento"] == ""){
+            $receptor["tipoDocumento"] = null;
+            }
+
+            if($receptor["numDocumento"] == ""){
+                $receptor["numDocumento"] = null;
+            }
+
+
+           if($receptor["tipoDocumento"] == "13"){
+                 $receptor["numDocumento"] = substr($receptor["numDocumento"], 0, -1) . '-' . substr($receptor["numDocumento"], -1);
+           }
+        }
 
         return $receptor;
     }

@@ -98,7 +98,7 @@ class CCFDTE
         $montoTotal = $subTotal + $totalImpuestos;
 
         // Calcular el total a pagar
-        $totalPagar = $subTotal + $totalImpuestos - $ivaRetenida;
+        $totalPagar = number_format(($subTotal + $totalImpuestos - $ivaRetenida), 2);
 
         $pagos[] = [
             "codigo" => $codigoPago,
@@ -109,7 +109,7 @@ class CCFDTE
         ];
 
         // Generar el total en letras
-        $numero_en_letras = Generator::generateStringFromNumber($totalPagar);
+        $numero_en_letras = Generator::generateStringFromNumber($totalPagar, 2);
 
            // Aplicando redondeo al valor en tributos
            foreach($tributos as $key=>$t )

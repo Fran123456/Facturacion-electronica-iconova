@@ -17,6 +17,6 @@ class InvalidacionDte extends Model
         'sello',
         'codigo_generacion',
         'dte_firmado',
-        'dte'
+        'dte','registro_dte_id',
     ];
 }

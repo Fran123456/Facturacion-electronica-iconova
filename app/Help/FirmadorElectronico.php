@@ -33,12 +33,16 @@ class FirmadorElectronico
         if ($jsonDTE == null)
             return response()->json(["error" => "Enviar un DTE valido por favor."], Response::HTTP_NOT_FOUND);
 
+              //if($nit == "06142806161048"){
+                //  $passwordPrivate  = $passwordPrivate. "#";
+                // }
         $jsonDocumento = [
             "nit" => $nit,
             "activo" => true,
             "passwordPri" => $passwordPrivate,
             "dteJson" => $jsonDTE
         ];
+        
 
         $url = Help::urlFirmador() . "firmardocumento/";
         $response = Http::post($url, $jsonDocumento);

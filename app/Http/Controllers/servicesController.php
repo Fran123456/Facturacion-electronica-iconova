@@ -93,6 +93,9 @@ class ServicesController extends Controller
         $nit = Crypt::decryptString($empresa->nit);
         $pwd = Crypt::decryptString($empresa->credenciales_api);
 
+      
+     
+
         
 
         $jsonRequest = [
@@ -137,12 +140,18 @@ class ServicesController extends Controller
     {
         $texto = $request->query("valor");
 
+        $nit = Crypt::decryptString($empresa->nit);
+        
+
         if (!$texto)
             return response()->json([
                 "msm" => "El valor es requerido en la petición",
             ], 400);
 
-        $encrypted = Crypt::decryptString($texto);
+        $encrypted = Crypt::decryptString(urldecode($texto));
+        if($nit == "06142806161048"){
+            $encrypted = $encrypted."#";
+        }
 
         return response()->json([
             "texto" => $encrypted,

@@ -25,14 +25,30 @@ class SendMailFe
         $nombreEmpresa = Crypt::decryptString($empresa->nombre);
         $dteActual = RegistroDTE::find($id);
         $nombreCliente = $receptor['nombre']??null;
+        $correoCliente = $receptor['correo']??"facturacion.inplan@gmail.com";
+        //??
         
         if($dteActual->sello != null){
             try{
 
                 if($dteActual->id_cliente != 1){
-                      Mail::to("francisco.navas.iconova@gmail.com")
+                      Mail::to([$correoCliente, 'facturacion.inplan@gmail.com'])
                         ->send((new DteMail($nombreCliente, $correoEmpresa, $telefono, $mailInfo))
                         ->from($correoEmpresa, $nombreEmpresa));
+
+                        $dteActual->anexo = $correoCliente;
+                        $dteActual->save();
+                }else{
+                    $dteActual->anexo = "No se ha mandado el correo";
+                    $dteActual->save();
+                }
+
+                if ($dteActual->id_cliente != 1) {
+                    /*Mail::to($correoCliente)
+                        ->queue(
+                            (new DteMail($nombreCliente, $correoEmpresa, $telefono, $mailInfo))
+                            ->from($correoEmpresa, $nombreEmpresa)
+                        );*/
                 }
             
 

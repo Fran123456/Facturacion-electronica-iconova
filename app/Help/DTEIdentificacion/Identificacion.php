@@ -33,7 +33,7 @@ class Identificacion
         $nit = Crypt::decryptString($empresa->nit);
         $nombreEmpresa = Crypt::decryptString($empresa->nombre);
         $telefono = Crypt::decryptString($empresa->telefono);
-        $correo = Crypt::decryptString($empresa->correo_electronico);
+        $correo = /*Crypt::decryptString($empresa->correo_electronico)*/ $empresa->correo_pdf;
 
         $emisor = [
             "nit" => $nit,
@@ -104,7 +104,7 @@ class Identificacion
         $nrc = Crypt::decryptString($empresa->nrc);
         $nombreEmpresa = Crypt::decryptString($empresa->nombre);
         $telefono = Crypt::decryptString($empresa->telefono);
-        $correo = Crypt::decryptString($empresa->correo_electronico);
+        $correo = /*Crypt::decryptString($empresa->correo_electronico)*/ $empresa->correo_pdf;
 
         $actividad = MHActividadEconomica::where('codigo', $empresa->codigo_actividad)->first();
 

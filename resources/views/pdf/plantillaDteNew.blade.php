@@ -129,24 +129,24 @@
                 <!-- Columna izquierda: Logo + datos básicos -->
                 <td width="42%" valign="top" style="padding-right: 5px;">
                     <div
-                        style="background-color: #ffffff; height: 80px; text-align: center; line-height: 50px; font-weight: bold;">
+                        style="background-color: #ffffff; height: 90px; text-align: center; line-height: 50px; font-weight: bold;">
 
-                        <img class="mt-2" src="apopsa.jpg" width="120" height="110" alt="">
+                        <img class="mt-2" src="logoPlanes.png" width="140" height="140" alt="">
                        <div>
 
                        </div>
                     </div>
                     <p>
-                       <h2><strong> {{ $data['emisor']['nombre']}}</strong></h2>
+                       <h3><strong> {{ $data['emisor']['nombre']}}</strong></h3>
                     </p>
-                    <p><strong>NIT:</strong> {{ $data['emisor']['numDoc'] }}</p>
-                    <p><strong>NRC:</strong> {{ $data['emisor']['nrc'] }}</p>
+                    <p><strong>NIT:</strong> {{ $data['emisor']['numDoc'] }} / <strong>NRC:</strong> {{ $data['emisor']['nrc'] }} </p>
+                    
                     <p style="line-height: 1.5; !important"><strong>Dirección:</strong>
                         {{--  $data['emisor']['municipio'] . ', ' . $data['emisor']['departamento'] . ', ' . $data['emisor']['complemento'] --}}
                         {{ $data['emisor']['complemento'] }}
                     </p>
-                    <p><strong>Teléfono:</strong> {{ $data['emisor']['telefono'] }}</p>
-                    <p><strong>Correo:</strong> {{ $data['emisor']['correo'] }}</p>
+                    <p><strong>Teléfono:</strong> {{ $data['emisor']['telefono'] }} / <strong>Correo:</strong> {{ $data['emisor']['correo'] }}</p>
+                   
                 </td>
 
                 <!-- Columna derecha: Información de factura -->
@@ -198,46 +198,130 @@
                 <!-- Columna izquierda: Datos del receptor -->
                 <td width="70%" valign="top" style="padding-right: 10px;">
                     <div style="background-color: #f5f5f5; padding: 8px; border: 1px solid #ccc;">
-                        <p ><strong>Nombre:</strong>
-                            @if ($data['receptor']['nombre'] == null ||  $data['receptor']['nombre']  == "" )
-                                Sin registro
-                             @else 
-                             {{ $data['receptor']['nombre']  }}
-                            @endif
-                        </p>
+                        @switch($data['tipoDocumento'])
+                            @case('03')
+                                <p><strong>Nombre:</strong>
+                                    @if ($data['receptor']['nombre'] == null || $data['receptor']['nombre'] == '')
+                                        Sin registro
+                                    @else
+                                        {{ $data['receptor']['nombre'] }}
+                                    @endif
+                                </p>
+                                <p><strong>{{ $data['receptor']['tipoDoc'] }}:</strong>
+                                    @if ($data['receptor']['numDoc'] == null || $data['receptor']['numDoc'] == '')
+                                        Sin registro
+                                    @else
+                                        {{ $data['receptor']['numDoc'] }}
+                                    @endif
+                                </p>
+                                @if ($data['receptor']['nrc'] != null)
+                                    <p style="margin-bottom:2;"><strong>NRC:</strong> {{ $data['receptor']['nrc'] ?? 'Sin registro' }}</p>
+                                @endif
+                                <p style="margin-top:0; margin-bottom:2; line-height:1.5;"><strong>Actividad Económica:</strong> {{ $data['receptor']['actividad'] ?? 'Sin registro' }}</p>
+                                <p style="margin-top:0; margin-bottom:2; line-height:1.5;"><strong>Dirección:</strong>
+                                    {{--   $data['receptor']['municipio'] . ', ' . $data['receptor']['departamento'] . ', ' . $data['receptor']['complemento'] --}}
+                                    @if ($data['receptor']['complemento'] == null || $data['receptor']['complemento'] == '')
+                                        Sin registro
+                                    @else
+                                        {{ $data['receptor']['complemento'] }}
+                                    @endif
+                                </p>
+                                <p><strong>Teléfono:</strong> {{ $data['receptor']['telefono'] ?? 'Sin registro' }}</p>
+                                <p><strong>Correo:</strong> {{ $data['receptor']['correo'] ?? 'Sin registro' }}</p>
+                                <p><strong>Condición Pago:</strong> {{ $data['receptor']['condicionPago']}}
+                                
+                                    @if ($data['receptor']['plazo'] != null )
+                                       <strong>Plazo:</strong>  {{ $data['receptor']['plazo']}}
+                                    @endif
 
 
-                        <p ><strong>Dirección:</strong>
-                            {{--   $data['receptor']['municipio'] . ', ' . $data['receptor']['departamento'] . ', ' . $data['receptor']['complemento'] --}}
-                            @if ($data['receptor']['complemento'] == null ||  $data['receptor']['complemento'] == "" )
-                                Sin registro
-                             @else 
-                             {{ $data['receptor']['complemento'] }}
-                            @endif
-                        </p>
-                        @if ($data['receptor']['nrc'] != null)
-                            <p><strong>NRC:</strong> {{ $data['receptor']['nrc'] ?? "Sin registro" }}</p>
-                        @endif
+                                    @if ($data['receptor']['periodo'] != null )
+                                       <strong>Periodo:</strong>  {{ $data['receptor']['periodo']}}
+                                    @endif
+                                
+                                </p>
+                                
+                            @break
 
-                        <p><strong>Tipo Documento: </strong>
-                          
-                             @if ($data['receptor']['tipoDoc']  == null ||  $data['receptor']['tipoDoc']  == "" )
-                                Sin registro
-                             @else 
-                             {{ $data['receptor']['tipoDoc']  }}
-                            @endif
-                        </p>
+                            @case('01')
+                                <p><strong>Nombre:</strong>
+                                    @if ($data['receptor']['nombre'] == null || $data['receptor']['nombre'] == '')
+                                        Sin registro
+                                    @else
+                                        {{ $data['receptor']['nombre'] }}
+                                    @endif
+                                </p>
+                                <p style="margin-bottom:2;"><strong>{{ $data['receptor']['tipoDoc'] ? $data['receptor']['tipoDoc'] : 'Documento' }}:</strong>
+                                    @if ($data['receptor']['numDoc'] == null || $data['receptor']['numDoc'] == '')
+                                        Sin registro
+                                    @else
+                                        {{ $data['receptor']['numDoc'] }}
+                                    @endif
+                                </p>
+                                <p style="margin-top:0; margin-bottom:0; line-height:1.5;"><strong>Dirección:</strong>
+                                    {{--   $data['receptor']['municipio'] . ', ' . $data['receptor']['departamento'] . ', ' . $data['receptor']['complemento'] --}}
+                                    @if ($data['receptor']['complemento'] == null || $data['receptor']['complemento'] == '')
+                                        Sin registro
+                                    @else
+                                        {{ $data['receptor']['complemento'] }}
+                                    @endif
+                                </p>
+                                <p><strong>Teléfono:</strong> {{ $data['receptor']['telefono'] ?? 'Sin registro' }}</p>
+                                <p><strong>Correo:</strong> {{ $data['receptor']['correo'] ?? 'Sin registro' }}</p>
+                                <p><strong>Condición Pago:</strong> {{ $data['receptor']['condicionPago']}}
+                                 @if ($data['receptor']['plazo'] != null )
+                                       <strong>Plazo:</strong>  {{ $data['receptor']['plazo']}}
+                                    @endif
 
-                        <p><strong>Documento:</strong>
-                           
-                          @if ($data['receptor']['numDoc'] == null ||  $data['receptor']['numDoc']  == "" )
-                                Sin registro
-                             @else 
-                             {{ $data['receptor']['numDoc']  }}
-                            @endif
-                        </p>
-                        <p><strong>Teléfono:</strong> {{ $data['receptor']['telefono'] ?? "Sin registro" }}</p>
-                        <p><strong>Correo:</strong> {{ $data['receptor']['correo'] ?? "Sin registro" }}</p>
+
+                                    @if ($data['receptor']['periodo'] != null )
+                                       <strong>Periodo:</strong>  {{ $data['receptor']['periodo']}}
+                                    @endif
+                                </p>
+                            @break
+
+                            @default
+                                <p><strong>Nombre:</strong>
+                                    @if ($data['receptor']['nombre'] == null || $data['receptor']['nombre'] == '')
+                                        Sin registro
+                                    @else
+                                        {{ $data['receptor']['nombre'] }}
+                                    @endif
+                                </p>
+
+
+                                <p><strong>Dirección:</strong>
+                                    {{--   $data['receptor']['municipio'] . ', ' . $data['receptor']['departamento'] . ', ' . $data['receptor']['complemento'] --}}
+                                    @if ($data['receptor']['complemento'] == null || $data['receptor']['complemento'] == '')
+                                        Sin registro
+                                    @else
+                                        {{ $data['receptor']['complemento'] }}
+                                    @endif
+                                </p>
+                                @if ($data['receptor']['nrc'] != null)
+                                    <p><strong>NRC:</strong> {{ $data['receptor']['nrc'] ?? 'Sin registro' }}</p>
+                                @endif
+
+                                <p><strong>Tipo Documento: </strong>
+
+                                    @if ($data['receptor']['tipoDoc'] == null || $data['receptor']['tipoDoc'] == '')
+                                        Sin registro
+                                    @else
+                                        {{ $data['receptor']['tipoDoc'] }}
+                                    @endif
+                                </p>
+
+                                <p><strong>Documento:</strong>
+
+                                    @if ($data['receptor']['numDoc'] == null || $data['receptor']['numDoc'] == '')
+                                        Sin registro
+                                    @else
+                                        {{ $data['receptor']['numDoc'] }}
+                                    @endif
+                                </p>
+                                <p><strong>Teléfono:</strong> {{ $data['receptor']['telefono'] ?? 'Sin registro' }}</p>
+                                <p><strong>Correo:</strong> {{ $data['receptor']['correo'] ?? 'Sin registro' }}</p>
+                        @endswitch
                     </div>
 
                 </td>
@@ -283,17 +367,31 @@
         <br>
         @endif
 
+        @if ($data['comentario'] != null)
+           
+            
+             <caption style="background-color: #eeeeeeab; height: 20px; vertical-align: right; text-align: left">
+                <strong>Comentario: </strong> {{$data['comentario']}}</caption>
+
+           
+        
+        <br>
+        @endif
+
+        
 
         <table width="100%" style="border-collapse: collapse; margin-bottom: 5px;margin-top:5px">
 
             <caption style="background-color: #eeeeeeab; font-weight: bold; height: 20px; vertical-align: center;">
                 CUERPO DEL DOCUMENTO</caption>
 
+          
+
             <thead style="background-color: #eeeeeeab;">
                 <tr>
 
                     <th class="table-border">Cantidad</th>
-
+                    <th class="table-border">Codigo</th>
                     <th class="table-border">Descripción</th>
                     <th class="table-border" style="width: 10%;">Precio unitario</th>
 
@@ -310,85 +408,15 @@
                 @endphp
 
 
-                {{--
-                <tr>
-                    @php
-                        print_r($data['cuerpoDoc']);
-                    @endphp
-
-                    @foreach ($data['cuerpoDoc'] as $item)
-
-
-
-                        <td class="table-border" style="text-align: center;width: 7%; ">{{ $item['cantidad'] }}</td>
-
-                        <td class="table-border" style="text-align: left;">{{ $item['descripcion'] }}</td>
-                        <td class="table-border" style="text-align: right;">${{ $item['precioUni'] }}</td>
-
-                        <td class="table-border" style="text-align: right;">${{ $item['noSuj'] }}</td>
-                        <td class="table-border" style="text-align: right;">${{ $item['exenta'] }}</td>
-                        <td class="table-border" style="text-align: right;">${{ $item['gravada'] }}</td>
-                    @endforeach ()
-
-
-
-                </tr>
-
-                --}}
-
+                
 
             </tbody>
 
         </table>
 
-        {{--
+        
 
-            <table width="100%" style="border-collapse: collapse; margin-bottom: 5px;margin-top:5px">
-
-            <caption style="background-color: #eeeeeeab; font-weight: bold; height: 20px; vertical-align: center;">
-                CUERPO DEL DOCUMENTO</caption>
-
-            <thead style="background-color: #eeeeeeab;">
-                <tr>
-                    <th class="table-border">Num Item</th>
-                    <th class="table-border">Cantidad</th>
-                    <th class="table-border">Unidad de Medida</th>
-                    <th class="table-border">Descripción</th>
-                    <th class="table-border" style="width: 10%;">Precio unitario</th>
-                    <th class="table-border" style="width: 10%;">Descuentos</th>
-                    <th class="table-border" style="width: 10%;">Ventas no sujetas</th>
-
-                    <th class="table-border" style="width: 10%;">Ventas exentas</th>
-                    <th class="table-border" style="width: 10%;">Ventas gravadas</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    @php
-                        print_r($data['cuerpoDoc']);
-                    @endphp
-
-                    @foreach ($data['cuerpoDoc'] as $item)
-
-
-                        <td class="table-border" style="text-align: center;">{{ $item['numItem'] }}</td>
-                        <td class="table-border" style="text-align: right;">{{ $item['cantidad'] }}</td>
-                        <td class="table-border" style="text-align: center;">{{ $item['medida'] }}</td>
-                        <td class="table-border" style="text-align: center;">{{ $item['descripcion'] }}</td>
-                        <td class="table-border" style="text-align: right;">${{ $item['precioUni'] }}</td>
-                        <td class="table-border" style="text-align: right;">${{ $item['descu'] }}</td>
-                        <td class="table-border" style="text-align: right;">${{ $item['noSuj'] }}</td>
-                        <td class="table-border" style="text-align: right;">${{ $item['exenta'] }}</td>
-                        <td class="table-border" style="text-align: right;">${{ $item['gravada'] }}</td>
-                    @endforeach ()
-
-
-
-                </tr>
-            </tbody>
-        </table>
-
-        --}}
+          
 
 
 

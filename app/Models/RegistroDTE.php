@@ -32,7 +32,7 @@ class RegistroDTE extends Model
         'dte_firmado',
         'anexo',
         'invalidacion_id',
-        'id_interno'
+        'id_interno','contingencia', 'json_productos','comentario'
     ];
 
     protected $casts = [

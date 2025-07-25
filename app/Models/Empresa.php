@@ -12,6 +12,7 @@ class Empresa extends Model
     protected $table = "empresa";
 
     protected $fillable = [
+        'correo_pdf',
         'id_usuario',
         'nombre',
         'public_key',

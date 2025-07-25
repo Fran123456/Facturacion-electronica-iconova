@@ -32,7 +32,7 @@ class InvalidarDteController extends Controller
 
         $dte = compact("identificacion", "emisor", "documento", "motivo");
         
-        [$responseData, $statusCode] =  InvalidarDte::invalidar($dte);
+        [$responseData, $statusCode, $dtejson, $id] =  InvalidarDte::invalidar($dte);
 
         $anulado = true;
         if($responseData['estado']=="RECHAZADO"){
@@ -43,7 +43,11 @@ class InvalidarDteController extends Controller
             'responseData' => $responseData,
             'statusCode' => $statusCode,
             'anulado'=>$anulado,
+            'dte'=> $dtejson,'id'=> $id
         ], $statusCode);
+
+
+      
     }
 
 

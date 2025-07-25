@@ -38,8 +38,10 @@ class FACTDTE
         return $items;
     }
 
-    public static function Resumen($cuerpo, $idTipoCliente, $pagoTributos,$codigoPago, $plazoPago = null, $periodoPago = null)
+    public static function Resumen($cuerpo, $idTipoCliente, $pagoTributos,$codigoPago, $periodoPago = null,
+    $plazoPago = null, $operacion = 1)
     {
+
         $resumen = [];
 
         $descripcionPago = Help::getPayWay($codigoPago);
@@ -115,6 +117,9 @@ class FACTDTE
 
             $montoPago = $ventaGravada - $ivaRetenidoItem;
 
+            if($periodoPago != null)
+                $periodoPago  = (int)$periodoPago;
+
             $pagos[] = [
                 "codigo" => $codigoPago,
                 "montoPago" => $montoPago,
@@ -127,7 +132,7 @@ class FACTDTE
 
         $totalPagar = round($subTotal + $totalImpuestos + $totalNoGravado - $ivaRetenida,2);
 
-        $total_en_letras = Generator::generateStringFromNumber($totalPagar);
+        $total_en_letras = Generator::generateStringFromNumber(number_format($totalPagar, 2));
 
         $resumen = [
             // TOTALES CALCULADOS
@@ -141,7 +146,7 @@ class FACTDTE
             'montoTotalOperacion' => round($subTotal,2),
             'totalIva' => round($totalIva,2),
             'pagos' => $pagos,
-            'totalPagar' => $totalPagar,
+            'totalPagar' => round($totalPagar,2),
 
             // CAMPOS CON VALORES FIJOS
             'descuNoSuj' => 0.0,
@@ -156,7 +161,7 @@ class FACTDTE
             'saldoFavor' => 0,
 
             // OTROS CAMPOS ADICIONALES QUE NO SON DE CALCULOS
-            'condicionOperacion' => 1,
+            'condicionOperacion' => (int)$operacion,
             'totalLetras' => 'USD ' . $total_en_letras,
             'numPagoElectronico' => null,
         ];
