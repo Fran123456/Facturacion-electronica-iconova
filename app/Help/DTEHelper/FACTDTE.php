@@ -130,6 +130,7 @@ class FACTDTE
         $totalPagar = round($subTotal + $totalImpuestos + $totalNoGravado - $ivaRetenida,2);
      
         $total_en_letras = Generator::generateStringFromNumber($totalPagar);
+ 
 
         $resumen = [
             // TOTALES CALCULADOS

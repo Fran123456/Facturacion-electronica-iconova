@@ -135,6 +135,7 @@ class Generator
 
     public static function generateStringFromNumber($number)
     {
+        $number= round($number,2);
         $numero_str = strval($number);
         $partes = explode('.', $numero_str);
         $entero = isset($partes[0]) ? intval($partes[0]) : 0;
@@ -142,4 +143,6 @@ class Generator
 
         return Help::numberToString($entero) . " con " . Help::numberToString($decimal);
     }
+
+    
 }

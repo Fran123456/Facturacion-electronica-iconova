@@ -8,9 +8,12 @@ use App\Help\Help;
 class CCFDTE
 {
 
-    public static function Resumen($cuerpo, $granContribuyente, $pagoTributos, $codigoPago, $plazoPago = null, $periodoPago = null)
+    public static function Resumen($cuerpo, $granContribuyente, $pagoTributos, $codigoPago, $plazoPago = null, $periodoPago = null
+    , $retenido = 0)
     {
         $resumen = [];
+
+        $retenido= round($retenido,2);
 
         // Obtener la descripción del método de pago
         $descripcionPago = Help::getPayWay($codigoPago);
@@ -88,8 +91,10 @@ class CCFDTE
             }
 
             // Calcular el monto de pago
-            $montoPago = $subTotal + $impuestoTotalItem - $ivaRetenidoItem;            
+            $montoPago = $subTotal + $impuestoTotalItem ;            
         }
+        //NUEVA FORMA DE CALCULAR EL RETENIDO
+        $montoPago = $montoPago - $retenido;
 
         // Redondear el subtotal
         $subTotal = round($subTotal, 2);
@@ -98,7 +103,7 @@ class CCFDTE
         $montoTotal = $subTotal + $totalImpuestos;
 
         // Calcular el total a pagar
-        $totalPagar = $subTotal + $totalImpuestos - $ivaRetenida;
+        $totalPagar = $subTotal + $totalImpuestos -  $retenido;
 
         $pagos[] = [
             "codigo" => $codigoPago,
@@ -134,7 +139,7 @@ class CCFDTE
             'descuGravada' => 0.0,
             'tributos' => $tributos ?? null,
             'ivaPerci1' => 0.0,
-            'ivaRete1' => round($ivaRetenida,2),
+            'ivaRete1' =>  $retenido,
             'reteRenta' => 0.0,
             'totalPagar' => round($totalPagar,2),
             'condicionOperacion' => 1,

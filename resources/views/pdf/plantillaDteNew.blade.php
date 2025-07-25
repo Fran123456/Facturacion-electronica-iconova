@@ -202,8 +202,8 @@
                     <div style="background-color: #f5f5f5; padding: 8px; border: 1px solid #ccc;">
                         <p><strong>Nombre:</strong> {{ $data['receptor']['nombre'] }}</p>
                         <p style="line-height: 1.0;"><strong>Dirección:</strong>
-                            {{--   $data['receptor']['municipio'] . ', ' . $data['receptor']['departamento'] . ', ' . $data['receptor']['complemento'] --}}
-                            {{ $data['receptor']['complemento'] }}
+                            {{  $data['receptor']['municipio'] . ', ' . $data['receptor']['departamento'] . ', ' . $data['receptor']['complemento'] }}
+                         
                         </p>
                         @if ($data['receptor']['nrc'] != null)
                             <p><strong>NRC:</strong> {{ $data['receptor']['nrc'] }}</p>

@@ -166,11 +166,11 @@ class FEXDTE
 
         $resumen = [
             "totalDescu" => $totalDescu,
-            "totalNoGravado" => $totalNoGravado,
-            "totalGravada" => $totalGravadas,
-            "totalPagar" =>  $totalPagar,
+            "totalNoGravado" => round($totalNoGravado,2),
+            "totalGravada" => round($totalGravadas,2),
+            "totalPagar" =>  round($totalPagar,2),
 
-            "montoTotalOperacion" => $montoTotalOperacion,
+            "montoTotalOperacion" => round( $montoTotalOperacion,2),
             "porcentajeDescuento" => $porcentajeDescuento,
             "seguro" => $seguro,
             "flete" => $flete,
