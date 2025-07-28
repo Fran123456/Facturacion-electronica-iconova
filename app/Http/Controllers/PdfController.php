@@ -81,10 +81,11 @@ class PdfController extends Controller
 
         $url = $data['url'];
         $qr = $data['qr'];
+        $img = $data['img'];
         $data = $data['data'];
 
         // CCF, Exportacion, Factura
-        $pdf = DomPDF::loadView('pdf.plantillaDteNew', compact('data', 'url', 'qr'));  // Carga la vista con los datos
+        $pdf = DomPDF::loadView('pdf.plantillaDteNew', compact('data', 'url', 'qr', 'img'));  // Carga la vista con los datos
 
         $pdf->setPaper('A4', 'portrait');
         return $pdf->stream('dte.pdf');  // Muestra el PDF en el navegador
@@ -192,13 +193,13 @@ class PdfController extends Controller
         // DATOS DEL RECEPTOR (NRC)
 
         $receptor_condicion_pago = 'Sin registro';
-        if ( $tipo_documento == '01' || $tipo_documento == '03' )
+        if ($tipo_documento == '01' || $tipo_documento == '03')
             $receptor_condicion_pago = MHCondicionOperacion::where('codigo', $JsonDTE['resumen']['condicionOperacion'])->value('valor');
 
         $receptor_plazo = null;
         $receptor_plazo = MHPlazo::where('codigo', $JsonDTE['resumen']['pagos'][0]['plazo'])->value('valor');
-        
-        $receptor_periodo = $JsonDTE['resumen']['pagos'][0]['periodo']?? null;
+
+        $receptor_periodo = $JsonDTE['resumen']['pagos'][0]['periodo'] ?? null;
 
         // DATOS DEL RECEPTOR (NOMBRE , TELEFONO, CORREO)
         if ($tipo_documento == '14') {
@@ -292,22 +293,22 @@ class PdfController extends Controller
         $tNoSujeta = 0;
         $tExenta = 0;
         $tGravada = 0;
-       
+
         $pro = json_decode($registroDTE->json_productos, true);
         $existCode = false;
         if (is_array($pro) && !empty($pro)) {
-            $existCode= true;
-        } 
-  
-        
+            $existCode = true;
+        }
+
+
         foreach ($aDetalle as $key => $row) {
             $sDesc = str_split($row['descripcion'], 60);
             $codigo = null;
-            if($existCode){
+            if ($existCode) {
                 $codigo = $pro[$key]['codigo'];
             }
 
-            
+
 
             $cantidad = $row['cantidad'];
             $preciouni = $row['precioUni'];
@@ -339,8 +340,8 @@ class PdfController extends Controller
 
             $l1 = '<tr>';
             $l2 = '<td style="text-align: center;width: 7%;">' . $cantidad . '</td>';
-            $l31 = '<td style="text-align: left;;width: 13%;">' .$codigo .  '</td>';
-            $l3 = '<td style="text-align: left;width: 40%;">' . $LaDescrip.  '</td>';
+            $l31 = '<td style="text-align: left;;width: 13%;">' . $codigo .  '</td>';
+            $l3 = '<td style="text-align: left;width: 40%;">' . $LaDescrip .  '</td>';
             $l4 = '<td style="text-align: right;width: 10%;">' . number_format($preciouni, 2) . '</td>';
             $l5 = '<td style="text-align: right;width: 10%;">' . number_format($ventasNoSuj, 2) . '</td>';
             $l6 = '<td style="text-align: right;width: 10%;">' . number_format($ventaExenta, 2) . '</td>';
@@ -348,7 +349,7 @@ class PdfController extends Controller
 
             $l8 = '</tr>';
 
-            $Html_detalle = $Html_detalle . $l1 . $l2 . $l31.$l3 . $l4 . $l5 . $l6 . $l7 . $l8;
+            $Html_detalle = $Html_detalle . $l1 . $l2 . $l31 . $l3 . $l4 . $l5 . $l6 . $l7 . $l8;
         }
 
         $cfoot = '<tr><td><span>.</span></td></tr><tr style="border-top: solid 1px;">
@@ -447,16 +448,17 @@ class PdfController extends Controller
                 'correo' => $receptor_correo,
                 'actividad' => $receptor_descActividad,
                 'condicionPago' => $receptor_condicion_pago,
-                'plazo'=>$receptor_plazo,
-                'periodo'=>$receptor_periodo
+                'plazo' => $receptor_plazo,
+                'periodo' => $receptor_periodo
             ),
             'detalleDoc' => $Html_detalle,
             'dteRel' => $dteRel,
             'tipoDocumento' => $tipo_documento,
-            'comentario'=> $registroDTE->comentario,
-            'productos'=> json_decode($registroDTE->productos, true),
+            'comentario' => $registroDTE->comentario,
+            'productos' => json_decode($registroDTE->productos, true),
+            
         );
-        
+
         // ---------------------------------------------------
         // GENERANDO QR
         // ----------------------------------------------------
@@ -481,10 +483,14 @@ class PdfController extends Controller
         // Codificar en base64
         $qr = base64_encode($qrContent);
 
+        $empresa = Empresa::find($registroDTE->empresa_id);
+        $img = $empresa?->img ?? null;
+
         return array(
             'qr' => $qr,
             'data' => $data,
-            'url' => $url
+            'url' => $url,
+            'img' => $img,
         );
     }
 }

@@ -8,7 +8,6 @@ use App\Models\Empresa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
-use App\Models\Config;
 use App\Help\Help;
 
 class ServicesController extends Controller
@@ -49,12 +48,12 @@ class ServicesController extends Controller
         if ($jsonDTE == null)
             return response()->json(["error" => "Enviar un DTE valido por favor."], Response::HTTP_NOT_FOUND);
 
- 
+
         $jsonDocumento = [
             "nit" => $nit,
             "activo" => true,
             "passwordPri" => $passwordPrivate,
-            "dteJson" => $jsonDTE["dteJson"]??$jsonDTE
+            "dteJson" => $jsonDTE["dteJson"] ?? $jsonDTE
         ];
 
         // $body = json_encode($jsonDocumento);
@@ -64,10 +63,9 @@ class ServicesController extends Controller
         $statusCode = $response->status(); // Obtener el código de estado de la respuesta
 
 
-      
-        if(isset($request['firmanteAutomatico']))
-        {
-            return array("msg"=>$responseData['body'] , "status"=>$statusCode );
+
+        if (isset($request['firmanteAutomatico'])) {
+            return array("msg" => $responseData['body'], "status" => $statusCode);
         }
 
         return response()->json($responseData, $statusCode);
@@ -93,27 +91,22 @@ class ServicesController extends Controller
         $nit = Crypt::decryptString($empresa->nit);
         $pwd = Crypt::decryptString($empresa->credenciales_api);
 
-      
-     
-
-        
-
         $jsonRequest = [
             "user" => $nit,
-            "pwd" => $pwd ,
+            "pwd" => $pwd,
         ];
 
         $requestResponse = Http::timeout(160)
             ->connectTimeout(10)->withHeaders([
-            'Content-Type' => 'application/x-www-form-urlencoded',
-            'User-Agent' => 'ApiLaravel/1.0',
-            "Accept" => "application/json"
+                'Content-Type' => 'application/x-www-form-urlencoded',
+                'User-Agent' => 'ApiLaravel/1.0',
+                "Accept" => "application/json"
 
-        ])->asForm()->post($url . "seguridad/auth", $jsonRequest);
+            ])->asForm()->post($url . "seguridad/auth", $jsonRequest);
 
         $responseData = $requestResponse->json();
         $statusCode = $requestResponse->status();
-     
+
         $empresa->token_mh = $responseData['body']['token'];
         $empresa->save();
         return response()->json($responseData, $statusCode);
@@ -138,23 +131,23 @@ class ServicesController extends Controller
     //! ENDPOINTS DE PRUEBA
     public function desencriptador(Request $request)
     {
-        $texto = $request->query("valor");
+        // $texto = $request->query("valor");
 
-        $nit = Crypt::decryptString($empresa->nit);
-        
+        // $nit = Crypt::decryptString($empresa->nit);
 
-        if (!$texto)
-            return response()->json([
-                "msm" => "El valor es requerido en la petición",
-            ], 400);
 
-        $encrypted = Crypt::decryptString(urldecode($texto));
-        if($nit == "06142806161048"){
-            $encrypted = $encrypted."#";
-        }
+        // if (!$texto)
+        //     return response()->json([
+        //         "msm" => "El valor es requerido en la petición",
+        //     ], 400);
 
-        return response()->json([
-            "texto" => $encrypted,
-        ], 200);
+        // $encrypted = Crypt::decryptString(urldecode($texto));
+        // if ($nit == "06142806161048") {
+        //     $encrypted = $encrypted . "#";
+        // }
+
+        // return response()->json([
+        //     "texto" => $encrypted,
+        // ], 200);
     }
 }

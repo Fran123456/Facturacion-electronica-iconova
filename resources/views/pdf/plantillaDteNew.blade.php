@@ -128,25 +128,22 @@
             <tr>
                 <!-- Columna izquierda: Logo + datos básicos -->
                 <td width="42%" valign="top" style="padding-right: 5px;">
-                    <div
-                        style="background-color: #ffffff; height: 90px; text-align: center; line-height: 50px; font-weight: bold;">
-
-                        <img class="mt-2" src="logoPlanes.png" width="140" height="140" alt="">
-                       <div>
-
-                       </div>
+                    <div style=" text-align:center; height: 120px;">
+                        <img src="{{ $img ? $img : 'logo.jpg' }}" style="max-height: 100%; max-width: 100%;" alt="">
                     </div>
-                    <p>
-                       <h3><strong> {{ $data['emisor']['nombre']}}</strong></h3>
+
+                    <h3><strong> {{ $data['emisor']['nombre'] }}</strong></h3>
                     </p>
-                    <p><strong>NIT:</strong> {{ $data['emisor']['numDoc'] }} / <strong>NRC:</strong> {{ $data['emisor']['nrc'] }} </p>
-                    
+                    <p><strong>NIT:</strong> {{ $data['emisor']['numDoc'] }} / <strong>NRC:</strong>
+                        {{ $data['emisor']['nrc'] }} </p>
+
                     <p style="line-height: 1.5; !important"><strong>Dirección:</strong>
                         {{--  $data['emisor']['municipio'] . ', ' . $data['emisor']['departamento'] . ', ' . $data['emisor']['complemento'] --}}
                         {{ $data['emisor']['complemento'] }}
                     </p>
-                    <p><strong>Teléfono:</strong> {{ $data['emisor']['telefono'] }} / <strong>Correo:</strong> {{ $data['emisor']['correo'] }}</p>
-                   
+                    <p><strong>Teléfono:</strong> {{ $data['emisor']['telefono'] }} / <strong>Correo:</strong>
+                        {{ $data['emisor']['correo'] }}</p>
+
                 </td>
 
                 <!-- Columna derecha: Información de factura -->
@@ -155,14 +152,10 @@
                     <div
                         style="background-color: rgb(59, 61, 62); color: white; text-align: center; padding: 5px; font-weight: bold;">
                         DOCUMENTO TRIBUTARIO ELECTRÓNICO <br>
-                        @if ($data['respuesta']['numControl'] =="" || $data['respuesta']['numControl'] == null)
-
+                        @if ($data['respuesta']['numControl'] == '' || $data['respuesta']['numControl'] == null)
                             <h3>PRE-FACTURA - {{ $data['respuesta']['descripcionTipo'] }}</h3>
-
                         @else
                             <h3>{{ $data['respuesta']['descripcionTipo'] }}</h3>
-
-
                         @endif
 
                         {{-- <h3>{{ $data['respuesta']['tipo'] }}</h3> --}}
@@ -171,15 +164,19 @@
 
                     </div>
                     <div style="background-color: #eee; padding: 8px; font-size: 12px;">
-                        <p  style="font-size: 11px;  !important"><strong>Código de generación:</strong>
+                        <p style="font-size: 11px;  !important"><strong>Código de generación:</strong>
                             {{ $data['respuesta']['codigo'] }}</p>
-                        <p  style="font-size: 11x; !important"><strong>Sello recepción:</strong>
+                        <p style="font-size: 11x; !important"><strong>Sello recepción:</strong>
                             {{ $data['respuesta']['sello'] }}</p>
-                        <p style="font-size: 11px"><strong>Número de control:</strong> {{ $data['respuesta']['numControl'] }}</p>
+                        <p style="font-size: 11px"><strong>Número de control:</strong>
+                            {{ $data['respuesta']['numControl'] }}</p>
                         <p style="font-size: 11px"><strong>Ambiente:</strong> {{ $data['respuesta']['ambiente'] }}</p>
-                        <p style="font-size: 11px"><strong>Versión del JSON:</strong> {{ $data['respuesta']['version'] }}</p>
-                        <p style="font-size: 11px"> <strong>Fecha de emisión:</strong> {{ $data['respuesta']['fecha'] }}</p>
-                        <p style="font-size: 11px"><strong>Hora de emisión:</strong> {{ $data['respuesta']['hora'] }}</p>
+                        <p style="font-size: 11px"><strong>Versión del JSON:</strong>
+                            {{ $data['respuesta']['version'] }}</p>
+                        <p style="font-size: 11px"> <strong>Fecha de emisión:</strong>
+                            {{ $data['respuesta']['fecha'] }}</p>
+                        <p style="font-size: 11px"><strong>Hora de emisión:</strong> {{ $data['respuesta']['hora'] }}
+                        </p>
                     </div>
                 </td>
             </tr>
@@ -215,9 +212,11 @@
                                     @endif
                                 </p>
                                 @if ($data['receptor']['nrc'] != null)
-                                    <p style="margin-bottom:2;"><strong>NRC:</strong> {{ $data['receptor']['nrc'] ?? 'Sin registro' }}</p>
+                                    <p style="margin-bottom:2;"><strong>NRC:</strong>
+                                        {{ $data['receptor']['nrc'] ?? 'Sin registro' }}</p>
                                 @endif
-                                <p style="margin-top:0; margin-bottom:2; line-height:1.5;"><strong>Actividad Económica:</strong> {{ $data['receptor']['actividad'] ?? 'Sin registro' }}</p>
+                                <p style="margin-top:0; margin-bottom:2; line-height:1.5;"><strong>Actividad Económica:</strong>
+                                    {{ $data['receptor']['actividad'] ?? 'Sin registro' }}</p>
                                 <p style="margin-top:0; margin-bottom:2; line-height:1.5;"><strong>Dirección:</strong>
                                     {{--   $data['receptor']['municipio'] . ', ' . $data['receptor']['departamento'] . ', ' . $data['receptor']['complemento'] --}}
                                     @if ($data['receptor']['complemento'] == null || $data['receptor']['complemento'] == '')
@@ -228,19 +227,18 @@
                                 </p>
                                 <p><strong>Teléfono:</strong> {{ $data['receptor']['telefono'] ?? 'Sin registro' }}</p>
                                 <p><strong>Correo:</strong> {{ $data['receptor']['correo'] ?? 'Sin registro' }}</p>
-                                <p><strong>Condición Pago:</strong> {{ $data['receptor']['condicionPago']}}
-                                
-                                    @if ($data['receptor']['plazo'] != null )
-                                       <strong>Plazo:</strong>  {{ $data['receptor']['plazo']}}
+                                <p><strong>Condición Pago:</strong> {{ $data['receptor']['condicionPago'] }}
+
+                                    @if ($data['receptor']['plazo'] != null)
+                                        <strong>Plazo:</strong> {{ $data['receptor']['plazo'] }}
                                     @endif
 
 
-                                    @if ($data['receptor']['periodo'] != null )
-                                       <strong>Periodo:</strong>  {{ $data['receptor']['periodo']}}
+                                    @if ($data['receptor']['periodo'] != null)
+                                        <strong>Periodo:</strong> {{ $data['receptor']['periodo'] }}
                                     @endif
-                                
+
                                 </p>
-                                
                             @break
 
                             @case('01')
@@ -251,7 +249,8 @@
                                         {{ $data['receptor']['nombre'] }}
                                     @endif
                                 </p>
-                                <p style="margin-bottom:2;"><strong>{{ $data['receptor']['tipoDoc'] ? $data['receptor']['tipoDoc'] : 'Documento' }}:</strong>
+                                <p style="margin-bottom:2;">
+                                    <strong>{{ $data['receptor']['tipoDoc'] ? $data['receptor']['tipoDoc'] : 'Documento' }}:</strong>
                                     @if ($data['receptor']['numDoc'] == null || $data['receptor']['numDoc'] == '')
                                         Sin registro
                                     @else
@@ -268,14 +267,14 @@
                                 </p>
                                 <p><strong>Teléfono:</strong> {{ $data['receptor']['telefono'] ?? 'Sin registro' }}</p>
                                 <p><strong>Correo:</strong> {{ $data['receptor']['correo'] ?? 'Sin registro' }}</p>
-                                <p><strong>Condición Pago:</strong> {{ $data['receptor']['condicionPago']}}
-                                 @if ($data['receptor']['plazo'] != null )
-                                       <strong>Plazo:</strong>  {{ $data['receptor']['plazo']}}
+                                <p><strong>Condición Pago:</strong> {{ $data['receptor']['condicionPago'] }}
+                                    @if ($data['receptor']['plazo'] != null)
+                                        <strong>Plazo:</strong> {{ $data['receptor']['plazo'] }}
                                     @endif
 
 
-                                    @if ($data['receptor']['periodo'] != null )
-                                       <strong>Periodo:</strong>  {{ $data['receptor']['periodo']}}
+                                    @if ($data['receptor']['periodo'] != null)
+                                        <strong>Periodo:</strong> {{ $data['receptor']['periodo'] }}
                                     @endif
                                 </p>
                             @break
@@ -332,7 +331,8 @@
 
 
 
-                    <img src="data:image/png;base64, {!! $qr !!}" alt="QR Code" width="160" height="160"  style="margin-button:10px">
+                    <img src="data:image/png;base64, {!! $qr !!}" alt="QR Code" width="160"
+                        height="160" style="margin-button:10px">
 
 
 
@@ -343,49 +343,50 @@
         <br>
 
 
-        
-        @if ($data['respuesta']['tipo_doc']== "05")
-            <table width="100%" style="border-collapse: collapse; margin-bottom: 5px;margin-top:5px"> 
-            <caption style="background-color: #eeeeeeab; font-weight: bold; height: 20px; vertical-align: center;">
-                DOCUMENTO RELACIONADO</caption>
 
-             <thead style="background-color: #eeeeeeab;">
-                <tr>
-                    <th class="table-border">Fecha</th>
-                    <th class="table-border">Codigo Generación</th>
-                    <th class="table-border">Número de control</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="table-border" style="text-align: center;">{{ \Carbon\Carbon::parse($data['dteRel']['fecha_recibido'])->format('d/m/Y') }}</td>
-                    <td class="table-border" style="text-align: center;">{{$data['dteRel']['codigo_generacion']}}</td>
-                    <td class="table-border" style="text-align: center;">{{$data['dteRel']['numero_dte']}}</td>
-                </tr>
-            </tbody>
-        </table>
-        <br>
+        @if ($data['respuesta']['tipo_doc'] == '05')
+            <table width="100%" style="border-collapse: collapse; margin-bottom: 5px;margin-top:5px">
+                <caption style="background-color: #eeeeeeab; font-weight: bold; height: 20px; vertical-align: center;">
+                    DOCUMENTO RELACIONADO</caption>
+
+                <thead style="background-color: #eeeeeeab;">
+                    <tr>
+                        <th class="table-border">Fecha</th>
+                        <th class="table-border">Codigo Generación</th>
+                        <th class="table-border">Número de control</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="table-border" style="text-align: center;">
+                            {{ \Carbon\Carbon::parse($data['dteRel']['fecha_recibido'])->format('d/m/Y') }}</td>
+                        <td class="table-border" style="text-align: center;">{{ $data['dteRel']['codigo_generacion'] }}
+                        </td>
+                        <td class="table-border" style="text-align: center;">{{ $data['dteRel']['numero_dte'] }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <br>
         @endif
 
         @if ($data['comentario'] != null)
-           
-            
-             <caption style="background-color: #eeeeeeab; height: 20px; vertical-align: right; text-align: left">
-                <strong>Comentario: </strong> {{$data['comentario']}}</caption>
+            <caption style="background-color: #eeeeeeab; height: 20px; vertical-align: right; text-align: left">
+                <strong>Comentario: </strong> {{ $data['comentario'] }}
+            </caption>
 
-           
-        
-        <br>
+
+
+            <br>
         @endif
 
-        
+
 
         <table width="100%" style="border-collapse: collapse; margin-bottom: 5px;margin-top:5px">
 
             <caption style="background-color: #eeeeeeab; font-weight: bold; height: 20px; vertical-align: center;">
                 CUERPO DEL DOCUMENTO</caption>
 
-          
+
 
             <thead style="background-color: #eeeeeeab;">
                 <tr>
@@ -408,15 +409,15 @@
                 @endphp
 
 
-                
+
 
             </tbody>
 
         </table>
 
-        
 
-          
+
+
 
 
 
@@ -428,11 +429,9 @@
 
     </div>
 
-@if ($data['respuesta']['anulado']  )
-    
-    
-
-    <div style="
+    @if ($data['respuesta']['anulado'])
+        <div
+            style="
     position: fixed;
     top: 35%;
     left: 5%;
@@ -444,10 +443,9 @@
     text-align: center;
     pointer-events: none;
 ">
-    DOCUMENTO NO VÁLIDO
-</div>
-
-@endif
+            DOCUMENTO NO VÁLIDO
+        </div>
+    @endif
 </body>
 
 </html>

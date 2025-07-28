@@ -83,7 +83,7 @@ class ConsultasController extends Controller
     {
 
         try {
-            $registro = RegistroDTE::with('tipoDocumento')->find($id);
+            $registro = RegistroDTE::with('tipoDocumento')->where('id', $id)->where('empresa_id', Help::getEmpresa()->id)->first();
 
             if (!$registro) {
                 return response()->json(['error' => 'Registro no encontrado'], 404);
@@ -212,6 +212,7 @@ class ConsultasController extends Controller
             }
 
             $query->where('estado', 1);
+            $query->where('empresa_id', Help::getEmpresa()->id);
 
             $registros = $query->get();
 

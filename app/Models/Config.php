@@ -16,6 +16,7 @@ class Config extends Model
         'titulo',
         'key_conf',
         'valor',
+        'empresa_id'
     ];
 
 }

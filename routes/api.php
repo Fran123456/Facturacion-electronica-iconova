@@ -110,11 +110,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/mh/enviar/dte/unitario/cd', [DteCdController::class, 'unitario']); //! No es requerido hacerlo
         Route::post('/mh/enviar/dte/unitario/dcl', [DteDclController::class, 'unitario']);
         Route::post('/mh/enviar/dte/unitario/nr', [DteNrController::class, 'unitario']);
+
+        // Route::get('/pdf/{empresaId}', [PdfController::class, 'test']);
     });
 });
 
 
-Route::get('/pdf/{empresaId}', [PdfController::class, 'test']);
 
 //! ENDPOINTS DE PRUEBA
 Route::get('/encriptador', [ServicesController::class, 'encriptador']);

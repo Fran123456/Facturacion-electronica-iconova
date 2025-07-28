@@ -1,53 +1,30 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Http\Request;
 use App\Help\Services\DteApiMHService;
-use App\Models\User;
-use Exception;
-use Illuminate\Auth\AuthenticationException;
-use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
-use App\Models\Empresa;
-use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\Http;
-use App\Models\Config;
 use App\Help\Help;
-use App\Help\DteCodeValidator;
 use App\Help\DTEHelper\CCFDTE;
-use App\Help\DTEHelper\FACTDTE;
-use App\help\FirmadorElectronico;
-use App\help\Generator;
 use App\Help\LoginMH;
-use Monolog\Handler\FirePHPHandler;
-use JsonSchema\Validator;
-use App\Mail\DteMail;
-use Illuminate\Support\Facades\Mail;
-use App\Help\WhatsappSender;
 use App\Help\DTEIdentificacion\Identificacion;
-use DateTime;
-use App\Help\DTEHelper\FEXDTE;
 use App\Help\DTEIdentificacion\Receptor;
-use App\Models\LogDTE;
-use App\Models\RegistroDTE;
-use Carbon\Carbon;
-use Illuminate\Http\Client\ConnectionException;
-use App\Help\DTEHelper\Anexo;
 use App\Help\Services\SendMailFe;
 
 // ^ COMPROBANTE CREDITO FISCAL
 class DteCCFController extends Controller
 {
     public function enviarDteUnitarioCCF(Request $request)
-    { 
-        
+    {
+
         $empresa = Help::getEmpresa();
         // Login para generar token de Hacienda.
 
         //obtenemos el json desde el request
         $json = $request->json()->all();
         $requestCrudo = $json;
-       
+
 
         //Se valida que si venga algo en el body.
         if (!$json) {
@@ -55,11 +32,11 @@ class DteCCFController extends Controller
         }
 
         //Generamos los pagos tributos
-        $json['pagoTributos']=CCFDTE::makePagoTributo($json['dteJson']['cuerpoDocumento']);
+        $json['pagoTributos'] = CCFDTE::makePagoTributo($json['dteJson']['cuerpoDocumento']);
 
         // VARAIBLES DE CONFIGURACION DEL DTE
         $dte = $json['dteJson'];
-        $cliente = Help::ValidarCliente($dte['receptor']['nit'],$dte['receptor']);
+        $cliente = Help::ValidarCliente($dte['receptor']['nit'], $dte['receptor']);
 
         $tipoDTE = '03';
         $idCliente = $cliente['id'];
@@ -77,7 +54,7 @@ class DteCCFController extends Controller
         $emisor = isset($json['emisor']) ? $json['emisor'] : Identificacion::emisor('03', '20', null);
         [$faltan, $receptor] = Receptor::generar($dte['receptor'], $tipoDTE);
 
-        if ( $faltan )
+        if ($faltan)
             return response()->json($receptor, 404);
 
         // Variables de Documento Relacionado y Cuerpo del Documento
@@ -114,37 +91,41 @@ class DteCCFController extends Controller
 
 
         $responseLogin = LoginMH::login();
-       
-       
-        
+
+
+
 
         if ($responseLogin['code'] != 200) {
-          //  return response()->json(DteCodeValidator::code404($responseLogin['error']), 404);
-             [$responseData, $statusCode, $id] = DteApiMHService::EnviarOfflineMH( $newDTE, $idCliente, $identificacion,
-            $requestCrudo );
-        }else{
-            
-            [$responseData, $statusCode, $id] = DteApiMHService::envidarDTE( $newDTE, $idCliente, $identificacion, $requestCrudo );
+            //  return response()->json(DteCodeValidator::code404($responseLogin['error']), 404);
+            [$responseData, $statusCode, $id] = DteApiMHService::EnviarOfflineMH(
+                $newDTE,
+                $idCliente,
+                $identificacion,
+                $requestCrudo
+            );
+        } else {
+
+            [$responseData, $statusCode, $id] = DteApiMHService::envidarDTE($newDTE, $idCliente, $identificacion, $requestCrudo);
         }
-       
+
         $mailInfo = array(
-            'responseData'=>$responseData,
-            'statusCode'=>$statusCode,
-            'dte'=> $newDTE,
-            'numeroControl'=>$identificacion['numeroControl'],
-            'fecEmi'=> $identificacion['fecEmi'],
-            'horEmi'=> $identificacion['horEmi'],
-            'codigoGeneracion'=> $identificacion['codigoGeneracion'],
-            'id'=>$id
+            'responseData' => $responseData,
+            'statusCode' => $statusCode,
+            'dte' => $newDTE,
+            'numeroControl' => $identificacion['numeroControl'],
+            'fecEmi' => $identificacion['fecEmi'],
+            'horEmi' => $identificacion['horEmi'],
+            'codigoGeneracion' => $identificacion['codigoGeneracion'],
+            'id' => $id
         );
 
 
-       SendMailFe::sending($id,$empresa, $mailInfo, $identificacion, $receptor);
+        SendMailFe::sending($id, $empresa, $mailInfo, $identificacion, $receptor);
 
-        
+
         return response()->json(
-            $mailInfo
-            , $statusCode);
+            $mailInfo,
+            $statusCode
+        );
     }
-
 }
