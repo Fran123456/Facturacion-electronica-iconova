@@ -71,7 +71,8 @@ class PdfController extends Controller
         $url = $data['url'];
         $qr = $data['qr'];
         $data = $data['data'];
-        $pdf = DomPDF::loadView('pdf.plantillaDteNew', compact('data', 'url', 'qr'));  // Carga la vista con los datos
+        $img = $data['img'];
+        $pdf = DomPDF::loadView('pdf.plantillaDteNew', compact('data', 'url', 'qr','img'));  // Carga la vista con los datos
         return $pdf->setPaper('A4', 'portrait');
     }
 
