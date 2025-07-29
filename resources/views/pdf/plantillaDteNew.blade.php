@@ -114,6 +114,25 @@
         .table-border {
             border: 0.5px solid black;
         }
+
+      
+        body {
+            font-family: sans-serif;
+        }
+
+       
+        .watermark {
+    position: fixed;
+    top: 35%;
+    left: 15%;
+    width: 70%;
+    text-align: center;
+    opacity: 0.2;
+    font-size: 80px;
+    transform: rotate(-30deg);
+    z-index: 9999; /* alto, pero no siempre funciona en DOMPDF */
+}
+    
     </style>
 </head>
 
@@ -121,8 +140,16 @@
 
 <body>
 
+     @if ($data['respuesta']['anulado'] == true)
+                <div class="watermark">
+            INVALIDADO
+    </div>
+
+     @endif
+
     <div class="container">
 
+  
         <!-- Encabezado -->
         <table width="100%" style="border-collapse: collapse; margin-bottom: 5px;">
             <tr>
