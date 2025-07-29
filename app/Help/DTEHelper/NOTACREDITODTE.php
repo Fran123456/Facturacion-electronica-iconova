@@ -180,7 +180,7 @@ class NOTACREDITODTE
             'reteRenta' => $reteRenta,
 
             'tributos' => $tributos,
-            'totalLetras' => 'USD ' . $numero_en_letras,
+            'totalLetras' => $numero_en_letras,
             'condicionOperacion' => 1,
         ];
 

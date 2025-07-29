@@ -143,7 +143,7 @@ class CCFDTE
             'reteRenta' => 0.0,
             'totalPagar' => round($totalPagar,2),
             'condicionOperacion' => 1,
-            'totalLetras' => 'USD ' . $numero_en_letras,
+            'totalLetras' =>  $numero_en_letras,
             'saldoFavor' => 0,
             'totalNoGravado' => 0,
             'porcentajeDescuento' => 0.0,

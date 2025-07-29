@@ -160,7 +160,7 @@ class FACTDTE
 
             // OTROS CAMPOS ADICIONALES QUE NO SON DE CALCULOS
             'condicionOperacion' => 1,
-            'totalLetras' => 'USD ' . $total_en_letras,
+            'totalLetras' =>  $total_en_letras,
             'numPagoElectronico' => null,
         ];
 
