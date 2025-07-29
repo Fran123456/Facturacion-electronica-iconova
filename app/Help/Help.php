@@ -312,6 +312,11 @@ class Help
     {
 
         $cliente = Cliente::where('nit', $numDocumento)->orWhere('dui', $numDocumento)->first();
+        if($cliente == null){
+            $cliente = Cliente::where('nrc', $clienteF['nrc'])->first();
+            
+        }
+      
 
         if($cliente ==null){
             $cliente = Cliente::create([

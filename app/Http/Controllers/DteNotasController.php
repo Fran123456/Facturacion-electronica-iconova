@@ -77,6 +77,7 @@ class DteNotasController extends Controller
 
         $emisor = Identificacion::emisor($tipoDTE, null, null, null);
         [$faltan, $receptor] = Receptor::generar($dte['receptor'], $tipoDTE);
+      
 
         if ( $faltan )
             return response()->json($receptor, 404);

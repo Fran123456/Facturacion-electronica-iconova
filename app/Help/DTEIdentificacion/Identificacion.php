@@ -5,6 +5,7 @@ namespace App\Help\DTEIdentificacion;
 use App\Help\Generator;
 use Illuminate\Support\Facades\Crypt;
 use App\Models\MH\MHActividadEconomica;
+use App\Models\MH\MHMunicipio;
 use App\Help\Help;
 
 class Identificacion
@@ -42,8 +43,8 @@ class Identificacion
             "tipoDocResponsable"=> "13",
             "numeroDocResponsable"=> $dui,
             "tipoEstablecimiento"=> $establecimientoTipo,
-            "codEstableMH"=> $codigoEstablecimiento,
-            "codPuntoVenta"=> $codPuntoVenta,
+            "codEstableMH"=>'M001' /*codigoEstablecimiento*/,
+            "codPuntoVenta"=> 'P001'/*$codPuntoVenta*/,
             "telefono" => $telefono,
             "correo" => $correo,
         ];
@@ -116,7 +117,7 @@ class Identificacion
             "descActividad" => $actividad->valor,
             "direccion" => [
                 "departamento" => $empresa->departamento,
-                "municipio" => $empresa->municipio,
+                "municipio" =>  MHMunicipio::where('codigo',$empresa->municipio)->where('departamento','06')->first()?->codigo ?? "23",
                 "complemento" => $empresa->direccion
             ],
             "telefono" => $telefono,
@@ -136,19 +137,19 @@ class Identificacion
 
         $excepciones1 = ["05", "07", "06", "09"];
         if (!in_array($tipoDoc, $excepciones1)) { //PARA FACTURA DIFERENTE DE EXPORTACION
-            $emisor["codEstableMH"] = $empresa->codigo_establecimiento;
-            $emisor["codEstable"] =  null;
-            $emisor["codPuntoVenta"] =  null;
-            $emisor["codPuntoVentaMH"] =  $puntoDeVentaCodigo ?? $empresa->codigo_establecimiento;
+            $emisor["codEstableMH"] ="M001" /*$empresa->codigo_establecimiento*/;
+            $emisor["codEstable"] =  "M001";
+            $emisor["codPuntoVenta"] =  "P001";
+            $emisor["codPuntoVentaMH"] = "P001" /*$puntoDeVentaCodigo ?? $empresa->codigo_establecimiento*/;
         }
 
         $grupo1 = ["07", "09"];
         if (in_array($tipoDoc, $grupo1)) {
 
-            $emisor["codigoMH"] = $empresa->codigo_establecimiento;
+            $emisor["codigoMH"] =/* $empresa->codigo_establecimiento*/"M001";
             $emisor["codigo"] =  null;
-            $emisor["puntoVenta"] =  null;
-            $emisor["puntoVentaMH"] =  $puntoDeVentaCodigo ?? $empresa->codigo_establecimiento;
+            $emisor["puntoVenta"] =  "P001";
+            $emisor["puntoVentaMH"] = "P001"/* $puntoDeVentaCodigo ?? $empresa->codigo_establecimiento*/;
         }
 
         return $emisor;

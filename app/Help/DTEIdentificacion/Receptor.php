@@ -69,6 +69,12 @@ class Receptor
                  $receptorDte['nrc']=  str_replace('-', '', $receptorDte['nrc']);
             }
 
+            if(isset($receptorDte['nit'])){
+                 $cliente->nit = $receptorDte['nit'];
+                $cliente->save();
+            }
+           
+
             $update = self::updateCliente($receptorDte);
            
             $cliente->update($update);

@@ -39,6 +39,7 @@ class LoginMH {
             "user" => $nit,
             "pwd" => $pwd,
         ];
+  
 
         try {
             $requestResponse = Http::withHeaders([
@@ -53,6 +54,7 @@ class LoginMH {
 
         $responseData = $requestResponse->json();
         $statusCode = $requestResponse->status();
+        
         $empresa->token_mh = $responseData['body']['token'];
         $empresa->save();
         return array(["error" => "login correcto",'code'=>200])[0];
