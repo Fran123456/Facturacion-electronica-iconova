@@ -42,12 +42,15 @@ class FirmadorElectronico
             "passwordPri" => $passwordPrivate,
             "dteJson" => $jsonDTE
         ];
+       
         
-
+        
         $url = Help::urlFirmador() . "firmardocumento/";
         $response = Http::post($url, $jsonDocumento);
-
+        
         $responseData = $response->json();
+
+   
         $statusCode = $response->status();
         $value = $responseData['body'];
 

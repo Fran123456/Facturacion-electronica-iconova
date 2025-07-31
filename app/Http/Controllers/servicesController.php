@@ -114,6 +114,7 @@ class ServicesController extends Controller
 
     public function encriptador(Request $request)
     {
+        
         $texto = $request->query("valor");
 
         if (!$texto)
@@ -131,9 +132,10 @@ class ServicesController extends Controller
     //! ENDPOINTS DE PRUEBA
     public function desencriptador(Request $request)
     {
-        // $texto = $request->query("valor");
+         $texto = $request->query("valor");
 
-        // $nit = Crypt::decryptString($empresa->nit);
+         $encrypted = Crypt::decryptString( $texto);
+         
 
 
         // if (!$texto)
@@ -146,8 +148,8 @@ class ServicesController extends Controller
         //     $encrypted = $encrypted . "#";
         // }
 
-        // return response()->json([
-        //     "texto" => $encrypted,
-        // ], 200);
+         return response()->json([
+             "texto" => $encrypted,
+         ], 200);
     }
 }
