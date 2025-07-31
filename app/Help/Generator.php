@@ -65,7 +65,7 @@ class Generator
         return $digitos;
     }
 
-    public static function generateNumControl($tipoDoc, $codigoEmpresa = "EIV6XMQ0")
+    public static function generateNumControl($tipoDoc, $codigoEmpresa = "M001P001")
     {
 
         $registroContadorDTE = null;

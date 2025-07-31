@@ -37,7 +37,10 @@ class LoginMH
             "user" => $nit,
             "pwd" => $pwd,
         ];
+<<<<<<< Updated upstream
   
+=======
+>>>>>>> Stashed changes
         
 
 
@@ -50,12 +53,14 @@ class LoginMH
                     "Accept" => "application/json"
 
                 ])->asForm()->post($url . "seguridad/auth", $jsonRequest);
+
         } catch (Exception $e) {
             return array(["error" => "No se pudo conectar con la  API de Ministerio hacienda", 'code' => 500])[0];
         }
 
 
         $responseData = $requestResponse->json();
+        
         $statusCode = $requestResponse->status();
         $empresa->token_mh = $responseData['body']['token'];
         $empresa->save();
