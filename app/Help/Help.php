@@ -53,7 +53,7 @@ class Help
     public static function urlFirmador()
     {
         return Config::where('key_conf', "FIRMADOR_URL_BASE")
-            ->where('empresa_id', self::getEmpresa()->id)
+            ->where('empresa_id', self::getEmpresa()?->id)
             ->first()?->valor;
     }
 
@@ -79,7 +79,7 @@ class Help
     public static function getEmpresa()
     {
         $usuario = Auth::user();
-        $empresa  =  Empresa::find($usuario->empresa_id);
+        $empresa  =  Empresa::find($usuario?->empresa_id);
         return $empresa;
     }
 
