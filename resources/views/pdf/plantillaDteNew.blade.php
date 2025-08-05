@@ -128,7 +128,7 @@
             <tr>
                 <!-- Columna izquierda: Logo + datos básicos -->
                 <td width="42%" valign="top" style="padding-right: 5px;">
-                    <div style=" text-align:center; height: 120px;">
+                    <div style=" text-align:center; height: 80px; padding-top:10px" class="">
                         <img src="{{ $img ? $img : 'logo.jpg' }}" style="max-height: 100%; max-width: 100%;" alt="">
                     </div>
 
@@ -150,18 +150,14 @@
                 <td width="58%" valign="top" style="padding-left: 10px;">
                     <br>
                     <div
-                        style="background-color: rgb(59, 61, 62); color: white; text-align: center; padding: 5px; font-weight: bold;">
+                        style="background-color: rgb(59, 61, 62); color: white; text-align: center; padding-top:15px; padding-bottom:4px;
+                        font-weight: bold;">
                         DOCUMENTO TRIBUTARIO ELECTRÓNICO <br>
                         @if ($data['respuesta']['numControl'] == '' || $data['respuesta']['numControl'] == null)
                             <h3>PRE-FACTURA - {{ $data['respuesta']['descripcionTipo'] }}</h3>
                         @else
                             <h3>{{ $data['respuesta']['descripcionTipo'] }}</h3>
                         @endif
-
-                        {{-- <h3>{{ $data['respuesta']['tipo'] }}</h3> --}}
-
-
-
                     </div>
                     <div style="background-color: #eee; padding: 8px; font-size: 12px;">
                         <p style="font-size: 11px;  !important"><strong>Código de generación:</strong>

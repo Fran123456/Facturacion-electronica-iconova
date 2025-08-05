@@ -72,7 +72,9 @@ class DteFcController extends Controller
         $periodoPago = isset($json['periodo_pago']) ? $json['periodo_pago'] :  null;
         $plazoPago = isset($json['plazo_pago']) ? $json['plazo_pago'] :  null;
         $operacion = isset($json['operacion']) ? $json['operacion'] :  1;
-        $resumen = FACTDTE::Resumen($cuerpoDocumento, $dte['receptor']['grancontribuyente'] ?? false,
+
+        $retension = $dte['retension'] >0 ? true: false;
+        $resumen = FACTDTE::Resumen($cuerpoDocumento, $dte['receptor']['grancontribuyente'] ??  $retension,
         $pagoTributos, $codigoPago, $periodoPago, $plazoPago, $operacion);
 
         // Variables de Documento Relacionado y Cuerpo del Documento
@@ -108,11 +110,9 @@ class DteFcController extends Controller
         //print_r(json_encode($newDTE));
         //return;
         $responseLogin = LoginMH::login();
-<<<<<<< Updated upstream
-      
-=======
+       
         
->>>>>>> Stashed changes
+        
        
         
       

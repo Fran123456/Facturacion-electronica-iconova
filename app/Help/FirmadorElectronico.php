@@ -36,17 +36,19 @@ class FirmadorElectronico
               //if($nit == "06142806161048"){
                 //  $passwordPrivate  = $passwordPrivate. "#";
                 // }
-        $jsonDocumento = [
+        
+        
+         $jsonDocumento = [
             "nit" => $nit,
             "activo" => true,
             "passwordPri" => $passwordPrivate,
             "dteJson" => $jsonDTE
         ];
        
-        
-        
         $url = Help::urlFirmador() . "firmardocumento/";
         $response = Http::post($url, $jsonDocumento);
+
+        
         
         $responseData = $response->json();
 

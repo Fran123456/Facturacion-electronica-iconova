@@ -135,11 +135,21 @@ class Generator
 
     public static function generateStringFromNumber($number)
     {
-        $numero_str = strval($number);
+       /* $numero_str = strval($number);
         $partes = explode('.', $numero_str);
         $entero = isset($partes[0]) ? intval($partes[0]) : 0;
         $decimal = isset($partes[1]) ? intval($partes[1]) : 0;
 
-        return Help::numberToString($entero) . " con " . Help::numberToString($decimal);
+        return Help::numberToString($entero) . " con " . Help::numberToString($decimal);*/
+
+        $formatter = new \NumberFormatter('es', \NumberFormatter::SPELLOUT);
+
+        $entero = floor($number);
+        $centavos = round(($number - $entero) * 100);
+
+        $texto = strtoupper($formatter->format($entero));
+        $centavosTexto = str_pad($centavos, 2, '0', STR_PAD_LEFT);
+
+        return "{$texto} {$centavosTexto}/100 USD";
     }
 }

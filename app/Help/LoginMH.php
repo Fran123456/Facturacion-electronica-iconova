@@ -37,10 +37,7 @@ class LoginMH
             "user" => $nit,
             "pwd" => $pwd,
         ];
-<<<<<<< Updated upstream
   
-=======
->>>>>>> Stashed changes
         
 
 

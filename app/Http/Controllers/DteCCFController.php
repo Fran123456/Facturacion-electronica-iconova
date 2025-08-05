@@ -65,10 +65,19 @@ class DteCCFController extends Controller
 
 
         $cuerpoDocumento = CCFDTE::makeCuerpoDocumento($cuerpoDocumento);
+       
+        
+
+
+        $pagoTributos = isset($json['pagoTributos']) ? $json['pagoTributos'] : null;
         $codigoPago = isset($json['codigo_pago']) ? $json['codigo_pago'] : "01";
-        $periodoPago = isset($json['periodo_pago']) ? $json['periodo_pago'] : null;
-        $plazoPago = isset($json['plazo_pago']) ? $json['plazo_pago'] : null;
-        $resumen = CCFDTE::Resumen($cuerpoDocumento, $dte['receptor']['grancontribuyente'], $json['pagoTributos'], $codigoPago, $periodoPago, $plazoPago);
+        $periodoPago = isset($json['periodo_pago']) ? $json['periodo_pago'] :  null;
+        $plazoPago = isset($json['plazo_pago']) ? $json['plazo_pago'] :  null;
+        $operacion = isset($json['operacion']) ? $json['operacion'] :  1;
+        $retension = $dte['retension'] >0 ? true: false;
+
+       
+        $resumen = CCFDTE::Resumen($cuerpoDocumento,  $retension, $json['pagoTributos'], $codigoPago, $periodoPago, $plazoPago, $operacion);
 
         // Variables de Extensión y Apéndice
         $extension = isset($json['extension']) ? $json['extension'] : null;
@@ -88,6 +97,8 @@ class DteCCFController extends Controller
             'extension' => $extension,
             'apendice' => $apendice
         ];
+      
+        
 
 
         $responseLogin = LoginMH::login();

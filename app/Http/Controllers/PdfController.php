@@ -198,7 +198,9 @@ class PdfController extends Controller
             $receptor_condicion_pago = MHCondicionOperacion::where('codigo', $JsonDTE['resumen']['condicionOperacion'])->value('valor');
 
         $receptor_plazo = null;
-        $receptor_plazo = MHPlazo::where('codigo', $JsonDTE['resumen']['pagos'][0]['plazo'])->value('valor');
+        if(isset($JsonDTE['resumen']['pagos'][0]['plazo'])){
+            $receptor_plazo = MHPlazo::where('codigo', $JsonDTE['resumen']['pagos'][0]['plazo'] )->value('valor');
+        }
 
         $receptor_periodo = $JsonDTE['resumen']['pagos'][0]['periodo'] ?? null;
 

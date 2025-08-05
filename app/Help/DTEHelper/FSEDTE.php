@@ -3,7 +3,7 @@
 namespace App\Help\DTEHelper;
 
 use App\Help\Generator;
-
+use App\Help\Help;
 class FSEDTE
 {
 
@@ -21,7 +21,8 @@ class FSEDTE
         return $cuerpo;
     }
 
-    public static function resumen($cuerpo)
+    public static function resumen($cuerpo,  $pagoTributos,$codigoPago, $periodoPago = null,
+    $plazoPago = null, $operacion = 1)
     {
 
         // VARIABLES PARA GUARDAR CALCULOS APARTIR DE LOS ITEMS DEL CUERPO DEL DOCUMENTO
@@ -35,7 +36,7 @@ class FSEDTE
         $ivaRete1 = 0.0;
         $reteRenta = 0.0;
 
-        $pagos = null;
+        $pagos = array();
         $observaciones = null;
 
         // VARIABLES DE PROCESO PARA GUARDAR VALORES A USAR AFUERA DEL CICLO FOREACH
@@ -45,7 +46,7 @@ class FSEDTE
             $compraItem = $value['compra'];
             $cantidadItem = $value['cantidad'];
             $precioUniItem = $value['precioUni'];
-            $montoDescuItem = $value['montoDescu'];
+            $montoDescuItem = 0;
 
             $subTotalItem = $precioUniItem * $cantidadItem - $montoDescuItem;
             $retencionItem = $subTotalItem * 0.1;
@@ -57,6 +58,17 @@ class FSEDTE
             $reteRenta += $renta;
             $totalPagar += $subTotalItem -  $renta;
 
+            $descripcionPago = Help::getPayWay($codigoPago);
+
+            $pago = [
+                "codigo" => $codigoPago,
+                "montoPago" => $subTotalItem -  $renta,
+                "referencia" => $descripcionPago,
+                "periodo" => (int)$periodoPago,
+                "plazo" => $plazoPago
+            ];
+            array_push($pagos, $pago);
+
             
         }
 
@@ -64,6 +76,8 @@ class FSEDTE
         $totalPagar = round($totalPagar, 2);
 
         $totalLetras = Generator::generateStringFromNumber($totalPagar);
+
+        $condicionOperacion = $operacion;
 
         return compact(
             'totalCompra',
@@ -76,6 +90,7 @@ class FSEDTE
             'reteRenta',
             'pagos',
             'observaciones',
+            'condicionOperacion'
         );
     }
 }

@@ -29,7 +29,7 @@ class DteFseController extends Controller
 
         //* VARAIBLES DE CONFIGURACION DEL DTE
         $dte = $json['dteJson'];
-        $condicionOperacion = $json['condicionOperacion'];
+        $condicionOperacion = $json['operacion'];
         //  $cliente = Help::getClienteId($dte['sujetoExcluido']['numDocumento']);
         $cliente = Help::ValidarCliente($dte['sujetoExcluido']['numDocumento'], $dte['sujetoExcluido']);
         $tipoDTE = '14';
@@ -53,7 +53,16 @@ class DteFseController extends Controller
         //* Variables de Cuerpo y Resumen
         $cuerpoDocumento = $dte['cuerpoDocumento'] ?? null;
         $cuerpoDocumento = FSEDTE::cuerpo($cuerpoDocumento);
-        $resumen = FSEDTE::resumen($cuerpoDocumento);
+
+
+        $pagoTributos = isset($json['pagoTributos']) ? $json['pagoTributos'] : null;
+        $codigoPago = isset($json['codigo_pago']) ? $json['codigo_pago'] : "01";
+        $periodoPago = isset($json['periodo_pago']) ? $json['periodo_pago'] :  null;
+        $plazoPago = isset($json['plazo_pago']) ? $json['plazo_pago'] :  null;
+        $operacion = isset($json['operacion']) ? $json['operacion'] :  1;
+
+        $resumen = FSEDTE::resumen($cuerpoDocumento,
+        $pagoTributos, $codigoPago, $periodoPago, $plazoPago, $operacion);
 
         $cuerpoDocumento = array_map(function ($item) {
             if (isset($item['renta'])) {
@@ -74,8 +83,8 @@ class DteFseController extends Controller
             'resumen',
             'apendice'
         );
+        
 
-        // return $newDTE;
 
         $responseLogin = LoginMH::login();
         $requestCrudo = $json;

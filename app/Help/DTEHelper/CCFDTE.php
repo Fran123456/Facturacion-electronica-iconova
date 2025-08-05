@@ -8,7 +8,9 @@ use App\Help\Help;
 class CCFDTE
 {
 
-    public static function Resumen($cuerpo, $granContribuyente, $pagoTributos, $codigoPago, $plazoPago = null, $periodoPago = null)
+
+    public static function Resumen($cuerpo, $granContribuyente, $pagoTributos, $codigoPago, $periodoPago = null, 
+    $plazoPago = null, $operacion = 1)
     {
         $resumen = [];
 
@@ -104,7 +106,7 @@ class CCFDTE
             "codigo" => $codigoPago,
             "montoPago" => round($totalPagar,2),
             "referencia" => $descripcionPago,
-            "periodo" => $periodoPago,
+            "periodo" => (int) $periodoPago,
             "plazo" => $plazoPago
         ];
 
@@ -137,7 +139,7 @@ class CCFDTE
             'ivaRete1' => $ivaRetenida,
             'reteRenta' => 0.0,
             'totalPagar' => round($totalPagar,2),
-            'condicionOperacion' => 1,
+             'condicionOperacion' => (int)$operacion,
             'totalLetras' => 'USD ' . $numero_en_letras,
             'saldoFavor' => 0,
             'totalNoGravado' => 0,

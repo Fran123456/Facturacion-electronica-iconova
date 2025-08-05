@@ -202,6 +202,8 @@ class DteApiMHService
 
             // FIRMAR DTE
              $DTESigned = FirmadorElectronico::firmador($dte);
+
+            
            
 
             $registoDTE['dte_firmado'] =  $DTESigned ;
@@ -210,6 +212,9 @@ class DteApiMHService
             }
             $registoDTE->save();
 
+           
+            //inicio
+           
             $jsonRequest = [
                 'ambiente' => $empresa->ambiente,
                 'idEnvio' => 1,
@@ -219,6 +224,7 @@ class DteApiMHService
                 'codigoGeneracion' => $identificacion['codigoGeneracion'],
                 'nitEmisor' => Crypt::decryptString($empresa->nit)
             ];
+          
 
             $requestResponse = Http::timeout(160)
             ->connectTimeout(10)->withHeaders([
@@ -226,6 +232,13 @@ class DteApiMHService
                 'User-Agent' => 'ApiLaravel/1.0',
                 'Content-Type' => 'application/JSON'
             ])->post($url . "fesv/recepciondte", $jsonRequest);
+
+        
+
+            //fin
+
+
+
 
             $responseData = $requestResponse->json();
             $statusCode = $requestResponse->status();
