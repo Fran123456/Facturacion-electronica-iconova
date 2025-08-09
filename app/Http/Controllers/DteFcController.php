@@ -100,6 +100,7 @@ class DteFcController extends Controller
             'apendice' => $apendice
         ];
        
+       
         // return response()->json($newDTE);
             
 
@@ -110,6 +111,7 @@ class DteFcController extends Controller
         //print_r(json_encode($newDTE));
         //return;
         $responseLogin = LoginMH::login();
+        
        
         
         

@@ -32,12 +32,12 @@ class SendMailFe
             try{
 
                 if($dteActual->id_cliente != 1 && $correoCliente  != null){
-                    /*  Mail::to([$correoCliente, 'facturacion.inplan@gmail.com'])
+                      Mail::to([$correoCliente, 'documentosdte@ninjawebcorporation.com'])
                         ->send((new DteMail($nombreCliente, $correoEmpresa, $telefono, $mailInfo))
                         ->from($correoEmpresa, $nombreEmpresa));
 
                         $dteActual->anexo = $correoCliente;
-                        $dteActual->save();*/
+                        $dteActual->save();
                 }else{
                     $dteActual->anexo = "No se ha mandado el correo";
                     $dteActual->save();

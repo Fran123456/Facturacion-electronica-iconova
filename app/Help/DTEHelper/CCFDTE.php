@@ -95,18 +95,27 @@ class CCFDTE
 
         // Redondear el subtotal
         $subTotal = round($subTotal, 2);
+       
 
         // Calcular el monto total de la operación
         $montoTotal = $subTotal + $totalImpuestos;
 
         // Calcular el total a pagar
-        $totalPagar = number_format(($subTotal + $totalImpuestos - $ivaRetenida), 2);
+        $totalPagar =   (float)($subTotal + $totalImpuestos - $ivaRetenida);
 
+        
+        if($codigoPago == "01"){
+          $periodoPago =  (int) $periodoPago;
+        }
+        if($periodoPago == 0 && $codigoPago == "01"){
+            $periodoPago = null;
+        }
+       
         $pagos[] = [
             "codigo" => $codigoPago,
             "montoPago" => round($totalPagar,2),
             "referencia" => $descripcionPago,
-            "periodo" => (int) $periodoPago,
+            "periodo" =>$periodoPago ,
             "plazo" => $plazoPago
         ];
 
@@ -182,13 +191,20 @@ class CCFDTE
     public static function makePagoTributo($cuerpoDocumento){
         $pagosTributos = array();
         foreach ($cuerpoDocumento as $key => $value) {
-            if($value['iva']>0){
+            if(isset($value['iva'])){
+                if($value['iva']>0){
                 $aux = array("20"=> $value['iva']);
                 array_push($pagosTributos, $aux);
-            }else{
-                $aux = array("D5"=> 0);
-                array_push($pagosTributos, $aux);
+                }else{
+                    $aux = array("D5"=> 0);
+                    array_push($pagosTributos, $aux);
+                }
             }
+
+          
+
+
+          
         }
         return  $pagosTributos;
     }

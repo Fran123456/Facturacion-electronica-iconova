@@ -70,8 +70,9 @@ class PdfController extends Controller
 
         $url = $data['url'];
         $qr = $data['qr'];
-        $data = $data['data'];
         $img = $data['img'];
+        $data = $data['data'];
+        
         $pdf = DomPDF::loadView('pdf.plantillaDteNew', compact('data', 'url', 'qr','img'));  // Carga la vista con los datos
         return $pdf->setPaper('A4', 'portrait');
     }
@@ -437,7 +438,7 @@ class PdfController extends Controller
                 'fecha' => $fecha_emision,
                 'hora' => $hora_emision,
                 'tipo_doc' => $tipo_documento,
-                'anulado' => $registroDTE->anulado
+                'anulado' => $registroDTE->invalidacion_id != null ? true:false
             ),
             'receptor' => array(
                 'nombre' => $receptor_nombre,
@@ -487,7 +488,7 @@ class PdfController extends Controller
         $qr = base64_encode($qrContent);
 
         $empresa = Empresa::find($registroDTE->empresa_id);
-        $img = $empresa?->img ?? null;
+        $img = $empresa?->img ?? 'logo-nw.png';
 
         return array(
             'qr' => $qr,

@@ -114,7 +114,29 @@
         .table-border {
             border: 0.5px solid black;
         }
+
+ 
+    
+
     </style>
+
+    @if ($data['respuesta']['anulado'])
+        <style>
+            body::before {
+        content: "INVALIDADO";
+        position: fixed;
+        top: 20%;
+        left: 0%;
+        font-size: 140px;
+        color: rgba(255, 0, 0, 0.2);
+        transform: rotate(-30deg);
+        z-index: 9999;
+        width: 100%;
+        text-align: center;
+        pointer-events: none;
+    }
+        </style>
+    @endif
 </head>
 
 
@@ -135,7 +157,7 @@
                     <h3><strong> {{ $data['emisor']['nombre'] }}</strong></h3>
                     </p>
                     <p><strong>NIT:</strong> {{ $data['emisor']['numDoc'] }} / <strong>NRC:</strong>
-                        {{ $data['emisor']['nrc'] }} </p>
+                        {{ $data['emisor']['nrc'] }}  </p>
 
                     <p style="line-height: 1.5; !important"><strong>Dirección:</strong>
                         {{--  $data['emisor']['municipio'] . ', ' . $data['emisor']['departamento'] . ', ' . $data['emisor']['complemento'] --}}
@@ -425,23 +447,7 @@
 
     </div>
 
-    @if ($data['respuesta']['anulado'])
-        <div
-            style="
-    position: fixed;
-    top: 35%;
-    left: 5%;
-    width: 100%;
-    font-size: 80px;
-    color: rgba(12, 12, 12, 0.4);
-    transform: rotate(-30deg);
-    z-index: -1;
-    text-align: center;
-    pointer-events: none;
-">
-            DOCUMENTO NO VÁLIDO
-        </div>
-    @endif
+ 
 </body>
 
 </html>

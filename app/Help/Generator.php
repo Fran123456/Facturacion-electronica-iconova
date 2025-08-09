@@ -100,8 +100,10 @@ class Generator
             $generated .= '-' . $digitos;
 
             $empresa->save();
+        
             return $generated;
         }
+     
 
         return null;
     }
@@ -135,6 +137,9 @@ class Generator
 
     public static function generateStringFromNumber($number)
     {
+        $number = Generator::toFloatSafe($number);
+       
+       
        /* $numero_str = strval($number);
         $partes = explode('.', $numero_str);
         $entero = isset($partes[0]) ? intval($partes[0]) : 0;
@@ -152,4 +157,30 @@ class Generator
 
         return "{$texto} {$centavosTexto}/100 USD";
     }
+
+    public static function toFloatSafe(string $number): float
+    {
+        // Quitar espacios y asegurarse de que es un string plano
+        $number = trim($number);
+
+        // Si ya es numérico puro, retornar como float directamente
+        if (is_numeric($number)) {
+            return (float) $number;
+        }
+
+        // Eliminar separadores de miles si vienen como ","
+        // y asegurar que el punto sea el separador decimal
+        $normalized = str_replace(',', '', $number);
+
+        // Validar que después de limpiar sigue siendo numérico
+        if (is_numeric($normalized)) {
+            return (float) $normalized;
+        }
+
+        // Si no se puede convertir de forma segura, retornar 0.0 o lanzar excepción
+        return 0.0;
+    }
+
+
+    
 }
